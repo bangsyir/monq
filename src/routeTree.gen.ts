@@ -9,13 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PlacesRouteImport } from './routes/places'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LayoutRouteRouteImport } from './routes/_layout/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PlacesIndexRouteImport } from './routes/places.index'
+import { Route as PlacesPlaceIdRouteImport } from './routes/places.$placeId'
 import { Route as LayoutDashboardRouteImport } from './routes/_layout/dashboard'
 import { Route as LayoutAdminRouteImport } from './routes/_layout/admin'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
 
+const PlacesRoute = PlacesRouteImport.update({
+  id: '/places',
+  path: '/places',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -29,6 +37,16 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PlacesIndexRoute = PlacesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PlacesRoute,
+} as any)
+const PlacesPlaceIdRoute = PlacesPlaceIdRouteImport.update({
+  id: '/$placeId',
+  path: '/$placeId',
+  getParentRoute: () => PlacesRoute,
 } as any)
 const LayoutDashboardRoute = LayoutDashboardRouteImport.update({
   id: '/dashboard',
@@ -49,8 +67,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/places': typeof PlacesRouteWithChildren
   '/admin': typeof LayoutAdminRoute
   '/dashboard': typeof LayoutDashboardRoute
+  '/places/$placeId': typeof PlacesPlaceIdRoute
+  '/places/': typeof PlacesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
@@ -58,6 +79,8 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/admin': typeof LayoutAdminRoute
   '/dashboard': typeof LayoutDashboardRoute
+  '/places/$placeId': typeof PlacesPlaceIdRoute
+  '/places': typeof PlacesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
@@ -65,22 +88,43 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_layout': typeof LayoutRouteRouteWithChildren
   '/login': typeof LoginRoute
+  '/places': typeof PlacesRouteWithChildren
   '/_layout/admin': typeof LayoutAdminRoute
   '/_layout/dashboard': typeof LayoutDashboardRoute
+  '/places/$placeId': typeof PlacesPlaceIdRoute
+  '/places/': typeof PlacesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/admin' | '/dashboard' | '/api/auth/$'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/places'
+    | '/admin'
+    | '/dashboard'
+    | '/places/$placeId'
+    | '/places/'
+    | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/admin' | '/dashboard' | '/api/auth/$'
+  to:
+    | '/'
+    | '/login'
+    | '/admin'
+    | '/dashboard'
+    | '/places/$placeId'
+    | '/places'
+    | '/api/auth/$'
   id:
     | '__root__'
     | '/'
     | '/_layout'
     | '/login'
+    | '/places'
     | '/_layout/admin'
     | '/_layout/dashboard'
+    | '/places/$placeId'
+    | '/places/'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
@@ -88,11 +132,19 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LayoutRouteRoute: typeof LayoutRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
+  PlacesRoute: typeof PlacesRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/places': {
+      id: '/places'
+      path: '/places'
+      fullPath: '/places'
+      preLoaderRoute: typeof PlacesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -113,6 +165,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/places/': {
+      id: '/places/'
+      path: '/'
+      fullPath: '/places/'
+      preLoaderRoute: typeof PlacesIndexRouteImport
+      parentRoute: typeof PlacesRoute
+    }
+    '/places/$placeId': {
+      id: '/places/$placeId'
+      path: '/$placeId'
+      fullPath: '/places/$placeId'
+      preLoaderRoute: typeof PlacesPlaceIdRouteImport
+      parentRoute: typeof PlacesRoute
     }
     '/_layout/dashboard': {
       id: '/_layout/dashboard'
@@ -152,10 +218,24 @@ const LayoutRouteRouteWithChildren = LayoutRouteRoute._addFileChildren(
   LayoutRouteRouteChildren,
 )
 
+interface PlacesRouteChildren {
+  PlacesPlaceIdRoute: typeof PlacesPlaceIdRoute
+  PlacesIndexRoute: typeof PlacesIndexRoute
+}
+
+const PlacesRouteChildren: PlacesRouteChildren = {
+  PlacesPlaceIdRoute: PlacesPlaceIdRoute,
+  PlacesIndexRoute: PlacesIndexRoute,
+}
+
+const PlacesRouteWithChildren =
+  PlacesRoute._addFileChildren(PlacesRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LayoutRouteRoute: LayoutRouteRouteWithChildren,
   LoginRoute: LoginRoute,
+  PlacesRoute: PlacesRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

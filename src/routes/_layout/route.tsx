@@ -1,24 +1,24 @@
-import { buttonVariants } from '@/components/ui/button'
+import { buttonVariants } from "@/components/ui/button"
 import {
   createFileRoute,
   Link,
   Outlet,
   redirect,
   useRouter,
-} from '@tanstack/react-router'
-import { GalleryVerticalEnd, LogOut } from 'lucide-react'
-import { authClient } from '@/lib/auth-client'
-import { getUser } from '@/lib/auth-server-func'
-export const Route = createFileRoute('/_layout')({
+} from "@tanstack/react-router"
+import { GalleryVerticalEnd, LogOut } from "lucide-react"
+import { authClient } from "@/lib/auth-client"
+import { getUser } from "@/lib/auth-server-func"
+export const Route = createFileRoute("/_layout")({
   component: RouteComponent,
 
-  beforeLoad: () => {
-    const user = getUser()
+  beforeLoad: async () => {
+    const user = await getUser()
     return { user }
   },
   loader: async ({ context, location }) => {
     if (!context) {
-      throw redirect({ to: '/login', search: location.href })
+      throw redirect({ to: "/login", search: location.href })
     }
     return { user: context.user }
   },
@@ -31,7 +31,7 @@ function RouteComponent() {
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          router.navigate({ to: '/login' })
+          router.navigate({ to: "/login" })
         },
       },
     })
@@ -60,8 +60,8 @@ function RouteComponent() {
               <button
                 onClick={handleLogout}
                 className={buttonVariants({
-                  size: 'sm',
-                  variant: 'outline',
+                  size: "sm",
+                  variant: "outline",
                 })}
               >
                 <LogOut className="size-4 mr-2" />
@@ -71,7 +71,7 @@ function RouteComponent() {
           ) : (
             <Link
               to="/login"
-              className={buttonVariants({ size: 'sm', variant: 'outline' })}
+              className={buttonVariants({ size: "sm", variant: "outline" })}
             >
               login
             </Link>

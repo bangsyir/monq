@@ -1,21 +1,21 @@
-import { createFileRoute, Link, redirect } from '@tanstack/react-router'
-import { GalleryVerticalEnd } from 'lucide-react'
-import { LoginForm } from '@/components/login-form'
-import { createServerFn } from '@tanstack/react-start'
-import { getRequestHeaders } from '@tanstack/react-start/server'
-import { auth } from '@/lib/auth'
+import { createFileRoute, Link, redirect } from "@tanstack/react-router"
+import { GalleryVerticalEnd } from "lucide-react"
+import { LoginForm } from "@/components/login-form"
+import { createServerFn } from "@tanstack/react-start"
+import { getRequestHeaders } from "@tanstack/react-start/server"
+import { auth } from "@/lib/auth"
 
-const fetchSession = createServerFn({ method: 'GET' }).handler(async () => {
+const fetchSession = createServerFn({ method: "GET" }).handler(async () => {
   const headers = getRequestHeaders()
   const session = await auth.api.getSession({ headers })
   return session
 })
 
-export const Route = createFileRoute('/login')({
-  beforeLoad: async () => {
+export const Route = createFileRoute("/login")({
+  beforeLoad: async ({ location }) => {
     const data = await fetchSession()
     if (data?.session) {
-      throw redirect({ to: '/' })
+      throw redirect({ to: "/", search: location.href })
     }
   },
   component: RouteComponent,
