@@ -1,22 +1,22 @@
-import { Link, useNavigate } from '@tanstack/react-router'
-import { Loader } from 'lucide-react'
-import { ThemeToggle } from './theme-toggle'
-import { authClient } from '@/lib/auth-client'
-import { Button } from './ui/button'
+import { Link, useNavigate } from "@tanstack/react-router"
+import { Loader } from "lucide-react"
+import { ThemeToggle } from "./theme-toggle"
+import { authClient } from "@/lib/auth-client"
+import LoginDialog from "./login-dialog"
+import { AuthUserDropdown } from "./user-dropdown"
 
 export function Navbar() {
-  const navigate = useNavigate()
   const { data: session, isPending } = authClient.useSession()
+  const navigate = useNavigate()
   const handleLogout = async () => {
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          navigate({ to: '/login' })
+          navigate({ to: "/" })
         },
       },
     })
   }
-
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-background/95 pt-2 pb-2 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="relative container mx-auto flex items-center justify-between px-4">
@@ -36,13 +36,13 @@ export function Navbar() {
             <div>Loading...</div>
           ) : session ? (
             <>
-              <div>{session.user.name}</div>
-              <Button variant={'outline'} size={'sm'} onClick={handleLogout}>
-                logout
-              </Button>
+              <AuthUserDropdown
+                name={session.user.name}
+                handleLogout={handleLogout}
+              />
             </>
           ) : (
-            <Link to="/login">Login</Link>
+            <LoginDialog />
           )}
         </div>
       </div>
