@@ -138,7 +138,7 @@ export const places = pgTable(
     userId: uuid("user_id"),
     name: text("name").notNull(),
     description: text("description").notNull(),
-    categoryId: text("category_id")
+    categoryId: uuid("category_id")
       .references(() => categories.id, { onDelete: "set null" })
       .notNull(),
 
@@ -177,7 +177,7 @@ export const placeImages = pgTable("place_images", {
   id: uuid("id")
     .$defaultFn(() => uuidv7())
     .primaryKey(),
-  placeId: text("place_id")
+  placeId: uuid("place_id")
     .references(() => places.id, { onDelete: "cascade" })
     .notNull(),
   url: text("url").notNull(),
@@ -203,10 +203,10 @@ export const reviews = pgTable("reviews", {
   id: uuid("id")
     .$defaultFn(() => uuidv7())
     .primaryKey(),
-  placeId: text("place_id")
+  placeId: uuid("place_id")
     .references(() => places.id, { onDelete: "cascade" })
     .notNull(),
-  userId: text("user_id")
+  userId: uuid("user_id")
     .references(() => users.id)
     .notNull(),
   rating: integer("rating").notNull(), // Assuming integer rating (1-5) based on typical reviews, or use real() if decimals needed
