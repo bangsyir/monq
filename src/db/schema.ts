@@ -1,13 +1,13 @@
 import { relations } from "drizzle-orm"
 import {
+  boolean,
+  index,
+  integer,
   pgTable,
+  real,
   text,
   timestamp,
-  boolean,
   uuid,
-  index,
-  real,
-  integer,
 } from "drizzle-orm/pg-core"
 import { v7 as uuidv7 } from "uuid"
 

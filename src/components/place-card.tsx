@@ -1,8 +1,9 @@
-import { motion } from "framer-motion"
-import { Heart, Star, MapPin } from "lucide-react"
-import { Place } from "@/types/place"
-import { Badge } from "@/components/ui/badge"
 import { Link } from "@tanstack/react-router"
+import { motion } from "framer-motion"
+import { Heart, MapPin,Star } from "lucide-react"
+
+import type { Place } from "@/types/place"
+import { Badge } from "@/components/ui/badge"
 
 interface PlaceCardProps {
   place: Place

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
+
 import { applyTheme, getCurrentTheme } from '@/utils/theme'
 
 type Theme = 'light' | 'dark'

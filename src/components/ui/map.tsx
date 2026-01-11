@@ -1,21 +1,36 @@
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { ButtonGroup } from "@/components/ui/button-group"
+import "leaflet-draw/dist/leaflet.draw.css"
+import "leaflet/dist/leaflet.css"
+
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+  CircleIcon,
+  LayersIcon,
+  LoaderCircleIcon,
+  MapPinIcon,
+  MinusIcon,
+  NavigationIcon,
+  PenLineIcon,
+  PentagonIcon,
+  PlusIcon,
+  SquareIcon,
+  Trash2Icon,
+  Undo2Icon,
+  WaypointsIcon,
+} from "lucide-react"
 import {
-  PlaceAutocomplete,
-  type PlaceAutocompleteProps,
-} from "@/components/ui/place-autocomplete"
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState
+} from "react"
+import { renderToString } from "react-dom/server"
+import {
+  useMap,
+  useMapEvents
+} from "react-leaflet"
+import * as ReactLeaflet from "react-leaflet"
+import LeafletMarkerClusterGroup from "react-leaflet-markercluster"
+import { useTheme } from "../theme-provider"
 import type { CheckboxItem } from "@radix-ui/react-dropdown-menu"
 import type {
   Circle,
@@ -42,52 +57,29 @@ import type {
   TileLayer,
   Tooltip,
 } from "leaflet"
-import "leaflet-draw/dist/leaflet.draw.css"
-import "leaflet/dist/leaflet.css"
-import {
-  CircleIcon,
-  LayersIcon,
-  LoaderCircleIcon,
-  MapPinIcon,
-  MinusIcon,
-  NavigationIcon,
-  PenLineIcon,
-  PentagonIcon,
-  PlusIcon,
-  SquareIcon,
-  Trash2Icon,
-  Undo2Icon,
-  WaypointsIcon,
-} from "lucide-react"
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-  type Ref,
-} from "react"
-import { renderToString } from "react-dom/server"
-import {
-  useMap,
-  useMapEvents,
-  type CircleMarkerProps,
-  type CircleProps,
-  type LayerGroupProps,
-  type MapContainerProps,
-  type MarkerProps,
-  type PolygonProps,
-  type PolylineProps,
-  type PopupProps,
-  type RectangleProps,
-  type TileLayerProps,
-  type TooltipProps,
-} from "react-leaflet"
+import type {ReactNode, Ref} from "react";
+import type {CircleMarkerProps, CircleProps, LayerGroupProps, MapContainerProps, MarkerProps, PolygonProps, PolylineProps, PopupProps, RectangleProps, TileLayerProps, TooltipProps} from "react-leaflet";
 import type { MarkerClusterGroupProps } from "react-leaflet-markercluster"
-import * as ReactLeaflet from "react-leaflet"
-import LeafletMarkerClusterGroup from "react-leaflet-markercluster"
-import { useTheme } from "../theme-provider"
+
+import type {PlaceAutocompleteProps} from "@/components/ui/place-autocomplete";
+import { Button } from "@/components/ui/button"
+import { ButtonGroup } from "@/components/ui/button-group"
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  PlaceAutocomplete
+} from "@/components/ui/place-autocomplete"
+import { cn } from "@/lib/utils"
+
 
 // Then update all references
 const LeafletMapContainer = ReactLeaflet.MapContainer
@@ -142,13 +134,13 @@ interface MapLayerGroupOption extends Pick<
 
 interface MapLayersContextType {
   registerTileLayer: (layer: MapTileLayerOption) => void
-  tileLayers: MapTileLayerOption[]
+  tileLayers: Array<MapTileLayerOption>
   selectedTileLayer: string
   setSelectedTileLayer: (name: string) => void
   registerLayerGroup: (layer: MapLayerGroupOption) => void
-  layerGroups: MapLayerGroupOption[]
-  activeLayerGroups: string[]
-  setActiveLayerGroups: (names: string[]) => void
+  layerGroups: Array<MapLayerGroupOption>
+  activeLayerGroups: Array<string>
+  setActiveLayerGroups: (names: Array<string>) => void
 }
 
 const MapLayersContext = createContext<MapLayersContextType | null>(null)
@@ -267,15 +259,15 @@ function MapLayers({
   ...props
 }: Omit<React.ComponentProps<typeof MapLayersContext.Provider>, "value"> & {
   defaultTileLayer?: string
-  defaultLayerGroups?: string[]
+  defaultLayerGroups?: Array<string>
 }) {
-  const [tileLayers, setTileLayers] = useState<MapTileLayerOption[]>([])
+  const [tileLayers, setTileLayers] = useState<Array<MapTileLayerOption>>([])
   const [selectedTileLayer, setSelectedTileLayer] = useState<string>(
     defaultTileLayer || "",
   )
-  const [layerGroups, setLayerGroups] = useState<MapLayerGroupOption[]>([])
+  const [layerGroups, setLayerGroups] = useState<Array<MapLayerGroupOption>>([])
   const [activeLayerGroups, setActiveLayerGroups] =
-    useState<string[]>(defaultLayerGroups)
+    useState<Array<string>>(defaultLayerGroups)
 
   function registerTileLayer(tileLayer: MapTileLayerOption) {
     setTileLayers((prevTileLayers) => {

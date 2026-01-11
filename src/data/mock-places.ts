@@ -1,6 +1,6 @@
-import { Place, PlaceReview } from "@/types/place"
+import type { Place, PlaceReview } from "@/types/place"
 
-export const mockPlaces: Place[] = [
+export const mockPlaces: Array<Place> = [
   {
     id: "1",
     name: "Mystic Falls",
@@ -241,7 +241,7 @@ export const mockPlaces: Place[] = [
   },
 ]
 
-export const mockReviews: Record<string, PlaceReview[]> = {
+export const mockReviews: Record<string, Array<PlaceReview>> = {
   "1": [
     {
       id: "r1",

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion"
 import { Star } from "lucide-react"
-import { PlaceReview } from "@/types/place"
+
+import type { PlaceReview } from "@/types/place"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface ReviewCardProps {

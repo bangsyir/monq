@@ -1,13 +1,14 @@
+import { ClientOnly, createFileRoute } from "@tanstack/react-router"
+import { motion } from "framer-motion"
+import { Grid2x2, MapPin, SlidersHorizontal } from "lucide-react"
+import React from "react"
+
 import AddPlaceDialog from "@/components/add-place-component"
 import CategoryFilter from "@/components/category-filter"
 import PlaceCard from "@/components/place-card"
 import PlacesMap from "@/components/places-map"
 import { Button } from "@/components/ui/button"
 import { mockPlaces } from "@/data/mock-places"
-import { ClientOnly, createFileRoute } from "@tanstack/react-router"
-import { motion } from "framer-motion"
-import { Grid2x2, MapPin, SlidersHorizontal } from "lucide-react"
-import React from "react"
 
 export const Route = createFileRoute("/places/")({
   component: RouteComponent,
@@ -17,7 +18,7 @@ export const Route = createFileRoute("/places/")({
     }
   },
   loaderDeps: ({ search: { cat } }) => ({ cat }),
-  loader: async ({ deps: { cat } }) => {
+  loader: ({ deps: { cat } }) => {
     if (cat === "" || cat === "all") {
       return {
         selectedCategory: "all",

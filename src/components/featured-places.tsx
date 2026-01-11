@@ -1,9 +1,15 @@
+import { Link } from "@tanstack/react-router"
 import { motion } from "framer-motion"
 import { ArrowRight } from "lucide-react"
-import { mockPlaces } from "@/data/mock-places"
+
 import PlaceCard from "./place-card"
 import { Button } from "@/components/ui/button"
-import { Link } from "@tanstack/react-router"
+import { mockPlaces } from "@/data/mock-places"
+
+
+
+
+
 
 const FeaturedPlaces = () => {
   const featuredPlaces = mockPlaces

@@ -1,3 +1,5 @@
+import { User } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -9,7 +11,6 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { User } from "lucide-react"
 
 export function AuthUserDropdown({
   name,

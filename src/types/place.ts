@@ -43,15 +43,15 @@ export interface Place {
   description: string
   category: PlaceCategory
   location: PlaceLocation
-  images: PlaceImage[]
+  images: Array<PlaceImage>
   rating: number
   reviewCount: number
-  amenities: PlaceAmenity[]
+  amenities: Array<PlaceAmenity>
   difficulty?: "easy" | "moderate" | "hard" | "expert"
   duration?: string
   distance?: string
   elevation?: string
-  bestSeason?: string[]
+  bestSeason?: Array<string>
   isFeatured?: boolean
   createdAt: string
 }

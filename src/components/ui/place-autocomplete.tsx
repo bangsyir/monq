@@ -1,4 +1,7 @@
-import { cn } from "@/lib/utils"
+import { MapPinIcon, SearchIcon } from "lucide-react"
+import * as React from "react"
+import type { BBox, Feature, FeatureCollection, Point } from "geojson"
+
 import {
     Command,
     CommandEmpty,
@@ -12,9 +15,7 @@ import {
     InputGroupInput,
 } from "@/components/ui/input-group"
 import { Spinner } from "@/components/ui/spinner"
-import type { BBox, Feature, FeatureCollection, Point } from "geojson"
-import { MapPinIcon, SearchIcon } from "lucide-react"
-import * as React from "react"
+import { cn } from "@/lib/utils"
 
 interface PlaceFeatureProperties {
     osm_id: number
@@ -78,7 +79,7 @@ interface PlaceAutocompleteProps
     defaultValue?: string
     onChange?: (value: string) => void
     onPlaceSelect?: (feature: PlaceFeature) => void
-    onResultsChange?: (results: PlaceFeature[]) => void
+    onResultsChange?: (results: Array<PlaceFeature>) => void
 }
 
 function formatAddress(properties: PlaceFeatureProperties) {
@@ -170,7 +171,7 @@ function usePlaceSearch({
 }: {
     debounceMs: number
 } & PlaceSearchOptions) {
-    const [results, setResults] = React.useState<PlaceFeature[]>([])
+    const [results, setResults] = React.useState<Array<PlaceFeature>>([])
     const [isLoading, setIsLoading] = React.useState(false)
     const [error, setError] = React.useState<Error | null>(null)
     const [hasSearched, setHasSearched] = React.useState(false)

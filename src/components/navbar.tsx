@@ -1,9 +1,11 @@
 import { Link, useNavigate } from "@tanstack/react-router"
 import { Loader } from "lucide-react"
-import { ThemeToggle } from "./theme-toggle"
-import { authClient } from "@/lib/auth-client"
+
+
 import LoginDialog from "./login-dialog"
+import { ThemeToggle } from "./theme-toggle"
 import { AuthUserDropdown } from "./user-dropdown"
+import { authClient } from "@/lib/auth-client"
 
 export function Navbar() {
   const { data: session, isPending } = authClient.useSession()

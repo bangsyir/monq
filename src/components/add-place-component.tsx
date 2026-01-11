@@ -1,7 +1,11 @@
-import { useState } from "react"
 import { useForm } from "@tanstack/react-form"
+import { MapPin, Plus, Upload } from "lucide-react"
+import { useState } from "react"
+import { toast } from "sonner"
 import { z } from "zod"
-import { Plus, MapPin, Upload } from "lucide-react"
+
+import type { PlaceCategory } from "@/types/place"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -10,9 +14,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import {
   Select,
   SelectContent,
@@ -20,14 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field"
-import { PlaceCategory } from "@/types/place"
-import { toast } from "sonner"
+import { Textarea } from "@/components/ui/textarea"
 
 const addPlaceSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters").max(100),
@@ -74,7 +75,7 @@ const addPlaceSchema = z.object({
   distance: z.string(),
 })
 
-const categories: { value: PlaceCategory; label: string }[] = [
+const categories: Array<{ value: PlaceCategory; label: string }> = [
   { value: "waterfall", label: "Waterfall" },
   { value: "campsite", label: "Campsite" },
   { value: "hiking", label: "Hiking" },
@@ -92,7 +93,7 @@ const difficulties = [
 
 const AddPlaceDialog = () => {
   const [open, setOpen] = useState(false)
-  const [images, setImages] = useState<File[]>([])
+  const [images, setImages] = useState<Array<File>>([])
 
   const form = useForm({
     defaultValues: {

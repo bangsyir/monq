@@ -1,14 +1,16 @@
-import { buttonVariants } from "@/components/ui/button"
 import {
-  createFileRoute,
   Link,
   Outlet,
+  createFileRoute,
   redirect,
   useRouter,
 } from "@tanstack/react-router"
 import { GalleryVerticalEnd, LogOut } from "lucide-react"
+
+import { buttonVariants } from "@/components/ui/button"
 import { authClient } from "@/lib/auth-client"
 import { getUser } from "@/lib/auth-server-func"
+
 export const Route = createFileRoute("/_layout")({
   component: RouteComponent,
 

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PlacesRouteImport } from './routes/places'
+import { Route as MapRouteImport } from './routes/map'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LayoutRouteRouteImport } from './routes/_layout/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -22,6 +23,11 @@ import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
 const PlacesRoute = PlacesRouteImport.update({
   id: '/places',
   path: '/places',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MapRoute = MapRouteImport.update({
+  id: '/map',
+  path: '/map',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -67,6 +73,7 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/map': typeof MapRoute
   '/places': typeof PlacesRouteWithChildren
   '/admin': typeof LayoutAdminRoute
   '/dashboard': typeof LayoutDashboardRoute
@@ -77,6 +84,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/map': typeof MapRoute
   '/admin': typeof LayoutAdminRoute
   '/dashboard': typeof LayoutDashboardRoute
   '/places/$placeId': typeof PlacesPlaceIdRoute
@@ -88,6 +96,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_layout': typeof LayoutRouteRouteWithChildren
   '/login': typeof LoginRoute
+  '/map': typeof MapRoute
   '/places': typeof PlacesRouteWithChildren
   '/_layout/admin': typeof LayoutAdminRoute
   '/_layout/dashboard': typeof LayoutDashboardRoute
@@ -100,6 +109,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/map'
     | '/places'
     | '/admin'
     | '/dashboard'
@@ -110,6 +120,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/map'
     | '/admin'
     | '/dashboard'
     | '/places/$placeId'
@@ -120,6 +131,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_layout'
     | '/login'
+    | '/map'
     | '/places'
     | '/_layout/admin'
     | '/_layout/dashboard'
@@ -132,6 +144,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LayoutRouteRoute: typeof LayoutRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
+  MapRoute: typeof MapRoute
   PlacesRoute: typeof PlacesRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
@@ -143,6 +156,13 @@ declare module '@tanstack/react-router' {
       path: '/places'
       fullPath: '/places'
       preLoaderRoute: typeof PlacesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/map': {
+      id: '/map'
+      path: '/map'
+      fullPath: '/map'
+      preLoaderRoute: typeof MapRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -235,6 +255,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LayoutRouteRoute: LayoutRouteRouteWithChildren,
   LoginRoute: LoginRoute,
+  MapRoute: MapRoute,
   PlacesRoute: PlacesRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }

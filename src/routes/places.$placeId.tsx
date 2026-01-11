@@ -1,4 +1,5 @@
 import { Link, createFileRoute, useParams } from "@tanstack/react-router"
+import { motion } from "framer-motion"
 import {
   ArrowLeft,
   Bike,
@@ -17,13 +18,13 @@ import {
   Tent,
   Waves,
 } from "lucide-react"
-import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { mockPlaces, mockReviews } from "@/data/mock-places"
+
+import ReviewCard from "@/components/review-card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
-import ReviewCard from "@/components/review-card"
+import { mockPlaces, mockReviews } from "@/data/mock-places"
 
 const amenityIcons: Record<string, React.ReactNode> = {
   car: <Car className="w-5 h-5" />,
@@ -66,7 +67,8 @@ export const Route = createFileRoute("/places/$placeId")({
 function RouteComponent() {
   const { placeId } = useParams({ from: "/places/$placeId" })
   const place = mockPlaces.find((p) => p.id === placeId)
-  const reviews = mockReviews[placeId || ""] || []
+  const reviews = mockReviews[placeId] ?? []
+
   if (!place) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -74,7 +76,7 @@ function RouteComponent() {
           <h1 className="text-2xl font-bold text-foreground mb-2">
             Place not found
           </h1>
-          <Link to="/places">
+          <Link to="/places" search={{ cat: "all" }}>
             <Button>Back to places</Button>
           </Link>
         </div>
@@ -87,7 +89,7 @@ function RouteComponent() {
         <main>
           {/* Back Button */}
           <div className="container mx-auto px-4 py-4">
-            <Link to="/places">
+            <Link to="/places" search={{ cat: "all" }}>
               <Button variant="ghost" className="gap-2">
                 <ArrowLeft className="w-4 h-4" />
                 Back to places
@@ -101,7 +103,7 @@ function RouteComponent() {
               <motion.div
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="aspect-[4/3] md:aspect-square"
+                className="aspect-4/3 md:aspect-square"
               >
                 <img
                   src={place.images[0]?.url}

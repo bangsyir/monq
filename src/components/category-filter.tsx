@@ -3,11 +3,11 @@ import { motion } from "framer-motion"
 import {
   Compass,
   Droplets,
-  Tent,
-  Mountain,
   Footprints,
-  Waves,
+  Mountain,
   Snowflake,
+  Tent,
+  Waves,
 } from "lucide-react"
 
 const categoryIcons: Record<string, React.ReactNode> = {

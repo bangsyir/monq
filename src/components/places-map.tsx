@@ -1,13 +1,15 @@
-import { useState, useEffect } from "react"
-import { MapPin, Star, X } from "lucide-react"
+import "leaflet/dist/leaflet.css"
 
 import { Link } from "@tanstack/react-router"
-import { Button } from "./ui/button"
-import { Place } from "@/types/place"
-import { useMap } from "react-leaflet"
-import L from "leaflet"
 import { motion } from "framer-motion"
-import "leaflet/dist/leaflet.css"
+import L from "leaflet"
+import { MapPin, Star, X } from "lucide-react"
+import { useEffect,useState } from "react"
+import { useMap } from "react-leaflet"
+import { toast } from "sonner"
+
+
+import { Button } from "./ui/button"
 import {
   Map,
   MapLayerGroup,
@@ -19,7 +21,7 @@ import {
   MapTileLayer,
   MapZoomControl,
 } from "./ui/map"
-import { toast } from "sonner"
+import type { Place } from "@/types/place"
 
 delete (L.Icon.Default.prototype as any)._getIconUrl
 L.Icon.Default.mergeOptions({
@@ -31,7 +33,7 @@ L.Icon.Default.mergeOptions({
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
 })
 interface PlacesMapProps {
-  places: Place[]
+  places: Array<Place>
   onClose: (value: "grid" | "map") => void
 }
 
