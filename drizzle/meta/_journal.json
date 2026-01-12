@@ -15,6 +15,27 @@
       "when": 1767844429577,
       "tag": "0001_past_vampiro",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1768195345722,
+      "tag": "0002_natural_silver_sable",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1768204420116,
+      "tag": "0003_pretty_onslaught",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1768204751744,
+      "tag": "0004_late_avengers",
+      "breakpoints": true
     }
   ]
 }

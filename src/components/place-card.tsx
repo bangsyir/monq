@@ -8,7 +8,14 @@ interface PlaceCardProps {
   place: Place
   index?: number
 }
-
+const categoryLabels: Record<string, string> = {
+  waterfall: "Waterfall",
+  campsite: "Campsite",
+  hiking: "Hiking",
+  trail: "Trail",
+  lake: "Lake",
+  mountain: "Mountain",
+}
 const difficultyColors: Record<string, string> = {
   easy: "bg-success/10 text-success border-success/20",
   moderate: "bg-warning/10 text-warning border-warning/20",
@@ -93,7 +100,23 @@ const PlaceCard = ({ place, index = 0 }: PlaceCardProps) => {
               {place.location.city}, {place.location.state}
             </span>
           </div>
-
+          {/* Categories */}
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {place.categories.slice(0, 3).map((cat) => (
+              <Badge
+                key={cat}
+                variant="secondary"
+                className="text-xs py-0 px-1.5"
+              >
+                {categoryLabels[cat]}
+              </Badge>
+            ))}
+            {place.categories.length > 3 && (
+              <Badge variant="secondary" className="text-xs py-0 px-1.5">
+                +{place.categories.length - 3}
+              </Badge>
+            )}
+          </div>
           <div className="flex items-center gap-3 text-sm text-muted-foreground">
             {place.distance && <span>{place.distance}</span>}
             {place.duration && <span>• {place.duration}</span>}

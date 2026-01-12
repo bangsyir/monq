@@ -41,7 +41,7 @@ export interface Place {
   id: string
   name: string
   description: string
-  category: PlaceCategory
+  categories: Array<PlaceCategory>
   location: PlaceLocation
   images: Array<PlaceImage>
   rating: number

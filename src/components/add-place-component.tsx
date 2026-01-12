@@ -1,8 +1,8 @@
 import { useState } from "react"
 import { useForm } from "@tanstack/react-form"
-import { MapPin, Plus, Upload } from "lucide-react"
+import { MapPin, Plus, Upload, X } from "lucide-react"
 import { toast } from "sonner"
-import { z } from "zod"
+import { Label } from "./ui/label"
 import type { PlaceCategory } from "@/types/place"
 import { Button } from "@/components/ui/button"
 import {
@@ -27,54 +27,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
+import { addPlaceSchema } from "@/schema/place-schema"
+import { addPlace } from "@/serverFunction/place.function"
 
-const addPlaceSchema = z.object({
-  name: z.string().min(3, "Name must be at least 3 characters").max(100),
-  description: z
-    .string()
-    .min(10, "Description must be at least 10 characters")
-    .max(1000),
-  category: z.enum([
-    "waterfall",
-    "campsite",
-    "hiking",
-    "trail",
-    "lake",
-    "mountain",
-  ] as const),
-  address: z.string().min(5, "Address is required"),
-  city: z.string().min(2, "City is required"),
-  state: z.string().min(2, "State is required"),
-  country: z.string().min(2, "Country is required"),
-  latitude: z
-    .string()
-    .refine(
-      (val) =>
-        !isNaN(parseFloat(val)) &&
-        parseFloat(val) >= -90 &&
-        parseFloat(val) <= 90,
-      {
-        message: "Latitude must be between -90 and 90",
-      },
-    ),
-  longitude: z
-    .string()
-    .refine(
-      (val) =>
-        !isNaN(parseFloat(val)) &&
-        parseFloat(val) >= -180 &&
-        parseFloat(val) <= 180,
-      {
-        message: "Longitude must be between -180 and 180",
-      },
-    ),
-  difficulty: z.enum(["", "easy", "moderate", "hard", "expert"]),
-  duration: z.string(),
-  distance: z.string(),
-})
-
-const categories: Array<{ value: PlaceCategory; label: string }> = [
+const categoryOptions: Array<{ value: PlaceCategory; label: string }> = [
   { value: "waterfall", label: "Waterfall" },
   { value: "campsite", label: "Campsite" },
   { value: "hiking", label: "Hiking" },
@@ -98,24 +56,25 @@ const AddPlaceDialog = () => {
     defaultValues: {
       name: "",
       description: "",
-      category: "waterfall" as PlaceCategory,
+      categories: [] as Array<string>,
       address: "",
       city: "",
       state: "",
       country: "",
       latitude: "",
       longitude: "",
-      difficulty: "" as "easy" | "moderate" | "hard" | "expert" | "",
+      difficulty: "",
       duration: "",
       distance: "",
     },
     validators: {
       onSubmit: addPlaceSchema,
     },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       console.log("Place data:", value)
       console.log("Images:", images)
-      toast.success("Place added successfully!")
+      const insert = await addPlace({ data: value })
+      toast.success(insert.message)
       setOpen(false)
       form.reset()
       setImages([])
@@ -209,38 +168,74 @@ const AddPlaceDialog = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <form.Field
-                  name="category"
+                  name="categories"
                   children={(field) => {
                     const isInvalid =
                       field.state.meta.isTouched && !field.state.meta.isValid
                     return (
-                      <Field data-invalid={isInvalid}>
-                        <FieldLabel htmlFor={field.name}>Category</FieldLabel>
-                        <Select
-                          name={field.name}
-                          value={field.state.value}
-                          onValueChange={(value) =>
-                            field.handleChange(value as PlaceCategory)
-                          }
-                        >
-                          <SelectTrigger
-                            id={field.name}
-                            aria-invalid={isInvalid}
-                          >
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {categories.map((cat) => (
-                              <SelectItem key={cat.value} value={cat.value}>
-                                {cat.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                      <div className="space-y-2 col-span-2">
+                        <Label>Categories (select multiple)</Label>
+                        <div className="space-y-3">
+                          {/* Selected categories */}
+                          {field.state.value.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {field.state.value.map((cat) => (
+                                <Badge
+                                  key={cat}
+                                  variant="secondary"
+                                  className="gap-1 pr-1"
+                                >
+                                  {
+                                    categoryOptions.find((c) => c.value === cat)
+                                      ?.label
+                                  }
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      field.handleChange(
+                                        field.state.value.filter(
+                                          (c) => c !== cat,
+                                        ),
+                                      )
+                                    }}
+                                    className="ml-1 rounded-full hover:bg-muted p-0.5"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Category selector */}
+                          <div className="flex flex-wrap gap-2">
+                            {categoryOptions
+                              .filter(
+                                (cat) => !field.state.value.includes(cat.value),
+                              )
+                              .map((cat) => (
+                                <Button
+                                  key={cat.value}
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    field.handleChange([
+                                      ...field.state.value,
+                                      cat.value,
+                                    ])
+                                  }}
+                                  className="text-xs"
+                                >
+                                  + {cat.label}
+                                </Button>
+                              ))}
+                          </div>
+                        </div>
                         {isInvalid && (
                           <FieldError errors={field.state.meta.errors} />
                         )}
-                      </Field>
+                      </div>
                     )
                   }}
                 />

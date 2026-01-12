@@ -135,12 +135,11 @@ export const places = pgTable(
     id: uuid("id")
       .$defaultFn(() => uuidv7())
       .primaryKey(),
-    userId: uuid("user_id"),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     description: text("description").notNull(),
-    categoryId: uuid("category_id")
-      .references(() => categories.id, { onDelete: "set null" })
-      .notNull(),
 
     // Location fields (flattened from JSON object)
     latitude: real("latitude"),
@@ -162,12 +161,34 @@ export const places = pgTable(
     bestSeason: text("best_season").array(),
 
     isFeatured: boolean("is_featured").default(false),
-    createdAt: timestamp("created_at").notNull(),
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+      mode: "date",
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", {
+      withTimezone: true,
+      mode: "date",
+      precision: 3,
+    })
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
   },
-  (table) => [
-    index("category_idx").on(table.categoryId),
-    index("featured_idx").on(table.isFeatured),
-  ],
+  (table) => [index("featured_idx").on(table.isFeatured)],
+)
+
+export const placeCategories = pgTable(
+  "place_categories",
+  {
+    placeId: uuid("place_id")
+      .notNull()
+      .references(() => places.id, { onDelete: "cascade" }),
+    category: text("category").notNull(),
+  },
+  (table) => [index("category_place_id_idx").on(table.placeId)],
 )
 /**
  * PLACE IMAGES TABLE
@@ -211,7 +232,13 @@ export const reviews = pgTable("reviews", {
     .notNull(),
   rating: integer("rating").notNull(), // Assuming integer rating (1-5) based on typical reviews, or use real() if decimals needed
   comment: text("comment").notNull(),
-  createdAt: timestamp("created_at").notNull(),
+  createdAt: timestamp("created_at", {
+    withTimezone: true,
+    mode: "date",
+    precision: 3,
+  })
+    .defaultNow()
+    .notNull(),
 })
 
 // ==========================================
@@ -247,10 +274,7 @@ export const placesRelations = relations(places, ({ one, many }) => ({
     fields: [places.userId],
     references: [users.id],
   }),
-  category: one(categories, {
-    fields: [places.categoryId],
-    references: [categories.id],
-  }),
+  categories: many(placeCategories),
   images: many(placeImages),
   amenities: many(placeAmenities),
   reviews: many(reviews),
@@ -277,7 +301,15 @@ export const placeAmenitiesRelations = relations(placeAmenities, ({ one }) => ({
     references: [amenities.id],
   }),
 }))
-
+export const placeCategoriesRelations = relations(
+  placeCategories,
+  ({ one }) => ({
+    place: one(places, {
+      fields: [placeCategories.placeId],
+      references: [places.id],
+    }),
+  }),
+)
 export const reviewsRelations = relations(reviews, ({ one }) => ({
   place: one(places, {
     fields: [reviews.placeId],
