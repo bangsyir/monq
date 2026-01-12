@@ -18,7 +18,6 @@ import {
   Tent,
   Waves,
 } from "lucide-react"
-
 import ReviewCard from "@/components/review-card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"

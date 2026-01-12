@@ -2,9 +2,8 @@ import { Link, createFileRoute, redirect } from "@tanstack/react-router"
 import { createServerFn } from "@tanstack/react-start"
 import { getRequestHeaders } from "@tanstack/react-start/server"
 import { GalleryVerticalEnd } from "lucide-react"
-
-import { LoginForm } from "@/components/login-form"
 import { auth } from "@/lib/auth"
+import { LoginForm } from "@/components/login-form"
 
 const fetchSession = createServerFn({ method: "GET" }).handler(async () => {
   const headers = getRequestHeaders()

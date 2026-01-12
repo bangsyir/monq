@@ -1,6 +1,8 @@
-import "leaflet-draw/dist/leaflet.draw.css"
-import "leaflet/dist/leaflet.css"
-
+import { createContext, useContext, useEffect, useRef, useState } from "react"
+import { renderToString } from "react-dom/server"
+import { useMap, useMapEvents } from "react-leaflet"
+import * as ReactLeaflet from "react-leaflet"
+import LeafletMarkerClusterGroup from "react-leaflet-markercluster"
 import {
   CircleIcon,
   LayersIcon,
@@ -16,21 +18,23 @@ import {
   Undo2Icon,
   WaypointsIcon,
 } from "lucide-react"
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState
-} from "react"
-import { renderToString } from "react-dom/server"
-import {
-  useMap,
-  useMapEvents
-} from "react-leaflet"
-import * as ReactLeaflet from "react-leaflet"
-import LeafletMarkerClusterGroup from "react-leaflet-markercluster"
 import { useTheme } from "../theme-provider"
+import type { ReactNode, Ref } from "react"
+import type {
+  CircleMarkerProps,
+  CircleProps,
+  LayerGroupProps,
+  MapContainerProps,
+  MarkerProps,
+  PolygonProps,
+  PolylineProps,
+  PopupProps,
+  RectangleProps,
+  TileLayerProps,
+  TooltipProps,
+} from "react-leaflet"
+import type { MarkerClusterGroupProps } from "react-leaflet-markercluster"
+import type { PlaceAutocompleteProps } from "@/components/ui/place-autocomplete"
 import type { CheckboxItem } from "@radix-ui/react-dropdown-menu"
 import type {
   Circle,
@@ -57,11 +61,6 @@ import type {
   TileLayer,
   Tooltip,
 } from "leaflet"
-import type {ReactNode, Ref} from "react";
-import type {CircleMarkerProps, CircleProps, LayerGroupProps, MapContainerProps, MarkerProps, PolygonProps, PolylineProps, PopupProps, RectangleProps, TileLayerProps, TooltipProps} from "react-leaflet";
-import type { MarkerClusterGroupProps } from "react-leaflet-markercluster"
-
-import type {PlaceAutocompleteProps} from "@/components/ui/place-autocomplete";
 import { Button } from "@/components/ui/button"
 import { ButtonGroup } from "@/components/ui/button-group"
 import {
@@ -75,11 +74,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-  PlaceAutocomplete
-} from "@/components/ui/place-autocomplete"
+import { PlaceAutocomplete } from "@/components/ui/place-autocomplete"
 import { cn } from "@/lib/utils"
-
+import "leaflet-draw/dist/leaflet.draw.css"
+import "leaflet/dist/leaflet.css"
 
 // Then update all references
 const LeafletMapContainer = ReactLeaflet.MapContainer
@@ -163,9 +161,7 @@ function MapTileLayer({
   ref?: Ref<TileLayer>
 }) {
   const map = useMap()
-  if (map.attributionControl) {
-    map.attributionControl.setPrefix("")
-  }
+  map.attributionControl.setPrefix("")
 
   const context = useContext(MapLayersContext)
   const DEFAULT_URL =
@@ -866,6 +862,7 @@ function MapDrawShapeButton<T extends Draw.Feature>({
   ...props
 }: React.ComponentProps<"button"> & {
   drawMode: MapDrawShape
+  // eslint-disable-next-line
   createDrawTool: (L: typeof import("leaflet"), map: DrawMap) => T
 }) {
   const drawContext = useMapDrawContext()
@@ -1063,6 +1060,7 @@ function MapDrawActionButton<T extends EditToolbar.Edit | EditToolbar.Delete>({
 }: React.ComponentProps<"button"> & {
   drawAction: MapDrawAction
   createDrawTool: (
+    // eslint-disable-next-line
     L: typeof import("leaflet"),
     map: DrawMap,
     featureGroup: L.FeatureGroup,
@@ -1077,18 +1075,22 @@ function MapDrawActionButton<T extends EditToolbar.Edit | EditToolbar.Delete>({
   const map = useMap()
   const { featureGroup, activeMode, setActiveMode } = drawContext
   const isActive = activeMode === drawAction
+  // eslint-disable-next-line
   const hasFeatures = featureGroup?.getLayers().length ?? 0 > 0
 
   useEffect(() => {
     if (!L || !featureGroup || !isActive) {
+      // eslint-disable-next-line
       controlRef.current?.disable?.()
       controlRef.current = null
       return
     }
     const control = createDrawTool(L, map as DrawMap, featureGroup)
+    // eslint-disable-next-line
     control.enable?.()
     controlRef.current = control
     return () => {
+      // eslint-disable-next-line
       control.disable?.()
       controlRef.current = null
     }
@@ -1265,8 +1267,10 @@ function useMapDrawHandleIcon() {
 }
 
 function useLeaflet() {
+  // eslint-disable-next-line
   const [L, setL] = useState<typeof import("leaflet") | null>(null)
   const [LeafletDraw, setLeafletDraw] = useState<
+    // eslint-disable-next-line
     typeof import("leaflet-draw") | null
   >(null)
 

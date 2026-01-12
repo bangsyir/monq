@@ -1,14 +1,11 @@
-import "leaflet/dist/leaflet.css"
-
+import { useEffect, useState } from "react"
+import { useMap } from "react-leaflet"
 import { Link } from "@tanstack/react-router"
 import { motion } from "framer-motion"
 import L from "leaflet"
+import "leaflet/dist/leaflet.css"
 import { MapPin, Star, X } from "lucide-react"
-import { useEffect,useState } from "react"
-import { useMap } from "react-leaflet"
 import { toast } from "sonner"
-
-
 import { Button } from "./ui/button"
 import {
   Map,
@@ -42,7 +39,7 @@ const PlacesMap = ({ places, onClose }: PlacesMapProps) => {
 
   useEffect(() => {
     const calculatedCenter: [number, number] =
-      places && places.length > 0
+      places.length > 0
         ? [
             places.reduce((sum, p) => sum + p.location.latitude, 0) /
               places.length,
@@ -98,7 +95,7 @@ const PlacesMap = ({ places, onClose }: PlacesMapProps) => {
                 attribution="Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
               />
               <MapLayerGroup name="Pin">
-                {places?.map((place) => (
+                {places.map((place) => (
                   <MapMarker
                     key={place.id}
                     position={[

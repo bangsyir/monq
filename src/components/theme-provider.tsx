@@ -1,8 +1,7 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from "react"
+import { applyTheme, getCurrentTheme } from "@/utils/theme"
 
-import { applyTheme, getCurrentTheme } from '@/utils/theme'
-
-type Theme = 'light' | 'dark'
+type Theme = "light" | "dark"
 
 interface ThemeContextType {
   theme: Theme
@@ -24,7 +23,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }
 
   const toggleTheme = () => {
-    setThemeState((prev) => (prev === 'dark' ? 'light' : 'dark'))
+    setThemeState((prev) => (prev === "dark" ? "light" : "dark"))
   }
 
   return (
@@ -37,7 +36,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 export function useTheme() {
   const context = useContext(ThemeContext)
   if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider')
+    throw new Error("useTheme must be used within a ThemeProvider")
   }
   return context
 }

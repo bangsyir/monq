@@ -1,7 +1,6 @@
+import { useState } from "react"
 import { useMutation } from "@tanstack/react-query"
 import { User } from "lucide-react"
-import { useState } from "react"
-
 import { Button } from "@/components/ui/button"
 import {
   Dialog,

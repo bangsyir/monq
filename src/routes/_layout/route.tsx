@@ -2,11 +2,9 @@ import {
   Link,
   Outlet,
   createFileRoute,
-  redirect,
   useRouter,
 } from "@tanstack/react-router"
 import { GalleryVerticalEnd, LogOut } from "lucide-react"
-
 import { buttonVariants } from "@/components/ui/button"
 import { authClient } from "@/lib/auth-client"
 import { getUser } from "@/lib/auth-server-func"
@@ -18,10 +16,7 @@ export const Route = createFileRoute("/_layout")({
     const user = await getUser()
     return { user }
   },
-  loader: async ({ context, location }) => {
-    if (!context) {
-      throw redirect({ to: "/login", search: location.href })
-    }
+  loader: ({ context }) => {
     return { user: context.user }
   },
 })

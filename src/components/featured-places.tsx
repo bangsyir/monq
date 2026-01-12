@@ -1,15 +1,9 @@
 import { Link } from "@tanstack/react-router"
 import { motion } from "framer-motion"
 import { ArrowRight } from "lucide-react"
-
 import PlaceCard from "./place-card"
-import { Button } from "@/components/ui/button"
 import { mockPlaces } from "@/data/mock-places"
-
-
-
-
-
+import { Button } from "@/components/ui/button"
 
 const FeaturedPlaces = () => {
   const featuredPlaces = mockPlaces
@@ -34,7 +28,7 @@ const FeaturedPlaces = () => {
               Handpicked destinations that will take your breath away
             </p>
           </div>
-          <Link to="/places">
+          <Link to="/places" search={{ cat: "all" }}>
             <Button variant="outline" className="gap-2">
               View all places
               <ArrowRight className="w-4 h-4" />

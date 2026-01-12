@@ -1,8 +1,7 @@
-import { Moon, Sun, SunMoon } from 'lucide-react'
-import React from 'react'
-
-import { useTheme } from './theme-provider'
-import { Button } from './ui/button'
+import React from "react"
+import { Moon, Sun, SunMoon } from "lucide-react"
+import { useTheme } from "./theme-provider"
+import { Button } from "./ui/button"
 
 export function ThemeToggle() {
   const { theme, toggleTheme } = useTheme()
@@ -17,8 +16,8 @@ export function ThemeToggle() {
   if (!mounted) {
     return (
       <Button
-        variant={'outline'}
-        size={'icon'}
+        variant={"outline"}
+        size={"icon"}
         aria-label="Toggle theme"
         onClick={toggleTheme}
       >
@@ -27,14 +26,14 @@ export function ThemeToggle() {
     )
   }
 
-  const isDarkTheme = theme === 'dark'
+  const isDarkTheme = theme === "dark"
   return (
     <div className="relative">
       <Button
-        variant={'outline'}
-        size={'icon'}
+        variant={"outline"}
+        size={"icon"}
         name="theme"
-        aria-label={`Switch to ${isDarkTheme ? 'light' : 'dark'} mode`}
+        aria-label={`Switch to ${isDarkTheme ? "light" : "dark"} mode`}
         onClick={toggleTheme}
       >
         {isDarkTheme ? (

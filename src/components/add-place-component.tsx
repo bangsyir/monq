@@ -1,9 +1,8 @@
+import { useState } from "react"
 import { useForm } from "@tanstack/react-form"
 import { MapPin, Plus, Upload } from "lucide-react"
-import { useState } from "react"
 import { toast } from "sonner"
 import { z } from "zod"
-
 import type { PlaceCategory } from "@/types/place"
 import { Button } from "@/components/ui/button"
 import {
@@ -113,7 +112,7 @@ const AddPlaceDialog = () => {
     validators: {
       onSubmit: addPlaceSchema,
     },
-    onSubmit: async ({ value }) => {
+    onSubmit: ({ value }) => {
       console.log("Place data:", value)
       console.log("Images:", images)
       toast.success("Place added successfully!")

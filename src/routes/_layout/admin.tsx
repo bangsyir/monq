@@ -1,11 +1,11 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute, redirect } from "@tanstack/react-router"
 
-export const Route = createFileRoute('/_layout/admin')({
+export const Route = createFileRoute("/_layout/admin")({
   component: RouteComponent,
   beforeLoad: async ({ context, location }) => {
     const user = await context.user
-    if (user.role !== 'admin') {
-      throw redirect({ to: '/dashboard', search: location.href })
+    if (user.role !== "admin") {
+      throw redirect({ to: "/dashboard", search: location.href })
     }
   },
 })
@@ -28,7 +28,7 @@ function RouteComponent() {
           </p>
           <div className="bg-muted p-4 rounded-md">
             <code className="text-sm">
-              pnpm tsx scripts/set-admin.ts {'<user-email>'}
+              pnpm tsx scripts/set-admin.ts {"<user-email>"}
             </code>
           </div>
           <p className="text-muted-foreground text-sm mt-4">Example:</p>

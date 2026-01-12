@@ -1,9 +1,8 @@
 import { Link } from "@tanstack/react-router"
 import { motion } from "framer-motion"
-import { Compass,MapPin, Search } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
+import { Compass, MapPin, Search } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 
 const HeroSection = () => {
   return (
@@ -55,7 +54,7 @@ const HeroSection = () => {
                     className="w-full bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none"
                   />
                 </div>
-                <Link to="/places">
+                <Link to="/places" search={{ cat: "all" }}>
                   <Button
                     className={cn(
                       "w-full sm:w-auto gap-2 px-4 py-5 rounded-xl",

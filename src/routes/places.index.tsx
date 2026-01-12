@@ -1,8 +1,7 @@
+import React from "react"
 import { ClientOnly, createFileRoute } from "@tanstack/react-router"
 import { motion } from "framer-motion"
 import { Grid2x2, MapPin, SlidersHorizontal } from "lucide-react"
-import React from "react"
-
 import AddPlaceDialog from "@/components/add-place-component"
 import CategoryFilter from "@/components/category-filter"
 import PlaceCard from "@/components/place-card"
