@@ -16,6 +16,7 @@ import { Route as LayoutRouteRouteImport } from './routes/_layout/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlacesIndexRouteImport } from './routes/places.index'
 import { Route as PlacesPlaceIdRouteImport } from './routes/places.$placeId'
+import { Route as ApiUploadRouteImport } from './routes/api/upload'
 import { Route as LayoutDashboardRouteImport } from './routes/_layout/dashboard'
 import { Route as LayoutAdminRouteImport } from './routes/_layout/admin'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
@@ -54,6 +55,11 @@ const PlacesPlaceIdRoute = PlacesPlaceIdRouteImport.update({
   path: '/$placeId',
   getParentRoute: () => PlacesRoute,
 } as any)
+const ApiUploadRoute = ApiUploadRouteImport.update({
+  id: '/api/upload',
+  path: '/api/upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LayoutDashboardRoute = LayoutDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -77,6 +83,7 @@ export interface FileRoutesByFullPath {
   '/places': typeof PlacesRouteWithChildren
   '/admin': typeof LayoutAdminRoute
   '/dashboard': typeof LayoutDashboardRoute
+  '/api/upload': typeof ApiUploadRoute
   '/places/$placeId': typeof PlacesPlaceIdRoute
   '/places/': typeof PlacesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -87,6 +94,7 @@ export interface FileRoutesByTo {
   '/map': typeof MapRoute
   '/admin': typeof LayoutAdminRoute
   '/dashboard': typeof LayoutDashboardRoute
+  '/api/upload': typeof ApiUploadRoute
   '/places/$placeId': typeof PlacesPlaceIdRoute
   '/places': typeof PlacesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -100,6 +108,7 @@ export interface FileRoutesById {
   '/places': typeof PlacesRouteWithChildren
   '/_layout/admin': typeof LayoutAdminRoute
   '/_layout/dashboard': typeof LayoutDashboardRoute
+  '/api/upload': typeof ApiUploadRoute
   '/places/$placeId': typeof PlacesPlaceIdRoute
   '/places/': typeof PlacesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -113,6 +122,7 @@ export interface FileRouteTypes {
     | '/places'
     | '/admin'
     | '/dashboard'
+    | '/api/upload'
     | '/places/$placeId'
     | '/places/'
     | '/api/auth/$'
@@ -123,6 +133,7 @@ export interface FileRouteTypes {
     | '/map'
     | '/admin'
     | '/dashboard'
+    | '/api/upload'
     | '/places/$placeId'
     | '/places'
     | '/api/auth/$'
@@ -135,6 +146,7 @@ export interface FileRouteTypes {
     | '/places'
     | '/_layout/admin'
     | '/_layout/dashboard'
+    | '/api/upload'
     | '/places/$placeId'
     | '/places/'
     | '/api/auth/$'
@@ -146,6 +158,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   MapRoute: typeof MapRoute
   PlacesRoute: typeof PlacesRouteWithChildren
+  ApiUploadRoute: typeof ApiUploadRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -199,6 +212,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/places/$placeId'
       preLoaderRoute: typeof PlacesPlaceIdRouteImport
       parentRoute: typeof PlacesRoute
+    }
+    '/api/upload': {
+      id: '/api/upload'
+      path: '/api/upload'
+      fullPath: '/api/upload'
+      preLoaderRoute: typeof ApiUploadRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_layout/dashboard': {
       id: '/_layout/dashboard'
@@ -257,6 +277,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   MapRoute: MapRoute,
   PlacesRoute: PlacesRouteWithChildren,
+  ApiUploadRoute: ApiUploadRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
