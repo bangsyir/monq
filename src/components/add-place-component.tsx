@@ -27,7 +27,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { addPlaceSchema } from "@/schema/place-schema";
+import { addPlaceClientSchema } from "@/schema/place-schema";
 import { addPlace } from "@/serverFunction/place.function";
 import type { PlaceCategory } from "@/types/place";
 import { Label } from "./ui/label";
@@ -50,7 +50,7 @@ const difficulties = [
 
 const AddPlaceDialog = () => {
 	const [open, setOpen] = useState(false);
-	const [images, setImages] = useState<Array<File>>([]);
+	// const [images, setImages] = useState<Array<File>>([]);
 
 	const form = useForm({
 		defaultValues: {
@@ -69,26 +69,69 @@ const AddPlaceDialog = () => {
 			images: [] as Array<File> | null,
 		},
 		validators: {
-			onSubmit: addPlaceSchema,
+			onSubmit: addPlaceClientSchema,
 		},
 		onSubmit: async ({ value }) => {
-			value.images;
+			const filesToUpload = value.images || [];
 
-			console.log("Place data:", value);
-			console.log("Images:", images);
-			const insert = await addPlace({ data: value });
+			const uploadedUrls = await Promise.all(
+				filesToUpload.map(async (file) => {
+					const formData = new FormData();
+					formData.append("file", file);
+
+					const response = await fetch("/api/upload", {
+						method: "POST",
+						body: formData,
+					});
+					if (!response.ok) throw new Error("Failed to upload image");
+					const result = await response.json();
+					return result.url as string;
+				}),
+			);
+			const { images: _, ...rest } = value;
+			const data = {
+				...rest,
+				images: uploadedUrls || [],
+			};
+			const insert = await addPlace({ data });
 			toast.success(insert.message);
+			// const uploadedUrls: Array<string> = [];
+
+			// for (const file of value.images) {
+			//   const formData = new FormData();
+			//   formData.append("file", file);
+			//
+			//   const response = await fetch("/api/upload", {
+			//     method: "POST",
+			//     body: formData,
+			//   });
+			//
+			//   if (!response.ok) {
+			//     throw new Error("Failed to upload image");
+			//   }
+			//
+			//   const result = await response.json();
+			//   uploadedUrls.push(result.url);
+			// }
+			// const data = {
+			//      ...value,
+			//      images: uploadedUrls
+			//    }
+
+			// const insert = await addPlace({ data: data });
+			// toast.success(insert.message);
 			setOpen(false);
 			form.reset();
-			setImages([]);
+			// setImages([]);
 		},
 	});
 
-	const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (e.target.files) {
-			setImages(Array.from(e.target.files));
-		}
-	};
+	// const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	// 	if (e.target.files) {
+	// 		setImages(Array.from(e.target.files));
+	// 	}
+	// 	console.log(images);
+	// };
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
@@ -527,15 +570,19 @@ const AddPlaceDialog = () => {
 												onChange={(e) => {
 													const files = Array.from(e.target.files || []);
 													field.handleChange(files);
-													handleImageChange(e);
+													// handleImageChange(e);
 												}}
 												className="mx-auto max-w-xs"
 											/>
-											{images.length > 0 && (
-												<p className="mt-2 text-primary text-sm">
-													{images.length} image(s) selected
-												</p>
+											{isInvalid && (
+												<FieldError errors={field.state.meta.errors} />
 											)}
+
+											{/* {images.length > 0 && ( */}
+											{/* 	<p className="mt-2 text-primary text-sm"> */}
+											{/* 		{images.length} image(s) selected */}
+											{/* 	</p> */}
+											{/* )} */}
 										</div>
 									</Field>
 								);
@@ -547,10 +594,11 @@ const AddPlaceDialog = () => {
 							type="button"
 							variant="outline"
 							onClick={() => setOpen(false)}
+							className="cursor-pointer"
 						>
 							Cancel
 						</Button>
-						<Button type="submit">
+						<Button type="submit" className="cursor-pointer">
 							<Plus className="mr-2 h-4 w-4" />
 							Add Place
 						</Button>

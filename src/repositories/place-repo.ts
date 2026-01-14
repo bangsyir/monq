@@ -26,7 +26,7 @@ export async function insertPlace(
 			distance: data.distance,
 			rating: 0,
 		})
-		.returning({ id: places.id });
+		.returning({ id: places.id, title: places.name });
 }
 
 export function insertCategories(data: Array<InsertCategories>) {

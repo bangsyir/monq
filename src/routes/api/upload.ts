@@ -10,7 +10,6 @@ export const Route = createFileRoute("/api/upload")({
 				try {
 					const formData = await request.formData();
 					const file = formData.get("file") as File | null;
-
 					if (!file) {
 						return new Response(JSON.stringify({ error: "No file provided" }), {
 							status: 400,
