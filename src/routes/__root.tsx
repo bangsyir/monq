@@ -59,6 +59,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			<head>
 				<HeadContent />
 				<script
+					// biome-ignore lint/security/noDangerouslySetInnerHtml: this is darkmode theme handling
 					dangerouslySetInnerHTML={{
 						__html: `
             (function () {

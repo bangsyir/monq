@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,19 +29,15 @@ export function AuthUserDropdown({
 					/>
 				}
 			>
-				<div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-					<User className="w-5 h-5 text-muted-foreground" />
+				<div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
+					<User className="h-5 w-5 text-muted-foreground" />
 				</div>
 				{name}
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="w-56" align="start">
 				<DropdownMenuGroup>
 					<DropdownMenuLabel>My Account</DropdownMenuLabel>
-					<DropdownMenuItem>
-						Profile
-						<DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-					</DropdownMenuItem>
-					<DropdownMenuItem>
+					<DropdownMenuItem render={<Link to="/settings" />}>
 						Settings
 						<DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
 					</DropdownMenuItem>

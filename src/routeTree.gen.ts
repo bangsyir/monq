@@ -9,18 +9,31 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as PlacesRouteImport } from './routes/places'
 import { Route as MapRouteImport } from './routes/map'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as LayoutRouteRouteImport } from './routes/_layout/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlacesIndexRouteImport } from './routes/places.index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as PlacesPlaceIdRouteImport } from './routes/places.$placeId'
 import { Route as ApiUploadRouteImport } from './routes/api/upload'
+import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as AdminPlacesRouteImport } from './routes/admin/places'
 import { Route as LayoutDashboardRouteImport } from './routes/_layout/dashboard'
 import { Route as LayoutAdminRouteImport } from './routes/_layout/admin'
+import { Route as AdminPlacesIndexRouteImport } from './routes/admin/places.index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
+import { Route as AdminPlacesAddRouteImport } from './routes/admin/places.add'
+import { Route as AdminPlacesPlaceIdUpdateRouteImport } from './routes/admin/places.$placeId.update'
 
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PlacesRoute = PlacesRouteImport.update({
   id: '/places',
   path: '/places',
@@ -34,6 +47,11 @@ const MapRoute = MapRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LayoutRouteRoute = LayoutRouteRouteImport.update({
@@ -50,6 +68,11 @@ const PlacesIndexRoute = PlacesIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PlacesRoute,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const PlacesPlaceIdRoute = PlacesPlaceIdRouteImport.update({
   id: '/$placeId',
   path: '/$placeId',
@@ -59,6 +82,16 @@ const ApiUploadRoute = ApiUploadRouteImport.update({
   id: '/api/upload',
   path: '/api/upload',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminPlacesRoute = AdminPlacesRouteImport.update({
+  id: '/places',
+  path: '/places',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const LayoutDashboardRoute = LayoutDashboardRouteImport.update({
   id: '/dashboard',
@@ -70,100 +103,165 @@ const LayoutAdminRoute = LayoutAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => LayoutRouteRoute,
 } as any)
+const AdminPlacesIndexRoute = AdminPlacesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminPlacesRoute,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminPlacesAddRoute = AdminPlacesAddRouteImport.update({
+  id: '/add',
+  path: '/add',
+  getParentRoute: () => AdminPlacesRoute,
+} as any)
+const AdminPlacesPlaceIdUpdateRoute =
+  AdminPlacesPlaceIdUpdateRouteImport.update({
+    id: '/$placeId/update',
+    path: '/$placeId/update',
+    getParentRoute: () => AdminPlacesRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof LayoutAdminRoute
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
   '/places': typeof PlacesRouteWithChildren
-  '/admin': typeof LayoutAdminRoute
+  '/settings': typeof SettingsRoute
   '/dashboard': typeof LayoutDashboardRoute
+  '/admin/places': typeof AdminPlacesRouteWithChildren
+  '/admin/users': typeof AdminUsersRoute
   '/api/upload': typeof ApiUploadRoute
   '/places/$placeId': typeof PlacesPlaceIdRoute
+  '/admin/': typeof AdminIndexRoute
   '/places/': typeof PlacesIndexRoute
+  '/admin/places/add': typeof AdminPlacesAddRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/admin/places/': typeof AdminPlacesIndexRoute
+  '/admin/places/$placeId/update': typeof AdminPlacesPlaceIdUpdateRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
-  '/admin': typeof LayoutAdminRoute
+  '/settings': typeof SettingsRoute
+  '/admin': typeof AdminIndexRoute
   '/dashboard': typeof LayoutDashboardRoute
+  '/admin/users': typeof AdminUsersRoute
   '/api/upload': typeof ApiUploadRoute
   '/places/$placeId': typeof PlacesPlaceIdRoute
   '/places': typeof PlacesIndexRoute
+  '/admin/places/add': typeof AdminPlacesAddRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/admin/places': typeof AdminPlacesIndexRoute
+  '/admin/places/$placeId/update': typeof AdminPlacesPlaceIdUpdateRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_layout': typeof LayoutRouteRouteWithChildren
+  '/admin': typeof AdminRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
   '/places': typeof PlacesRouteWithChildren
+  '/settings': typeof SettingsRoute
   '/_layout/admin': typeof LayoutAdminRoute
   '/_layout/dashboard': typeof LayoutDashboardRoute
+  '/admin/places': typeof AdminPlacesRouteWithChildren
+  '/admin/users': typeof AdminUsersRoute
   '/api/upload': typeof ApiUploadRoute
   '/places/$placeId': typeof PlacesPlaceIdRoute
+  '/admin/': typeof AdminIndexRoute
   '/places/': typeof PlacesIndexRoute
+  '/admin/places/add': typeof AdminPlacesAddRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/admin/places/': typeof AdminPlacesIndexRoute
+  '/admin/places/$placeId/update': typeof AdminPlacesPlaceIdUpdateRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/login'
     | '/map'
     | '/places'
-    | '/admin'
+    | '/settings'
     | '/dashboard'
+    | '/admin/places'
+    | '/admin/users'
     | '/api/upload'
     | '/places/$placeId'
+    | '/admin/'
     | '/places/'
+    | '/admin/places/add'
     | '/api/auth/$'
+    | '/admin/places/'
+    | '/admin/places/$placeId/update'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
     | '/map'
+    | '/settings'
     | '/admin'
     | '/dashboard'
+    | '/admin/users'
     | '/api/upload'
     | '/places/$placeId'
     | '/places'
+    | '/admin/places/add'
     | '/api/auth/$'
+    | '/admin/places'
+    | '/admin/places/$placeId/update'
   id:
     | '__root__'
     | '/'
     | '/_layout'
+    | '/admin'
     | '/login'
     | '/map'
     | '/places'
+    | '/settings'
     | '/_layout/admin'
     | '/_layout/dashboard'
+    | '/admin/places'
+    | '/admin/users'
     | '/api/upload'
     | '/places/$placeId'
+    | '/admin/'
     | '/places/'
+    | '/admin/places/add'
     | '/api/auth/$'
+    | '/admin/places/'
+    | '/admin/places/$placeId/update'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LayoutRouteRoute: typeof LayoutRouteRouteWithChildren
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
   MapRoute: typeof MapRoute
   PlacesRoute: typeof PlacesRouteWithChildren
+  SettingsRoute: typeof SettingsRoute
   ApiUploadRoute: typeof ApiUploadRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/places': {
       id: '/places'
       path: '/places'
@@ -183,6 +281,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_layout': {
@@ -206,6 +311,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlacesIndexRouteImport
       parentRoute: typeof PlacesRoute
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/places/$placeId': {
       id: '/places/$placeId'
       path: '/$placeId'
@@ -219,6 +331,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/upload'
       preLoaderRoute: typeof ApiUploadRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/places': {
+      id: '/admin/places'
+      path: '/places'
+      fullPath: '/admin/places'
+      preLoaderRoute: typeof AdminPlacesRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/_layout/dashboard': {
       id: '/_layout/dashboard'
@@ -234,12 +360,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutAdminRouteImport
       parentRoute: typeof LayoutRouteRoute
     }
+    '/admin/places/': {
+      id: '/admin/places/'
+      path: '/'
+      fullPath: '/admin/places/'
+      preLoaderRoute: typeof AdminPlacesIndexRouteImport
+      parentRoute: typeof AdminPlacesRoute
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/places/add': {
+      id: '/admin/places/add'
+      path: '/add'
+      fullPath: '/admin/places/add'
+      preLoaderRoute: typeof AdminPlacesAddRouteImport
+      parentRoute: typeof AdminPlacesRoute
+    }
+    '/admin/places/$placeId/update': {
+      id: '/admin/places/$placeId/update'
+      path: '/$placeId/update'
+      fullPath: '/admin/places/$placeId/update'
+      preLoaderRoute: typeof AdminPlacesPlaceIdUpdateRouteImport
+      parentRoute: typeof AdminPlacesRoute
     }
   }
 }
@@ -258,6 +405,38 @@ const LayoutRouteRouteWithChildren = LayoutRouteRoute._addFileChildren(
   LayoutRouteRouteChildren,
 )
 
+interface AdminPlacesRouteChildren {
+  AdminPlacesAddRoute: typeof AdminPlacesAddRoute
+  AdminPlacesIndexRoute: typeof AdminPlacesIndexRoute
+  AdminPlacesPlaceIdUpdateRoute: typeof AdminPlacesPlaceIdUpdateRoute
+}
+
+const AdminPlacesRouteChildren: AdminPlacesRouteChildren = {
+  AdminPlacesAddRoute: AdminPlacesAddRoute,
+  AdminPlacesIndexRoute: AdminPlacesIndexRoute,
+  AdminPlacesPlaceIdUpdateRoute: AdminPlacesPlaceIdUpdateRoute,
+}
+
+const AdminPlacesRouteWithChildren = AdminPlacesRoute._addFileChildren(
+  AdminPlacesRouteChildren,
+)
+
+interface AdminRouteRouteChildren {
+  AdminPlacesRoute: typeof AdminPlacesRouteWithChildren
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminPlacesRoute: AdminPlacesRouteWithChildren,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
+
 interface PlacesRouteChildren {
   PlacesPlaceIdRoute: typeof PlacesPlaceIdRoute
   PlacesIndexRoute: typeof PlacesIndexRoute
@@ -274,9 +453,11 @@ const PlacesRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LayoutRouteRoute: LayoutRouteRouteWithChildren,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
   LoginRoute: LoginRoute,
   MapRoute: MapRoute,
   PlacesRoute: PlacesRouteWithChildren,
+  SettingsRoute: SettingsRoute,
   ApiUploadRoute: ApiUploadRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
