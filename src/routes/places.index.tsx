@@ -1,11 +1,10 @@
-import { ClientOnly, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Grid2x2, MapPin, SlidersHorizontal } from "lucide-react";
 import React from "react";
 import AddPlaceDialog from "@/components/add-place-component";
 import CategoryFilter from "@/components/category-filter";
 import PlaceCard from "@/components/place-card";
-import PlacesMap from "@/components/places-map";
 import { Button } from "@/components/ui/button";
 import { mockPlaces } from "@/data/mock-places";
 import type { PlaceCategory } from "@/types/place";
@@ -94,37 +93,28 @@ function RouteComponent() {
 							<AddPlaceDialog />
 						</div>
 					</motion.div>
-					{view === "grid" ? (
-						<>
-							{/* Places Grid */}
-							<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-								{places.map((place, index) => (
-									<PlaceCard key={place.id} place={place} index={index} />
-								))}
-							</div>
+					{/* Places Grid */}
+					<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+						{places.map((place, index) => (
+							<PlaceCard key={place.id} place={place} index={index} />
+						))}
+					</div>
 
-							{/* Empty State */}
-							{places.length === 0 && (
-								<motion.div
-									initial={{ opacity: 0 }}
-									animate={{ opacity: 1 }}
-									className="py-20 text-center"
-								>
-									<MapPin className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
-									<h2 className="mb-2 font-semibold text-foreground text-xl">
-										No places found
-									</h2>
-									<p className="text-muted-foreground">
-										Try selecting a different category to discover more hidden
-										gems.
-									</p>
-								</motion.div>
-							)}
-						</>
-					) : (
-						<ClientOnly fallback={<div>loading...</div>}>
-							<PlacesMap places={places} onClose={setView} />
-						</ClientOnly>
+					{/* Empty State */}
+					{places.length === 0 && (
+						<motion.div
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							className="py-20 text-center"
+						>
+							<MapPin className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
+							<h2 className="mb-2 font-semibold text-foreground text-xl">
+								No places found
+							</h2>
+							<p className="text-muted-foreground">
+								Try selecting a different category to discover more hidden gems.
+							</p>
+						</motion.div>
 					)}
 				</div>
 			</main>
