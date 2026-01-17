@@ -1,5 +1,5 @@
+import { Link, useLocation } from "@tanstack/react-router";
 import { GalleryVerticalEnd } from "lucide-react";
-
 import {
 	Sidebar,
 	SidebarContent,
@@ -15,74 +15,22 @@ import {
 
 // This is sample data.
 const data = {
-	versions: ["1.0.1", "1.1.0-alpha", "2.0.0-beta1"],
 	navMain: [
 		{
-			title: "Getting Started",
+			title: "Main",
 			url: "#",
 			items: [
 				{
-					title: "Installation",
-					url: "#",
+					title: "Dashboard",
+					url: "/admin",
 				},
 				{
-					title: "Project Structure",
-					url: "#",
-				},
-			],
-		},
-		{
-			title: "Building Your Application",
-			url: "#",
-			items: [
-				{
-					title: "Routing",
-					url: "#",
+					title: "Places",
+					url: "/admin/places",
 				},
 				{
-					title: "Data Fetching",
-					url: "#",
-					isActive: true,
-				},
-				{
-					title: "Rendering",
-					url: "#",
-				},
-				{
-					title: "Caching",
-					url: "#",
-				},
-				{
-					title: "Styling",
-					url: "#",
-				},
-				{
-					title: "Optimizing",
-					url: "#",
-				},
-				{
-					title: "Configuring",
-					url: "#",
-				},
-				{
-					title: "Testing",
-					url: "#",
-				},
-				{
-					title: "Authentication",
-					url: "#",
-				},
-				{
-					title: "Deploying",
-					url: "#",
-				},
-				{
-					title: "Upgrading",
-					url: "#",
-				},
-				{
-					title: "Examples",
-					url: "#",
+					title: "Users",
+					url: "/admin/users",
 				},
 			],
 		},
@@ -90,24 +38,32 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+	const location = useLocation();
+
+	const isActive = (url: string) => {
+		if (url === "/admin") {
+			return location.pathname === url;
+		}
+		return location.pathname.startsWith(url);
+	};
+
 	return (
 		<Sidebar {...props}>
 			<SidebarHeader>
 				<SidebarMenu>
 					<SidebarMenuItem>
 						<SidebarMenuButton size="lg" asChild>
-							<a href="#">
+							<Link to="/admin">
 								<div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
 									<GalleryVerticalEnd className="size-4" />
 								</div>
 								<div className="flex flex-col gap-0.5 leading-none">
-									<span className="font-medium">Documentation</span>
-									<span className="">v1.0.0</span>
+									<span className="font-medium">Monq admin</span>
 								</div>
-							</a>
-						</SidebarMenuButton>{" "}
+							</Link>
+						</SidebarMenuButton>
 					</SidebarMenuItem>
-				</SidebarMenu>{" "}
+				</SidebarMenu>
 			</SidebarHeader>
 			<SidebarContent>
 				{/* We create a SidebarGroup for each parent. */}
@@ -118,8 +74,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 							<SidebarMenu>
 								{item.items.map((item) => (
 									<SidebarMenuItem key={item.title}>
-										<SidebarMenuButton asChild isActive={item.isActive}>
-											<a href={item.url}>{item.title}</a>
+										<SidebarMenuButton asChild isActive={isActive(item.url)}>
+											<Link to={item.url}>{item.title}</Link>
 										</SidebarMenuButton>
 									</SidebarMenuItem>
 								))}
