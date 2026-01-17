@@ -2,19 +2,27 @@ import {
 	createFileRoute,
 	Link,
 	Outlet,
+	redirect,
 	useRouter,
 } from "@tanstack/react-router";
 import { GalleryVerticalEnd, LogOut } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
-import { getUser } from "@/lib/auth-server-func";
+import { getSession } from "@/lib/auth-server-func";
 
 export const Route = createFileRoute("/_layout")({
 	component: RouteComponent,
-
-	beforeLoad: async () => {
-		const user = await getUser();
-		return { user };
+	beforeLoad: async ({ location }) => {
+		const session = await getSession();
+		if (!session) {
+			throw redirect({
+				to: "/login",
+				search: {
+					redirect: location.href,
+				},
+			});
+		}
+		return session;
 	},
 	loader: ({ context }) => {
 		return { user: context.user };
@@ -36,22 +44,22 @@ function RouteComponent() {
 
 	return (
 		<div>
-			<div className="container flex justify-between items-center mx-auto px-4 py-2">
+			<div className="container mx-auto flex items-center justify-between px-4 py-2">
 				<Link
 					to="/"
 					className="flex items-center gap-2 self-center font-medium"
 				>
-					<div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
+					<div className="flex size-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
 						<GalleryVerticalEnd className="size-4" />
 					</div>
 				</Link>
 				<div className="flex items-center gap-3">
 					{isPending ? (
-						<span className="text-sm text-muted-foreground">Loading...</span>
+						<span className="text-muted-foreground text-sm">Loading...</span>
 					) : session ? (
 						<>
 							<Link to="/admin">Admin</Link>
-							<span className="text-sm font-medium">
+							<span className="font-medium text-sm">
 								{session.user.name || session.user.email}
 							</span>
 							<button
@@ -61,7 +69,7 @@ function RouteComponent() {
 									variant: "outline",
 								})}
 							>
-								<LogOut className="size-4 mr-2" />
+								<LogOut className="mr-2 size-4" />
 								Logout
 							</button>
 						</>

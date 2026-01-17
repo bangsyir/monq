@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
 	Breadcrumb,
@@ -14,9 +14,20 @@ import {
 	SidebarProvider,
 	SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { getSession } from "@/lib/auth-server-func";
 
 export const Route = createFileRoute("/admin")({
 	component: RouteComponent,
+	beforeLoad: async () => {
+		const session = await getSession();
+		if (!session) {
+			throw redirect({ to: "/login" });
+		}
+		if (session.user.role !== "admin") {
+			throw redirect({ to: "/" });
+		}
+		return session;
+	},
 });
 
 function RouteComponent() {
@@ -44,7 +55,9 @@ function RouteComponent() {
 						</BreadcrumbList>
 					</Breadcrumb>
 				</header>
-				<Outlet />
+				<div className="container mx-auto px-4">
+					<Outlet />
+				</div>
 			</SidebarInset>
 		</SidebarProvider>
 	);

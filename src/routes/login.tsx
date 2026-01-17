@@ -12,10 +12,12 @@ const fetchSession = createServerFn({ method: "GET" }).handler(async () => {
 });
 
 export const Route = createFileRoute("/login")({
-	beforeLoad: async ({ location }) => {
+	beforeLoad: async () => {
 		const data = await fetchSession();
 		if (data?.session) {
-			throw redirect({ to: "/", search: location.href });
+			throw redirect({
+				to: "/",
+			});
 		}
 	},
 	component: RouteComponent,
