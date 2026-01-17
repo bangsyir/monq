@@ -6,8 +6,11 @@ import { auth } from "@/lib/auth";
 export const authMiddleware = createMiddleware().server(async ({ next }) => {
 	const headers = getRequestHeaders();
 	const session = await auth.api.getSession({ headers });
+
 	if (!session) {
-		throw redirect({ to: "/login" });
+		throw redirect({
+			to: "/login",
+		});
 	}
 	return await next({
 		context: {
@@ -20,3 +23,26 @@ export const authMiddleware = createMiddleware().server(async ({ next }) => {
 		},
 	});
 });
+
+export const authAdminMiddleware = createMiddleware().server(
+	async ({ next }) => {
+		const headers = getRequestHeaders();
+		const session = await auth.api.getSession({ headers });
+		if (!session) {
+			throw redirect({ to: "/login" });
+		}
+		if (session.user.role !== "admin") {
+			throw redirect({ to: "/" });
+		}
+		return await next({
+			context: {
+				user: {
+					id: session.user.id,
+					name: session.user.name,
+					image: session.user.image,
+					role: session.user.role,
+				},
+			},
+		});
+	},
+);
