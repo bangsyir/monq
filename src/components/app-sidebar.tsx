@@ -1,4 +1,4 @@
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { GalleryVerticalEnd } from "lucide-react";
 import {
 	Sidebar,
@@ -38,13 +38,13 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-	const location = useLocation();
+	const routerState = useRouterState();
 
 	const isActive = (url: string) => {
 		if (url === "/admin") {
-			return location.pathname === url;
+			return routerState.location.pathname === url;
 		}
-		return location.pathname.startsWith(url);
+		return routerState.location.pathname.startsWith(url);
 	};
 
 	return (

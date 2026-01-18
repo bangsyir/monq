@@ -1,4 +1,10 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import {
+	createFileRoute,
+	Outlet,
+	redirect,
+	useRouterState,
+} from "@tanstack/react-router";
+import React from "react";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
 	Breadcrumb,
@@ -31,6 +37,55 @@ export const Route = createFileRoute("/admin")({
 });
 
 function RouteComponent() {
+	const routerState = useRouterState();
+
+	const breadcrumbs = React.useMemo(() => {
+		const pathname = routerState.location.pathname;
+		const crumbs = [];
+
+		// Always include admin dashboard as first breadcrumb
+		crumbs.push({
+			label: "Dashboard",
+			href: "/admin",
+		});
+
+		// Manual route matching based on pathname
+		if (pathname === "/admin/users" || pathname.startsWith("/admin/users/")) {
+			crumbs.push({
+				label: "Users",
+				href: "/admin/users",
+			});
+		}
+
+		// Match dynamic user detail routes
+		if (/^\/admin\/users\/[a-f0-9-]{36}$/.test(pathname)) {
+			// Users breadcrumb already added above
+			crumbs.push({
+				label: "User Details",
+				href: undefined, // Current page
+			});
+		}
+
+		// Match dynamic user update routes
+		if (/^\/admin\/users\/[a-f0-9-]{36}\/update$/.test(pathname)) {
+			// Users breadcrumb already added above
+			crumbs.push({
+				label: "Update User",
+				href: undefined, // Current page
+			});
+		}
+
+		// Add other admin routes here as needed
+		if (pathname === "/admin/places") {
+			crumbs.push({
+				label: "Places",
+				href: "/admin/places",
+			});
+		}
+
+		return crumbs;
+	}, [routerState.location.pathname]);
+
 	return (
 		<SidebarProvider>
 			<AppSidebar />
@@ -43,15 +98,27 @@ function RouteComponent() {
 					/>
 					<Breadcrumb>
 						<BreadcrumbList>
-							<BreadcrumbItem className="hidden md:block">
-								<BreadcrumbLink href="#">
-									Building Your Application
-								</BreadcrumbLink>
-							</BreadcrumbItem>
-							<BreadcrumbSeparator className="hidden md:block" />
-							<BreadcrumbItem>
-								<BreadcrumbPage>Data Fetching</BreadcrumbPage>
-							</BreadcrumbItem>
+							{breadcrumbs.map((crumb, index) => (
+								<React.Fragment key={index}>
+									<BreadcrumbItem className="hidden md:block">
+										{crumb.href ? (
+											<BreadcrumbLink
+												href={crumb.href}
+												className="flex items-center"
+											>
+												{crumb.label}
+											</BreadcrumbLink>
+										) : (
+											<BreadcrumbPage className="flex items-center">
+												{crumb.label}
+											</BreadcrumbPage>
+										)}
+									</BreadcrumbItem>
+									{index < breadcrumbs.length - 1 && (
+										<BreadcrumbSeparator className="hidden md:block" />
+									)}
+								</React.Fragment>
+							))}
 						</BreadcrumbList>
 					</Breadcrumb>
 				</header>

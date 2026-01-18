@@ -20,12 +20,14 @@ import { Route as PlacesIndexRouteImport } from './routes/places.index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as PlacesPlaceIdRouteImport } from './routes/places.$placeId'
 import { Route as ApiUploadRouteImport } from './routes/api/upload'
-import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminPlacesRouteImport } from './routes/admin/places'
 import { Route as LayoutDashboardRouteImport } from './routes/_layout/dashboard'
+import { Route as AdminUsersIndexRouteImport } from './routes/admin/users.index'
 import { Route as AdminPlacesIndexRouteImport } from './routes/admin/places.index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
+import { Route as AdminUsersUserIdRouteImport } from './routes/admin/users.$userId'
 import { Route as AdminPlacesAddRouteImport } from './routes/admin/places.add'
+import { Route as AdminUsersUserIdUpdateRouteImport } from './routes/admin/users_.$userId.update'
 import { Route as AdminPlacesPlaceIdUpdateRouteImport } from './routes/admin/places.$placeId.update'
 
 const SettingsRoute = SettingsRouteImport.update({
@@ -82,11 +84,6 @@ const ApiUploadRoute = ApiUploadRouteImport.update({
   path: '/api/upload',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminUsersRoute = AdminUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
 const AdminPlacesRoute = AdminPlacesRouteImport.update({
   id: '/places',
   path: '/places',
@@ -96,6 +93,11 @@ const LayoutDashboardRoute = LayoutDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => LayoutRouteRoute,
+} as any)
+const AdminUsersIndexRoute = AdminUsersIndexRouteImport.update({
+  id: '/users/',
+  path: '/users/',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminPlacesIndexRoute = AdminPlacesIndexRouteImport.update({
   id: '/',
@@ -107,10 +109,20 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminUsersUserIdRoute = AdminUsersUserIdRouteImport.update({
+  id: '/users/$userId',
+  path: '/users/$userId',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminPlacesAddRoute = AdminPlacesAddRouteImport.update({
   id: '/add',
   path: '/add',
   getParentRoute: () => AdminPlacesRoute,
+} as any)
+const AdminUsersUserIdUpdateRoute = AdminUsersUserIdUpdateRouteImport.update({
+  id: '/users_/$userId/update',
+  path: '/users/$userId/update',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminPlacesPlaceIdUpdateRoute =
   AdminPlacesPlaceIdUpdateRouteImport.update({
@@ -128,15 +140,17 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/dashboard': typeof LayoutDashboardRoute
   '/admin/places': typeof AdminPlacesRouteWithChildren
-  '/admin/users': typeof AdminUsersRoute
   '/api/upload': typeof ApiUploadRoute
   '/places/$placeId': typeof PlacesPlaceIdRoute
   '/admin/': typeof AdminIndexRoute
   '/places/': typeof PlacesIndexRoute
   '/admin/places/add': typeof AdminPlacesAddRoute
+  '/admin/users/$userId': typeof AdminUsersUserIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/admin/places/': typeof AdminPlacesIndexRoute
+  '/admin/users': typeof AdminUsersIndexRoute
   '/admin/places/$placeId/update': typeof AdminPlacesPlaceIdUpdateRoute
+  '/admin/users/$userId/update': typeof AdminUsersUserIdUpdateRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -144,15 +158,17 @@ export interface FileRoutesByTo {
   '/map': typeof MapRoute
   '/settings': typeof SettingsRoute
   '/dashboard': typeof LayoutDashboardRoute
-  '/admin/users': typeof AdminUsersRoute
   '/api/upload': typeof ApiUploadRoute
   '/places/$placeId': typeof PlacesPlaceIdRoute
   '/admin': typeof AdminIndexRoute
   '/places': typeof PlacesIndexRoute
   '/admin/places/add': typeof AdminPlacesAddRoute
+  '/admin/users/$userId': typeof AdminUsersUserIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/admin/places': typeof AdminPlacesIndexRoute
+  '/admin/users': typeof AdminUsersIndexRoute
   '/admin/places/$placeId/update': typeof AdminPlacesPlaceIdUpdateRoute
+  '/admin/users/$userId/update': typeof AdminUsersUserIdUpdateRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -165,15 +181,17 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/_layout/dashboard': typeof LayoutDashboardRoute
   '/admin/places': typeof AdminPlacesRouteWithChildren
-  '/admin/users': typeof AdminUsersRoute
   '/api/upload': typeof ApiUploadRoute
   '/places/$placeId': typeof PlacesPlaceIdRoute
   '/admin/': typeof AdminIndexRoute
   '/places/': typeof PlacesIndexRoute
   '/admin/places/add': typeof AdminPlacesAddRoute
+  '/admin/users/$userId': typeof AdminUsersUserIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/admin/places/': typeof AdminPlacesIndexRoute
+  '/admin/users/': typeof AdminUsersIndexRoute
   '/admin/places/$placeId/update': typeof AdminPlacesPlaceIdUpdateRoute
+  '/admin/users_/$userId/update': typeof AdminUsersUserIdUpdateRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -186,15 +204,17 @@ export interface FileRouteTypes {
     | '/settings'
     | '/dashboard'
     | '/admin/places'
-    | '/admin/users'
     | '/api/upload'
     | '/places/$placeId'
     | '/admin/'
     | '/places/'
     | '/admin/places/add'
+    | '/admin/users/$userId'
     | '/api/auth/$'
     | '/admin/places/'
+    | '/admin/users'
     | '/admin/places/$placeId/update'
+    | '/admin/users/$userId/update'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -202,15 +222,17 @@ export interface FileRouteTypes {
     | '/map'
     | '/settings'
     | '/dashboard'
-    | '/admin/users'
     | '/api/upload'
     | '/places/$placeId'
     | '/admin'
     | '/places'
     | '/admin/places/add'
+    | '/admin/users/$userId'
     | '/api/auth/$'
     | '/admin/places'
+    | '/admin/users'
     | '/admin/places/$placeId/update'
+    | '/admin/users/$userId/update'
   id:
     | '__root__'
     | '/'
@@ -222,15 +244,17 @@ export interface FileRouteTypes {
     | '/settings'
     | '/_layout/dashboard'
     | '/admin/places'
-    | '/admin/users'
     | '/api/upload'
     | '/places/$placeId'
     | '/admin/'
     | '/places/'
     | '/admin/places/add'
+    | '/admin/users/$userId'
     | '/api/auth/$'
     | '/admin/places/'
+    | '/admin/users/'
     | '/admin/places/$placeId/update'
+    | '/admin/users_/$userId/update'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -324,13 +348,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiUploadRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/users': {
-      id: '/admin/users'
-      path: '/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AdminUsersRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
     '/admin/places': {
       id: '/admin/places'
       path: '/places'
@@ -344,6 +361,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard'
       preLoaderRoute: typeof LayoutDashboardRouteImport
       parentRoute: typeof LayoutRouteRoute
+    }
+    '/admin/users/': {
+      id: '/admin/users/'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/admin/places/': {
       id: '/admin/places/'
@@ -359,12 +383,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/users/$userId': {
+      id: '/admin/users/$userId'
+      path: '/users/$userId'
+      fullPath: '/admin/users/$userId'
+      preLoaderRoute: typeof AdminUsersUserIdRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/places/add': {
       id: '/admin/places/add'
       path: '/add'
       fullPath: '/admin/places/add'
       preLoaderRoute: typeof AdminPlacesAddRouteImport
       parentRoute: typeof AdminPlacesRoute
+    }
+    '/admin/users_/$userId/update': {
+      id: '/admin/users_/$userId/update'
+      path: '/users/$userId/update'
+      fullPath: '/admin/users/$userId/update'
+      preLoaderRoute: typeof AdminUsersUserIdUpdateRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/admin/places/$placeId/update': {
       id: '/admin/places/$placeId/update'
@@ -406,14 +444,18 @@ const AdminPlacesRouteWithChildren = AdminPlacesRoute._addFileChildren(
 
 interface AdminRouteRouteChildren {
   AdminPlacesRoute: typeof AdminPlacesRouteWithChildren
-  AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminUsersUserIdRoute: typeof AdminUsersUserIdRoute
+  AdminUsersIndexRoute: typeof AdminUsersIndexRoute
+  AdminUsersUserIdUpdateRoute: typeof AdminUsersUserIdUpdateRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminPlacesRoute: AdminPlacesRouteWithChildren,
-  AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminUsersUserIdRoute: AdminUsersUserIdRoute,
+  AdminUsersIndexRoute: AdminUsersIndexRoute,
+  AdminUsersUserIdUpdateRoute: AdminUsersUserIdUpdateRoute,
 }
 
 const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
