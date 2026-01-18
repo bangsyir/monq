@@ -9,8 +9,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 
-const getUserFn = createServerFn({ method: "GET" }).handler(
-	async ({ data }: { data: { userId: string } }) => {
+const getUserFn = createServerFn({ method: "GET" })
+	.inputValidator((data: { userId: string }) => data)
+	.handler(async ({ data }) => {
 		const user = await db
 			.select()
 			.from(users)
@@ -18,8 +19,7 @@ const getUserFn = createServerFn({ method: "GET" }).handler(
 			.limit(1);
 
 		return user[0] || null;
-	},
-);
+	});
 
 export const Route = createFileRoute("/admin/users/$userId")({
 	loader: async ({ params }) => {
@@ -39,7 +39,7 @@ function RouteComponent() {
 	}
 
 	const handleBack = () => {
-		navigate({ to: "/admin/users" });
+		navigate({ to: "/admin/users", search: true });
 	};
 
 	return (

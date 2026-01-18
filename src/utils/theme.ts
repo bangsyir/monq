@@ -15,7 +15,7 @@ export const setStorageItem = (key: string, value: string) => {
 export const THEME = "theme";
 
 export function getSystemTheme(): "light" | "dark" {
-	if (typeof window === "undefined") return "light";
+	if (typeof window === "undefined") return "dark";
 	return window.matchMedia("(prefers-color-scheme: dark)").matches
 		? "dark"
 		: "light";

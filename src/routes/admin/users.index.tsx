@@ -30,7 +30,7 @@ const UserQuerySchema = z.object({
 	sortBy: z.enum(["name", "email", "createdAt", "role"]).default("createdAt"),
 	sortOrder: z.enum(["asc", "desc"]).default("desc"),
 });
-
+type UserFilter = z.infer<typeof UserQuerySchema>;
 // Function to get total users count (cached separately)
 const getTotalUsersCount = createServerFn({ method: "GET" }).handler(
 	async () => {
@@ -98,14 +98,7 @@ const getUsersFn = createServerFn({ method: "GET" })
 	});
 export const Route = createFileRoute("/admin/users/")({
 	ssr: false,
-	validateSearch: (search: Record<string, unknown>) => ({
-		search: (search.search as string) || "",
-		limit: Number(search.limit) || 10,
-		offset: Number(search.offset) || 0,
-		sortBy:
-			(search.sortBy as "name" | "email" | "createdAt" | "role") || "createdAt",
-		sortOrder: (search.sortOrder as "asc" | "desc") || "desc",
-	}),
+	validateSearch: () => ({}) as UserFilter,
 	loaderDeps: ({ search: { search, limit, offset, sortBy, sortOrder } }) => ({
 		search,
 		limit,
