@@ -93,6 +93,7 @@ const getUsersFn = createServerFn({ method: "GET" })
 		return {
 			users: result,
 			totalCount,
+			offset,
 			hasMore: offset + limit < totalCount,
 		};
 	});
@@ -322,7 +323,7 @@ function RouteComponent() {
 						onClick={() =>
 							handlePageChange(Math.max(0, search.offset - search.limit))
 						}
-						disabled={search.offset === 0}
+						disabled={data.offset === 0}
 						className="rounded-md border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
 					>
 						Previous

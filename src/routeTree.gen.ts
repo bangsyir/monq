@@ -29,6 +29,7 @@ import { Route as AdminUsersUserIdRouteImport } from './routes/admin/users.$user
 import { Route as AdminPlacesAddRouteImport } from './routes/admin/places.add'
 import { Route as AdminUsersUserIdUpdateRouteImport } from './routes/admin/users_.$userId.update'
 import { Route as AdminPlacesPlaceIdUpdateRouteImport } from './routes/admin/places.$placeId.update'
+import { Route as AdminPlacesPlaceIdImagesRouteImport } from './routes/admin/places.$placeId.images'
 
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
@@ -130,6 +131,12 @@ const AdminPlacesPlaceIdUpdateRoute =
     path: '/$placeId/update',
     getParentRoute: () => AdminPlacesRoute,
   } as any)
+const AdminPlacesPlaceIdImagesRoute =
+  AdminPlacesPlaceIdImagesRouteImport.update({
+    id: '/$placeId/images',
+    path: '/$placeId/images',
+    getParentRoute: () => AdminPlacesRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -149,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/admin/places/': typeof AdminPlacesIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
+  '/admin/places/$placeId/images': typeof AdminPlacesPlaceIdImagesRoute
   '/admin/places/$placeId/update': typeof AdminPlacesPlaceIdUpdateRoute
   '/admin/users/$userId/update': typeof AdminUsersUserIdUpdateRoute
 }
@@ -167,6 +175,7 @@ export interface FileRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/admin/places': typeof AdminPlacesIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
+  '/admin/places/$placeId/images': typeof AdminPlacesPlaceIdImagesRoute
   '/admin/places/$placeId/update': typeof AdminPlacesPlaceIdUpdateRoute
   '/admin/users/$userId/update': typeof AdminUsersUserIdUpdateRoute
 }
@@ -190,6 +199,7 @@ export interface FileRoutesById {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/admin/places/': typeof AdminPlacesIndexRoute
   '/admin/users/': typeof AdminUsersIndexRoute
+  '/admin/places/$placeId/images': typeof AdminPlacesPlaceIdImagesRoute
   '/admin/places/$placeId/update': typeof AdminPlacesPlaceIdUpdateRoute
   '/admin/users_/$userId/update': typeof AdminUsersUserIdUpdateRoute
 }
@@ -213,6 +223,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/admin/places/'
     | '/admin/users'
+    | '/admin/places/$placeId/images'
     | '/admin/places/$placeId/update'
     | '/admin/users/$userId/update'
   fileRoutesByTo: FileRoutesByTo
@@ -231,6 +242,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/admin/places'
     | '/admin/users'
+    | '/admin/places/$placeId/images'
     | '/admin/places/$placeId/update'
     | '/admin/users/$userId/update'
   id:
@@ -253,6 +265,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/admin/places/'
     | '/admin/users/'
+    | '/admin/places/$placeId/images'
     | '/admin/places/$placeId/update'
     | '/admin/users_/$userId/update'
   fileRoutesById: FileRoutesById
@@ -411,6 +424,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPlacesPlaceIdUpdateRouteImport
       parentRoute: typeof AdminPlacesRoute
     }
+    '/admin/places/$placeId/images': {
+      id: '/admin/places/$placeId/images'
+      path: '/$placeId/images'
+      fullPath: '/admin/places/$placeId/images'
+      preLoaderRoute: typeof AdminPlacesPlaceIdImagesRouteImport
+      parentRoute: typeof AdminPlacesRoute
+    }
   }
 }
 
@@ -429,12 +449,14 @@ const LayoutRouteRouteWithChildren = LayoutRouteRoute._addFileChildren(
 interface AdminPlacesRouteChildren {
   AdminPlacesAddRoute: typeof AdminPlacesAddRoute
   AdminPlacesIndexRoute: typeof AdminPlacesIndexRoute
+  AdminPlacesPlaceIdImagesRoute: typeof AdminPlacesPlaceIdImagesRoute
   AdminPlacesPlaceIdUpdateRoute: typeof AdminPlacesPlaceIdUpdateRoute
 }
 
 const AdminPlacesRouteChildren: AdminPlacesRouteChildren = {
   AdminPlacesAddRoute: AdminPlacesAddRoute,
   AdminPlacesIndexRoute: AdminPlacesIndexRoute,
+  AdminPlacesPlaceIdImagesRoute: AdminPlacesPlaceIdImagesRoute,
   AdminPlacesPlaceIdUpdateRoute: AdminPlacesPlaceIdUpdateRoute,
 }
 

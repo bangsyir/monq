@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { asc, count, desc, like, or, sql } from "drizzle-orm";
-import { Edit, MapPin, MoreHorizontal, Star } from "lucide-react";
+import { Edit, Image, MapPin, MoreHorizontal, Star } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -110,6 +110,7 @@ const getPlacesFn = createServerFn({ method: "GET" })
 		return {
 			places: result,
 			totalCount,
+			offset,
 			hasMore: offset + limit < totalCount,
 		};
 	});
@@ -223,7 +224,7 @@ function RouteComponent() {
 				<TableHeader>
 					<TableRow>
 						<TableHead
-							className="cursor-pointer hover:bg-gray-100"
+							className="cursor-pointer"
 							onClick={() => handleSort("name")}
 						>
 							Name{" "}
@@ -231,7 +232,7 @@ function RouteComponent() {
 								(search.sortOrder === "asc" ? "↑" : "↓")}
 						</TableHead>
 						<TableHead
-							className="cursor-pointer hover:bg-gray-100"
+							className="cursor-pointer"
 							onClick={() => handleSort("rating")}
 						>
 							Rating{" "}
@@ -239,7 +240,7 @@ function RouteComponent() {
 								(search.sortOrder === "asc" ? "↑" : "↓")}
 						</TableHead>
 						<TableHead
-							className="cursor-pointer hover:bg-gray-100"
+							className="cursor-pointer"
 							onClick={() => handleSort("city")}
 						>
 							Location{" "}
@@ -249,16 +250,14 @@ function RouteComponent() {
 						<TableHead>Difficulty</TableHead>
 						<TableHead>Duration/Distance</TableHead>
 						<TableHead
-							className="cursor-pointer hover:bg-gray-100"
+							className="cursor-pointer"
 							onClick={() => handleSort("createdAt")}
 						>
 							Created{" "}
 							{search.sortBy === "createdAt" &&
 								(search.sortOrder === "asc" ? "↑" : "↓")}
 						</TableHead>
-						<TableHead className="cursor-pointer hover:bg-gray-100">
-							Action{" "}
-						</TableHead>
+						<TableHead className="cursor-pointer">Action </TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>
@@ -311,10 +310,10 @@ function RouteComponent() {
 							</TableCell>
 							<TableCell>
 								<DropdownMenu>
-									<DropdownMenuTrigger>
-										<Button variant="ghost" className="h-8 w-8 p-0">
-											<MoreHorizontal className="h-4 w-4" />
-										</Button>
+									<DropdownMenuTrigger
+										render={<Button variant="ghost" className="h-8 w-8 p-0" />}
+									>
+										<MoreHorizontal className="h-4 w-4" />
 									</DropdownMenuTrigger>
 									<DropdownMenuContent align="end">
 										<DropdownMenuItem
@@ -322,6 +321,17 @@ function RouteComponent() {
 										>
 											<Edit className="mr-2 h-4 w-4" />
 											Edit Place
+										</DropdownMenuItem>
+										<DropdownMenuItem
+											render={
+												<Link
+													to="/admin/places/$placeId/images"
+													params={{ placeId: place.id }}
+												/>
+											}
+										>
+											<Image className="mr-2 h-4 w-4" />
+											Edit Image
 										</DropdownMenuItem>
 									</DropdownMenuContent>
 								</DropdownMenu>
@@ -343,7 +353,7 @@ function RouteComponent() {
 						onClick={() =>
 							handlePageChange(Math.max(0, search.offset - search.limit))
 						}
-						disabled={search.offset === 0}
+						disabled={data.offset === 0}
 						className="rounded-md border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
 					>
 						Previous

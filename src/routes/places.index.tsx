@@ -9,16 +9,15 @@ import { Button } from "@/components/ui/button";
 import { mockPlaces } from "@/data/mock-places";
 import type { PlaceCategory } from "@/types/place";
 
+type CategoryFilterType = {
+	cat: string;
+};
 export const Route = createFileRoute("/places/")({
 	component: RouteComponent,
-	validateSearch: (search) => {
-		return {
-			cat: (search.cat as string) || "all",
-		};
-	},
+	validateSearch: () => ({}) as CategoryFilterType,
 	loaderDeps: ({ search: { cat } }) => ({ cat }),
 	loader: ({ deps: { cat } }) => {
-		if (cat === "" || cat === "all") {
+		if (cat === undefined || cat === "all") {
 			return {
 				selectedCategory: "all",
 				places: mockPlaces,

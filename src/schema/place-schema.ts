@@ -81,3 +81,30 @@ export const addPlaceServerSchema = z.object({
 });
 
 export type AddPlaceServer = z.infer<typeof addPlaceServerSchema>;
+
+export const updatePlaceClientSchema = addPlaceClientSchema
+	.extend({
+		id: z.uuid(),
+	})
+	.partial({
+		name: true,
+		description: true,
+		categories: true,
+		address: true,
+		city: true,
+		state: true,
+		country: true,
+		latitude: true,
+		longitude: true,
+		difficulty: true,
+		duration: true,
+		distance: true,
+		images: true,
+	});
+
+export const updatePlaceServerSchema = addPlaceServerSchema.extend({
+	id: z.uuid(),
+});
+
+export type UpdatePlaceClient = z.infer<typeof updatePlaceClientSchema>;
+export type UpdatePlaceServer = z.infer<typeof updatePlaceServerSchema>;
