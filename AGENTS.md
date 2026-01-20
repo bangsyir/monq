@@ -10,14 +10,6 @@ bun preview      # Preview production build
 bun check        # Run all Biome checks (lint + format)
 ```
 
-### Testing
-```bash
-bun test                 # Run all tests
-bun test path/to/test    # Run specific test file
-bun test --reporter=verbose    # Detailed test output
-bun test --ui            # Interactive test UI (if configured)
-```
-
 ### Database (Drizzle ORM)
 ```bash
 bun db:generate   # Generate migrations from schema changes
@@ -112,12 +104,6 @@ pnpm dlx shadcn@latest add [component-name]
 - Mock external dependencies and API calls
 - Ensure accessibility in component tests
 
-## Git Workflow
-
-- Feature branches: `feature/description` or `fix/description`
-- Commit messages: conventional commits (feat:, fix:, docs:, etc.)
-- Run `bun check` before committing to ensure code quality
-- Include tests for new features and bug fixes
 
 ## Performance Considerations
 
