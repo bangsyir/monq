@@ -205,7 +205,7 @@ function RouteComponent() {
 					<TableRow>
 						<TableHead>Image</TableHead>
 						<TableHead
-							className="cursor-pointer hover:bg-gray-100"
+							className="cursor-pointer"
 							onClick={() => handleSort("name")}
 						>
 							Name{" "}
@@ -213,7 +213,7 @@ function RouteComponent() {
 								(search.sortOrder === "asc" ? "↑" : "↓")}
 						</TableHead>
 						<TableHead
-							className="cursor-pointer hover:bg-gray-100"
+							className="cursor-pointer"
 							onClick={() => handleSort("email")}
 						>
 							Email{" "}
@@ -221,7 +221,7 @@ function RouteComponent() {
 								(search.sortOrder === "asc" ? "↑" : "↓")}
 						</TableHead>
 						<TableHead
-							className="cursor-pointer hover:bg-gray-100"
+							className="cursor-pointer"
 							onClick={() => handleSort("role")}
 						>
 							Role{" "}
@@ -230,16 +230,14 @@ function RouteComponent() {
 						</TableHead>
 						<TableHead>Status</TableHead>
 						<TableHead
-							className="cursor-pointer hover:bg-gray-100"
+							className="cursor-pointer"
 							onClick={() => handleSort("createdAt")}
 						>
 							Created{" "}
 							{search.sortBy === "createdAt" &&
 								(search.sortOrder === "asc" ? "↑" : "↓")}
 						</TableHead>
-						<TableHead className="cursor-pointer hover:bg-gray-100">
-							Action{" "}
-						</TableHead>
+						<TableHead>Action</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>

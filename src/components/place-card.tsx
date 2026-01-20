@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { Heart, MapPin, Star } from "lucide-react";
+import { MapPin, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Place } from "@/types/place";
 
@@ -17,10 +17,10 @@ const categoryLabels: Record<string, string> = {
 	mountain: "Mountain",
 };
 const difficultyColors: Record<string, string> = {
-	easy: "bg-success/10 text-success border-success/20",
-	moderate: "bg-warning/10 text-warning border-warning/20",
-	hard: "bg-accent/10 text-accent border-accent/20",
-	expert: "bg-destructive/10 text-destructive border-destructive/20",
+	easy: "bg-success border-success/20",
+	moderate: "bg-warning border-warning/20",
+	hard: "bg-accent border-accent/20",
+	expert: "bg-destructive border-destructive/20",
 };
 
 const PlaceCard = ({ place, index = 0 }: PlaceCardProps) => {
@@ -47,17 +47,17 @@ const PlaceCard = ({ place, index = 0 }: PlaceCardProps) => {
 					</div>
 
 					{/* Favorite Button */}
-					<motion.button
-						className="absolute top-3 right-3 rounded-full bg-card/80 p-2 shadow-md backdrop-blur-sm transition-colors hover:bg-card"
-						whileHover={{ scale: 1.1 }}
-						whileTap={{ scale: 0.9 }}
-						onClick={(e) => {
-							e.preventDefault();
-							e.stopPropagation();
-						}}
-					>
-						<Heart className="h-5 w-5 text-foreground" />
-					</motion.button>
+					{/* <motion.button */}
+					{/* 	className="absolute top-3 right-3 rounded-full bg-card/80 p-2 shadow-md backdrop-blur-sm transition-colors hover:bg-card" */}
+					{/* 	whileHover={{ scale: 1.1 }} */}
+					{/* 	whileTap={{ scale: 0.9 }} */}
+					{/* 	onClick={(e) => { */}
+					{/* 		e.preventDefault(); */}
+					{/* 		e.stopPropagation(); */}
+					{/* 	}} */}
+					{/* > */}
+					{/* 	<Heart className="h-5 w-5 text-foreground" /> */}
+					{/* </motion.button> */}
 
 					{/* Featured Badge */}
 					{place.isFeatured && (

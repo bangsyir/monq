@@ -30,7 +30,8 @@
 				"noChildrenProp": "off"
 			},
 			"suspicious": {
-				"noArrayIndexKey": "off"
+				"noArrayIndexKey": "off",
+        "noShadowRestrictedNames": "error"
 			},
 			"nursery": {
 				"useSortedClasses": {
@@ -47,6 +48,11 @@
 	"javascript": {
 		"formatter": {
 			"quoteStyle": "double"
+		}
+	},
+	"json": {
+		"formatter": {
+			"enabled": false
 		}
 	}
 }

@@ -5,6 +5,7 @@ import React from "react";
 import AddPlaceDialog from "@/components/add-place-component";
 import CategoryFilter from "@/components/category-filter";
 import PlaceCard from "@/components/place-card";
+import { PlaceExample } from "@/components/place-map";
 import { Button } from "@/components/ui/button";
 import { mockPlaces } from "@/data/mock-places";
 import type { PlaceCategory } from "@/types/place";
@@ -93,11 +94,15 @@ function RouteComponent() {
 						</div>
 					</motion.div>
 					{/* Places Grid */}
-					<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-						{places.map((place, index) => (
-							<PlaceCard key={place.id} place={place} index={index} />
-						))}
-					</div>
+					{view === "grid" ? (
+						<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+							{places.map((place, index) => (
+								<PlaceCard key={place.id} place={place} index={index} />
+							))}
+						</div>
+					) : (
+						<PlaceExample />
+					)}
 
 					{/* Empty State */}
 					{places.length === 0 && (
