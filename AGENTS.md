@@ -3,14 +3,18 @@
 ## Development Commands
 
 ### Core Commands
+
 ```bash
 bun dev          # Start development server (port 3000)
 bun build        # Build for production
 bun preview      # Preview production build
-bun check        # Run all Biome checks (lint + format)
+bun check        # Run all perttier checks (lint)
+bun format       # Run format using prettier
+bun lint         # Run eslint
 ```
 
 ### Database (Drizzle ORM)
+
 ```bash
 bun db:generate   # Generate migrations from schema changes
 bun db:migrate     # Apply pending migrations
@@ -32,17 +36,13 @@ bun db:studio     # Open Drizzle Studio for database management
 ## Code Style Guidelines
 
 ### Import Organization
-- Biome automatically organizes imports on save
+
+- Eslint automatically organizes imports on save
 - Use path aliases: `@/components/*`, `@/lib/utils`, `@/hooks/*`
 - Order: external libraries → internal modules → relative imports
 
-### Formatting (Biome Configuration)
-- **Indentation**: Tabs
-- **Quotes**: Double quotes for JS/TS
-- **Line endings**: System default
-- **Semicolons**: Required (TypeScript standard)
-
 ### Naming Conventions
+
 - **Components**: PascalCase (e.g., `UserProfile.tsx`)
 - **Functions/Variables**: camelCase
 - **Constants**: UPPER_SNAKE_CASE for exports, camelCase for locals
@@ -50,6 +50,7 @@ bun db:studio     # Open Drizzle Studio for database management
 - **Hooks**: `use` prefix (e.g., `useUserData`)
 
 ### TypeScript Standards
+
 - Strict mode enabled - all type checking enforced
 - Use explicit return types for public APIs
 - Prefer `interface` over `type` for object shapes
@@ -57,6 +58,7 @@ bun db:studio     # Open Drizzle Studio for database management
 - Unused locals/parameters are checked and should be removed
 
 ### Error Handling
+
 - Use TanStack Query's built-in error handling for API calls
 - Implement error boundaries for React components
 - Log errors appropriately but don't expose sensitive data
@@ -65,18 +67,21 @@ bun db:studio     # Open Drizzle Studio for database management
 ## UI Development
 
 ### Shadcn/UI Components
+
 ```bash
 # Install new components (always use latest version)
 pnpm dlx shadcn@latest add [component-name]
 ```
 
 ### Styling with Tailwind v4
+
 - Use utility classes from the configured design system
 - Leverage CSS custom properties for theming
 - Dark mode support via next-themes
 - Responsive design with mobile-first approach
 
 ### Component Patterns
+
 - Place reusable components in `src/components/`
 - UI components from shadcn go in `src/components/ui/`
 - Use compound component patterns for complex UIs
@@ -85,12 +90,14 @@ pnpm dlx shadcn@latest add [component-name]
 ## Database & API
 
 ### Schema Changes
+
 1. Edit `src/db/schema.ts`
 2. Run `bun db:generate` to create migration
 3. Run `bun db:migrate` to apply changes
 4. Use `bun db:studio` for visual database management
 
 ### API Patterns
+
 - Use TanStack Query and Tanstact start for data fetching
 - Implement proper loading/error states
 - Cache strategies via query keys
@@ -103,7 +110,6 @@ pnpm dlx shadcn@latest add [component-name]
 - Test user behavior, not implementation details
 - Mock external dependencies and API calls
 - Ensure accessibility in component tests
-
 
 ## Performance Considerations
 

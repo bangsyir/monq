@@ -1,18 +1,18 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { motion } from "framer-motion";
-import { Grid2x2, MapPin, SlidersHorizontal } from "lucide-react";
-import React from "react";
-import type { PlaceCategory } from "@/types/place";
-import AddPlaceDialog from "@/components/add-place-component";
-import CategoryFilter from "@/components/category-filter";
-import PlaceCard from "@/components/place-card";
-import { PlaceExample } from "@/components/place-map";
-import { Button } from "@/components/ui/button";
-import { mockPlaces } from "@/data/mock-places";
+import { createFileRoute } from "@tanstack/react-router"
+import { motion } from "framer-motion"
+import { Grid2x2, MapPin, SlidersHorizontal } from "lucide-react"
+import React from "react"
+import type { PlaceCategory } from "@/types/place"
+import AddPlaceDialog from "@/components/add-place-component"
+import CategoryFilter from "@/components/category-filter"
+import PlaceCard from "@/components/place-card"
+import { PlaceExample } from "@/components/place-map"
+import { Button } from "@/components/ui/button"
+import { mockPlaces } from "@/data/mock-places"
 
 type CategoryFilterType = {
-  cat: string;
-};
+  cat: string
+}
 export const Route = createFileRoute("/places/")({
   component: RouteComponent,
   validateSearch: () => ({}) as CategoryFilterType,
@@ -22,25 +22,25 @@ export const Route = createFileRoute("/places/")({
       return {
         selectedCategory: "all",
         places: mockPlaces,
-      };
+      }
     }
     return {
       selectedCategory: cat,
       places: mockPlaces.filter((places) =>
         places.categories.includes(cat as PlaceCategory),
       ),
-    };
+    }
   },
-});
+})
 
 function RouteComponent() {
-  const { selectedCategory, places } = Route.useLoaderData();
-  const [view, setView] = React.useState<"grid" | "map">("grid");
+  const { selectedCategory, places } = Route.useLoaderData()
+  const [view, setView] = React.useState<"grid" | "map">("grid")
 
   return (
     <>
       {/* Category Filter */}
-      <div className="fixed right-0 left-0 z-40 border-border border-b bg-background/95 backdrop-blur-md">
+      <div className="border-border bg-background/95 fixed right-0 left-0 z-40 border-b backdrop-blur-md">
         <div className="container mx-auto">
           <CategoryFilter selectedCategory={selectedCategory} />
         </div>
@@ -56,12 +56,12 @@ function RouteComponent() {
             className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-center"
           >
             <div>
-              <h1 className="font-bold text-2xl text-foreground md:text-3xl">
+              <h1 className="text-foreground text-2xl font-bold md:text-3xl">
                 {selectedCategory === "all"
                   ? "All Hidden Gems"
                   : `${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)}s`}
               </h1>
-              <p className="mt-1 text-muted-foreground">
+              <p className="text-muted-foreground mt-1">
                 {places.length} places to explore
               </p>
             </div>
@@ -90,7 +90,7 @@ function RouteComponent() {
                   </>
                 )}
               </Button>
-              <AddPlaceDialog />
+              {/* <AddPlaceDialog /> */}
             </div>
           </motion.div>
           {/* Places Grid */}
@@ -111,8 +111,8 @@ function RouteComponent() {
               animate={{ opacity: 1 }}
               className="py-20 text-center"
             >
-              <MapPin className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
-              <h2 className="mb-2 font-semibold text-foreground text-xl">
+              <MapPin className="text-muted-foreground mx-auto mb-4 h-16 w-16" />
+              <h2 className="text-foreground mb-2 text-xl font-semibold">
                 No places found
               </h2>
               <p className="text-muted-foreground">
@@ -123,5 +123,5 @@ function RouteComponent() {
         </div>
       </main>
     </>
-  );
+  )
 }
