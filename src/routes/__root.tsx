@@ -1,67 +1,67 @@
 import { TanStackDevtools } from "@tanstack/react-devtools";
-import type { QueryClient } from "@tanstack/react-query";
 import {
-	createRootRouteWithContext,
-	HeadContent,
-	Outlet,
-	Scripts,
+  HeadContent,
+  Outlet,
+  Scripts,
+  createRootRouteWithContext,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "@/components/ui/sonner";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
+import type { QueryClient } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/theme-provider";
 
 interface MyRouterContext {
-	queryClient: QueryClient;
+  queryClient: QueryClient;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
-	head: () => ({
-		meta: [
-			{
-				charSet: "utf-8",
-			},
-			{
-				name: "viewport",
-				content: "width=device-width, initial-scale=1",
-			},
-			{
-				title: "Discover Nature's Best Kept Secrets'",
-			},
-		],
-		links: [
-			{
-				rel: "stylesheet",
-				href: appCss,
-			},
-		],
-	}),
-	shellComponent: RootComponent,
-	notFoundComponent: () => {
-		return <p>Not found!</p>;
-	},
+  head: () => ({
+    meta: [
+      {
+        charSet: "utf-8",
+      },
+      {
+        name: "viewport",
+        content: "width=device-width, initial-scale=1",
+      },
+      {
+        title: "Discover Nature's Best Kept Secrets'",
+      },
+    ],
+    links: [
+      {
+        rel: "stylesheet",
+        href: appCss,
+      },
+    ],
+  }),
+  shellComponent: RootComponent,
+  notFoundComponent: () => {
+    return <p>Not found!</p>;
+  },
 });
 
 function RootComponent() {
-	return (
-		<ThemeProvider>
-			<RootDocument>
-				<Outlet />
-			</RootDocument>
-		</ThemeProvider>
-	);
+  return (
+    <ThemeProvider>
+      <RootDocument>
+        <Outlet />
+      </RootDocument>
+    </ThemeProvider>
+  );
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-	return (
-		<html lang="en" suppressHydrationWarning>
-			<head>
-				<HeadContent />
-				<script
-					// biome-ignore lint/security/noDangerouslySetInnerHtml: this is darkmode theme handling
-					dangerouslySetInnerHTML={{
-						__html: `
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <HeadContent />
+        <script
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: this is darkmode theme handling
+          dangerouslySetInnerHTML={{
+            __html: `
             (function () {
               try {
                 var theme = localStorage.getItem("theme");
@@ -72,26 +72,26 @@ function RootDocument({ children }: { children: React.ReactNode }) {
               } catch (_) {}
             })();
           `,
-					}}
-				/>
-			</head>
-			<body>
-				{children}
-				<TanStackDevtools
-					config={{
-						position: "bottom-right",
-					}}
-					plugins={[
-						{
-							name: "Tanstack Router",
-							render: <TanStackRouterDevtoolsPanel />,
-						},
-						TanStackQueryDevtools,
-					]}
-				/>
-				<Toaster />
-				<Scripts />
-			</body>
-		</html>
-	);
+          }}
+        />
+      </head>
+      <body>
+        {children}
+        <TanStackDevtools
+          config={{
+            position: "bottom-right",
+          }}
+          plugins={[
+            {
+              name: "Tanstack Router",
+              render: <TanStackRouterDevtoolsPanel />,
+            },
+            TanStackQueryDevtools,
+          ]}
+        />
+        <Toaster />
+        <Scripts />
+      </body>
+    </html>
+  );
 }

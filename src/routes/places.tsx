@@ -1,15 +1,15 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { Outlet, createFileRoute } from "@tanstack/react-router";
 import { Navbar } from "@/components/navbar";
 
 export const Route = createFileRoute("/places")({
-	component: RouteComponent,
+  component: RouteComponent,
 });
 
 function RouteComponent() {
-	return (
-		<div className="min-h-screen">
-			<Navbar />
-			<Outlet />
-		</div>
-	);
+  return (
+    <div className="min-h-screen">
+      <Navbar />
+      <Outlet />
+    </div>
+  );
 }
