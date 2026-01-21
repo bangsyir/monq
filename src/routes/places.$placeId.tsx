@@ -1,5 +1,5 @@
-import { Link, createFileRoute, useParams } from "@tanstack/react-router";
-import { motion } from "framer-motion";
+import { Link, createFileRoute, useParams } from "@tanstack/react-router"
+import { motion } from "framer-motion"
 import {
   ArrowLeft,
   Bike,
@@ -7,6 +7,7 @@ import {
   Car,
   Clock,
   Dog,
+  ExternalLink,
   Fish,
   Flame,
   Heart,
@@ -17,13 +18,15 @@ import {
   Star,
   Tent,
   Waves,
-} from "lucide-react";
-import ReviewCard from "@/components/review-card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Textarea } from "@/components/ui/textarea";
-import { mockPlaces, mockReviews } from "@/data/mock-places";
+} from "lucide-react"
+import { useState } from "react"
+import type { PlaceComment } from "@/types/place"
+import CommentCard from "@/components/comment-card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
+import { Textarea } from "@/components/ui/textarea"
+import { mockComments, mockPlaces } from "@/data/mock-places"
 
 const amenityIcons: Record<string, React.ReactNode> = {
   car: <Car className="h-5 w-5" />,
@@ -50,29 +53,72 @@ const amenityIcons: Record<string, React.ReactNode> = {
   fish: <Fish className="h-5 w-5" />,
   tent: <Tent className="h-5 w-5" />,
   "mountain-snow": <Mountain className="h-5 w-5" />,
-};
+}
 
 const difficultyColors: Record<string, string> = {
   easy: "bg-green-500 text-foreground",
   moderate: "bg-yellow-500 text-foreground",
   hard: "bg-accent text-accent-foreground",
   expert: "bg-destructive text-foreground",
-};
+}
 
 export const Route = createFileRoute("/places/$placeId")({
   component: RouteComponent,
-});
+})
 
 function RouteComponent() {
-  const { placeId } = useParams({ from: "/places/$placeId" });
-  const place = mockPlaces.find((p) => p.id === placeId);
-  const reviews = mockReviews[placeId] ?? [];
+  const { placeId } = useParams({ from: "/places/$placeId" })
+  const place = mockPlaces.find((p) => p.id === placeId)
+  const [comments, setComments] = useState<Array<PlaceComment>>(
+    mockComments[placeId] ?? [],
+  )
+  const [newComment, setNewComment] = useState("")
+
+  const handleAddComment = () => {
+    if (newComment.trim()) {
+      const comment: PlaceComment = {
+        id: Date.now().toString(),
+        userId: "user1",
+        userName: "Guest User",
+        userAvatar: "",
+        comment: newComment,
+        createdAt: new Date().toISOString(),
+        replies: [],
+      }
+      setComments([comment, ...comments])
+      setNewComment("")
+    }
+  }
+
+  const handleReply = (commentId: string, replyText: string) => {
+    setComments(
+      comments.map((comment) => {
+        if (comment.id === commentId) {
+          return {
+            ...comment,
+            replies: [
+              ...(comment.replies || []),
+              {
+                id: Date.now().toString(),
+                userId: "user1",
+                userName: "Guest User",
+                userAvatar: "",
+                comment: replyText,
+                createdAt: new Date().toISOString(),
+              },
+            ],
+          }
+        }
+        return comment
+      }),
+    )
+  }
 
   if (!place) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <h1 className="mb-2 font-bold text-2xl text-foreground">
+          <h1 className="text-foreground mb-2 text-2xl font-bold">
             Place not found
           </h1>
           <Link to="/places" search={{ cat: "all" }}>
@@ -80,7 +126,7 @@ function RouteComponent() {
           </Link>
         </div>
       </div>
-    );
+    )
   }
   return (
     <div>
@@ -116,7 +162,7 @@ function RouteComponent() {
                   initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: (i + 1) * 0.1 }}
-                  className="aspect-square bg-muted"
+                  className="bg-muted aspect-square"
                 >
                   <img
                     src={place.images[i % place.images.length]?.url}
@@ -141,13 +187,13 @@ function RouteComponent() {
               >
                 <div className="mb-4 flex flex-wrap items-start justify-between gap-4">
                   <div>
-                    <h1 className="mb-2 font-bold text-3xl text-foreground md:text-4xl">
+                    <h1 className="text-foreground mb-2 text-3xl font-bold md:text-4xl">
                       {place.name}
                     </h1>
-                    <div className="flex flex-wrap items-center gap-4 text-muted-foreground">
+                    <div className="text-muted-foreground flex flex-wrap items-center gap-4">
                       <div className="flex items-center gap-1">
-                        <Star className="h-5 w-5 fill-accent text-accent" />
-                        <span className="font-semibold text-foreground">
+                        <Star className="fill-accent text-accent h-5 w-5" />
+                        <span className="text-foreground font-semibold">
                           {place.rating}
                         </span>
                         <span>({place.reviewCount} reviews)</span>
@@ -191,37 +237,37 @@ function RouteComponent() {
                 className="grid grid-cols-2 gap-4 md:grid-cols-4"
               >
                 {place.distance && (
-                  <div className="rounded-xl bg-secondary p-4">
-                    <Router className="mb-2 h-6 w-6 text-primary" />
+                  <div className="bg-secondary rounded-xl p-4">
+                    <Router className="text-primary mb-2 h-6 w-6" />
                     <p className="text-muted-foreground text-sm">Distance</p>
-                    <p className="font-semibold text-foreground">
+                    <p className="text-foreground font-semibold">
                       {place.distance}
                     </p>
                   </div>
                 )}
                 {place.duration && (
-                  <div className="rounded-xl bg-secondary p-4">
-                    <Clock className="mb-2 h-6 w-6 text-primary" />
+                  <div className="bg-secondary rounded-xl p-4">
+                    <Clock className="text-primary mb-2 h-6 w-6" />
                     <p className="text-muted-foreground text-sm">Duration</p>
-                    <p className="font-semibold text-foreground">
+                    <p className="text-foreground font-semibold">
                       {place.duration}
                     </p>
                   </div>
                 )}
                 {place.elevation && (
-                  <div className="rounded-xl bg-secondary p-4">
-                    <Mountain className="mb-2 h-6 w-6 text-primary" />
+                  <div className="bg-secondary rounded-xl p-4">
+                    <Mountain className="text-primary mb-2 h-6 w-6" />
                     <p className="text-muted-foreground text-sm">Elevation</p>
-                    <p className="font-semibold text-foreground">
+                    <p className="text-foreground font-semibold">
                       {place.elevation}
                     </p>
                   </div>
                 )}
                 {place.bestSeason && (
-                  <div className="rounded-xl bg-secondary p-4">
-                    <Calendar className="mb-2 h-6 w-6 text-primary" />
+                  <div className="bg-secondary rounded-xl p-4">
+                    <Calendar className="text-primary mb-2 h-6 w-6" />
                     <p className="text-muted-foreground text-sm">Best Season</p>
-                    <p className="font-semibold text-foreground">
+                    <p className="text-foreground font-semibold">
                       {place.bestSeason.join(", ")}
                     </p>
                   </div>
@@ -236,7 +282,7 @@ function RouteComponent() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
-                <h2 className="mb-4 font-semibold text-foreground text-xl">
+                <h2 className="text-foreground mb-4 text-xl font-semibold">
                   About this place
                 </h2>
                 <p className="text-foreground leading-relaxed">
@@ -252,14 +298,14 @@ function RouteComponent() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
-                <h2 className="mb-4 font-semibold text-foreground text-xl">
+                <h2 className="text-foreground mb-4 text-xl font-semibold">
                   What this place offers
                 </h2>
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
                   {place.amenities.map((amenity) => (
                     <div
                       key={amenity.id}
-                      className="flex items-center gap-3 rounded-lg bg-secondary p-3"
+                      className="bg-secondary flex items-center gap-3 rounded-lg p-3"
                     >
                       <div className="text-primary">
                         {amenityIcons[amenity.icon] || (
@@ -274,58 +320,54 @@ function RouteComponent() {
 
               <Separator />
 
-              {/* Reviews */}
+              {/* Comments */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
               >
                 <div className="mb-6 flex items-center justify-between">
-                  <h2 className="font-semibold text-foreground text-xl">
-                    Reviews ({reviews.length})
+                  <h2 className="text-foreground text-xl font-semibold">
+                    Comments ({comments.length})
                   </h2>
                   <div className="flex items-center gap-2">
-                    <Star className="h-5 w-5 fill-accent text-accent" />
-                    <span className="font-semibold text-foreground">
+                    <Star className="fill-accent text-accent h-5 w-5" />
+                    <span className="text-foreground font-semibold">
                       {place.rating}
                     </span>
                   </div>
                 </div>
 
-                {/* Add Review */}
-                <div className="mb-6 rounded-xl bg-secondary p-6">
-                  <h3 className="mb-4 font-semibold text-foreground">
-                    Write a review
+                {/* Add Comment */}
+                <div className="bg-secondary mb-6 rounded-xl p-6">
+                  <h3 className="text-foreground mb-4 font-semibold">
+                    Leave a comment
                   </h3>
-                  <div className="mb-4 flex gap-1">
-                    {[...Array(5)].map((a, _) => (
-                      <button
-                        type="button"
-                        key={a}
-                        className="p-1 transition-transform hover:scale-110"
-                      >
-                        <Star className="h-6 w-6 fill-muted text-muted hover:fill-accent hover:text-accent" />
-                      </button>
-                    ))}
-                  </div>
                   <Textarea
-                    placeholder="Share your experience..."
-                    className="mb-4 bg-background"
+                    placeholder="Share your thoughts..."
+                    className="bg-background mb-4"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
                   />
-                  <Button variant="nature">Submit Review</Button>
-                  <p className="mt-3 text-muted-foreground text-sm">
-                    Please log in to submit a review.
+                  <Button onClick={handleAddComment}>Post Comment</Button>
+                  <p className="text-muted-foreground mt-3 text-sm">
+                    Please log in to post a comment.
                   </p>
                 </div>
 
-                {/* Review List */}
+                {/* Comment List */}
                 <div className="space-y-4">
-                  {reviews.map((review, index) => (
-                    <ReviewCard key={review.id} review={review} index={index} />
+                  {comments.map((comment, index) => (
+                    <CommentCard
+                      key={comment.id}
+                      comment={comment}
+                      index={index}
+                      onReply={handleReply}
+                    />
                   ))}
-                  {reviews.length === 0 && (
-                    <p className="py-8 text-center text-muted-foreground">
-                      No reviews yet. Be the first to share your experience!
+                  {comments.length === 0 && (
+                    <p className="text-muted-foreground py-8 text-center">
+                      No comments yet. Be the first to share your thoughts!
                     </p>
                   )}
                 </div>
@@ -341,14 +383,14 @@ function RouteComponent() {
                 className="sticky top-28 space-y-6"
               >
                 {/* Location Card */}
-                <div className="rounded-xl border border-border bg-card p-6 shadow-card">
-                  <h3 className="mb-4 font-semibold text-foreground">
+                <div className="border-border bg-card shadow-card rounded-xl border p-6">
+                  <h3 className="text-foreground mb-4 font-semibold">
                     Location
                   </h3>
 
                   {/* Map Placeholder */}
-                  <div className="mb-4 flex aspect-video items-center justify-center rounded-lg bg-muted">
-                    <div className="text-center text-muted-foreground">
+                  <div className="bg-muted mb-4 flex aspect-video items-center justify-center rounded-lg">
+                    <div className="text-muted-foreground text-center">
                       <MapPin className="mx-auto mb-2 h-8 w-8" />
                       <p className="text-sm">Map View</p>
                     </div>
@@ -356,7 +398,7 @@ function RouteComponent() {
 
                   <div className="space-y-3 text-sm">
                     <div className="flex items-start gap-2">
-                      <MapPin className="mt-0.5 h-4 w-4 text-muted-foreground" />
+                      <MapPin className="text-muted-foreground mt-0.5 h-4 w-4" />
                       <div>
                         <p className="text-foreground">
                           {place.location.address}
@@ -373,27 +415,50 @@ function RouteComponent() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <p className="text-muted-foreground">Latitude</p>
-                        <p className="font-mono text-foreground">
+                        <p className="text-foreground font-mono">
                           {place.location.latitude.toFixed(4)}
                         </p>
                       </div>
                       <div>
                         <p className="text-muted-foreground">Longitude</p>
-                        <p className="font-mono text-foreground">
+                        <p className="text-foreground font-mono">
                           {place.location.longitude.toFixed(4)}
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  <Button variant="nature" className="mt-4 w-full">
-                    Get Directions
-                  </Button>
+                  <div className="mt-4 space-y-2">
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${place.location.latitude},${place.location.longitude}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block"
+                    >
+                      <Button variant="outline" className="w-full">
+                        <ExternalLink className="mr-2 h-4 w-4" />
+                        Google Maps
+                      </Button>
+                    </a>
+                    {place.categories.includes("hiking") && (
+                      <a
+                        href={`https://www.alltrails.com/search?q=${encodeURIComponent(place.name + " " + place.location.city + " " + place.location.state)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block"
+                      >
+                        <Button variant="outline" className="w-full">
+                          <ExternalLink className="mr-2 h-4 w-4" />
+                          AllTrails
+                        </Button>
+                      </a>
+                    )}
+                  </div>
                 </div>
 
                 {/* Weather Card */}
-                <div className="rounded-xl border border-border bg-card p-6 shadow-card">
-                  <h3 className="mb-4 font-semibold text-foreground">
+                <div className="border-border bg-card shadow-card rounded-xl border p-6">
+                  <h3 className="text-foreground mb-4 font-semibold">
                     Best Time to Visit
                   </h3>
                   {place.bestSeason && (
@@ -405,7 +470,7 @@ function RouteComponent() {
                       ))}
                     </div>
                   )}
-                  <p className="mt-4 text-muted-foreground text-sm">
+                  <p className="text-muted-foreground mt-4 text-sm">
                     Plan your visit during these seasons for the best
                     experience.
                   </p>
@@ -418,5 +483,5 @@ function RouteComponent() {
 
       {/* <Footer /> */}
     </div>
-  );
+  )
 }
