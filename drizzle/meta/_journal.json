@@ -36,6 +36,20 @@
       "when": 1768204751744,
       "tag": "0004_late_avengers",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1769085452797,
+      "tag": "0005_outgoing_dagger",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1769089320537,
+      "tag": "0006_true_iron_fist",
+      "breakpoints": true
     }
   ]
 }

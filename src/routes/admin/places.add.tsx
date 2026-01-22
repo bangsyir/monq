@@ -42,6 +42,23 @@ const difficulties = [
   { value: "expert", label: "Expert" },
 ]
 
+const amenityIcons = [
+  { value: "car", label: "Car", icon: "🚗" },
+  { value: "toilet", label: "Restrooms", icon: "🚻" },
+  { value: "waves", label: "Swimming", icon: "🌊" },
+  { value: "flame", label: "Fire Pit", icon: "🔥" },
+  { value: "table", label: "Picnic Table", icon: "🪵" },
+  { value: "sunrise", label: "Ocean View", icon: "🌅" },
+  { value: "mountain", label: "Scenic Overlook", icon: "⛰️" },
+  { value: "dog", label: "Dog Friendly", icon: "🐕" },
+  { value: "bike", label: "Bike Allowed", icon: "🚲" },
+  { value: "sailboat", label: "Kayaking", icon: "⛵" },
+  { value: "fish", label: "Fishing", icon: "🐟" },
+  { value: "tent", label: "Camping", icon: "⛺" },
+  { value: "mountain-snow", label: "Technical Climb", icon: "🏔️" },
+  { value: "signpost", label: "Trail Markers", icon: "🪧" },
+]
+
 export const Route = createFileRoute("/admin/places/add")({
   ssr: false,
   component: RouteComponent,
@@ -66,6 +83,7 @@ function RouteComponent() {
       duration: "",
       distance: "",
       images: [] as Array<File> | null,
+      amenities: [] as Array<{ name: string; icon: string }>,
     },
     validators: {
       onSubmit: addPlaceClientSchema,
@@ -517,6 +535,100 @@ function RouteComponent() {
                   }}
                 />
               </div>
+            </div>
+
+            {/* Amenities */}
+            <div className="space-y-4">
+              <form.Field
+                name="amenities"
+                children={(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor={field.name}>
+                        Amenities (Optional)
+                      </FieldLabel>
+                      <div className="space-y-3">
+                        {/* Selected amenities */}
+                        {field.state.value.length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {field.state.value.map((amenity, index) => (
+                              <div
+                                key={index}
+                                className="bg-secondary text-secondary-foreground inline-flex items-center gap-1 rounded-full px-3 py-1"
+                              >
+                                <span>
+                                  {
+                                    amenityIcons.find(
+                                      (icon) => icon.value === amenity.icon,
+                                    )?.icon
+                                  }
+                                </span>
+                                {amenity.name}
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    field.handleChange(
+                                      field.state.value.filter(
+                                        (_, i) => i !== index,
+                                      ),
+                                    )
+                                  }}
+                                  className="hover:bg-muted ml-1 rounded-full p-0.5"
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Add new amenity */}
+                        <div className="space-y-2">
+                          <div className="flex gap-2">
+                            <select
+                              className="border-input bg-background flex-1 rounded-md border px-3 py-2 text-sm"
+                              onChange={(e) => {
+                                const selectedIcon = e.target.value
+                                if (selectedIcon) {
+                                  const icon = amenityIcons.find(
+                                    (i) => i.value === selectedIcon,
+                                  )
+                                  if (icon) {
+                                    field.handleChange([
+                                      ...field.state.value,
+                                      { name: icon.label, icon: icon.value },
+                                    ])
+                                    e.target.value = ""
+                                  }
+                                }
+                              }}
+                            >
+                              <option value="">Add amenity...</option>
+                              {amenityIcons
+                                .filter(
+                                  (icon) =>
+                                    !field.state.value.some(
+                                      (amenity) => amenity.icon === icon.value,
+                                    ),
+                                )
+                                .map((icon) => (
+                                  <option key={icon.value} value={icon.value}>
+                                    {icon.icon} {icon.label}
+                                  </option>
+                                ))}
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                    </Field>
+                  )
+                }}
+              />
             </div>
 
             {/* Images */}

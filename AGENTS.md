@@ -1,18 +1,5 @@
 # AGENTS.md
 
-## Development Commands
-
-### Core Commands
-
-```bash
-bun dev          # Start development server (port 3000)
-bun build        # Build for production
-bun preview      # Preview production build
-bun check        # Run all perttier checks (lint)
-bun format       # Run format using prettier
-bun lint         # Run eslint
-```
-
 ### Database (Drizzle ORM)
 
 ```bash

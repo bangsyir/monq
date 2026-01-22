@@ -112,19 +112,6 @@ export const categories = pgTable("categories", {
 })
 
 /**
- * AMENITIES TABLE
- * Normalized from the amenities array inside places.
- * This allows reusing amenities like "Parking" across different places.
- */
-export const amenities = pgTable("amenities", {
-  id: uuid("id")
-    .$defaultFn(() => uuidv7())
-    .primaryKey(),
-  name: text("name").notNull(),
-  icon: text("icon").notNull(),
-})
-
-/**
  * PLACES TABLE
  * Represents the main `mockPlaces` objects.
  * I flattened the `location` object into columns for easier querying.
@@ -159,6 +146,9 @@ export const places = pgTable(
 
     // Using a native Postgres array for seasons
     bestSeason: text("best_season").array(),
+
+    // Amenities as JSON array (matches mock data structure)
+    amenities: text("amenities").array(),
 
     isFeatured: boolean("is_featured").default(false),
     createdAt: timestamp("created_at", {
@@ -204,18 +194,7 @@ export const placeImages = pgTable("place_images", {
   url: text("url").notNull(),
   alt: text("alt"),
 })
-/**
- * PLACE AMENITIES TABLE
- * Many-to-many relationship between Places and Amenities.
- */
-export const placeAmenities = pgTable("place_amenities", {
-  placeId: uuid("place_id")
-    .references(() => places.id, { onDelete: "cascade" })
-    .notNull(),
-  amenityId: uuid("amenity_id")
-    .references(() => amenities.id, { onDelete: "cascade" })
-    .notNull(),
-})
+
 /**
  * REVIEWS TABLE
  * Represents the `mockReviews` data.
@@ -241,6 +220,48 @@ export const reviews = pgTable("reviews", {
     .notNull(),
 })
 
+/**
+ * COMMENTS TABLE
+ * Represents user comments on places with support for threaded replies.
+ * Based on the PlaceComment interface in the frontend.
+ */
+export const comments = pgTable(
+  "comments",
+  {
+    id: uuid("id")
+      .$defaultFn(() => uuidv7())
+      .primaryKey(),
+    placeId: uuid("place_id")
+      .references(() => places.id, { onDelete: "cascade" })
+      .notNull(),
+    userId: uuid("user_id")
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
+    parentId: uuid("parent_id"),
+    comment: text("comment").notNull(),
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+      mode: "date",
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", {
+      withTimezone: true,
+      mode: "date",
+      precision: 3,
+    })
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("comments_place_id_idx").on(table.placeId),
+    index("comments_user_id_idx").on(table.userId),
+    index("comments_parent_id_idx").on(table.parentId),
+  ],
+)
+
 // ==========================================
 // RELATIONSHIPS
 // ==========================================
@@ -249,6 +270,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   sessions: many(sessions),
   accounts: many(accounts),
   places: many(places),
+  comments: many(comments),
 }))
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
@@ -276,29 +298,14 @@ export const placesRelations = relations(places, ({ one, many }) => ({
   }),
   categories: many(placeCategories),
   images: many(placeImages),
-  amenities: many(placeAmenities),
   reviews: many(reviews),
-}))
-
-export const amenitiesRelations = relations(amenities, ({ many }) => ({
-  places: many(placeAmenities),
+  comments: many(comments),
 }))
 
 export const placeImagesRelations = relations(placeImages, ({ one }) => ({
   place: one(places, {
     fields: [placeImages.placeId],
     references: [places.id],
-  }),
-}))
-
-export const placeAmenitiesRelations = relations(placeAmenities, ({ one }) => ({
-  place: one(places, {
-    fields: [placeAmenities.placeId],
-    references: [places.id],
-  }),
-  amenity: one(amenities, {
-    fields: [placeAmenities.amenityId],
-    references: [amenities.id],
   }),
 }))
 export const placeCategoriesRelations = relations(
@@ -319,4 +326,17 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
     fields: [reviews.userId],
     references: [users.id],
   }),
+}))
+
+export const commentsRelations = relations(comments, ({ one }) => ({
+  place: one(places, {
+    fields: [comments.placeId],
+    references: [places.id],
+  }),
+  user: one(users, {
+    fields: [comments.userId],
+    references: [users.id],
+  }),
+  // Note: For threaded replies, you'll need to handle parentId queries manually
+  // due to Drizzle ORM limitations with self-referencing relations
 }))

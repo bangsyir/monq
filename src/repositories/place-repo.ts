@@ -27,6 +27,7 @@ export async function insertPlace(
       duration: data.duration,
       distance: data.distance,
       rating: 0,
+      amenities: data.amenities || [],
     })
     .returning({ id: places.id, title: places.name })
 }
