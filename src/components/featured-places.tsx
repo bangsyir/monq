@@ -1,14 +1,14 @@
-import { Link } from "@tanstack/react-router";
-import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
-import PlaceCard from "./place-card";
-import { Button } from "@/components/ui/button";
-import { mockPlaces } from "@/data/mock-places";
+import { Link } from "@tanstack/react-router"
+import { motion } from "framer-motion"
+import { ArrowRight } from "lucide-react"
+import PlaceCard from "./place-card"
+import { Button } from "@/components/ui/button"
+import { mockPlaces } from "@/data/mock-places"
 
 const FeaturedPlaces = () => {
   const featuredPlaces = mockPlaces
     .filter((place) => place.isFeatured)
-    .slice(0, 4);
+    .slice(0, 4)
 
   return (
     <section className="bg-background py-20">
@@ -21,10 +21,10 @@ const FeaturedPlaces = () => {
           className="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end"
         >
           <div>
-            <h2 className="mb-2 font-bold text-3xl text-foreground md:text-4xl">
+            <h2 className="text-foreground mb-2 text-3xl font-bold md:text-4xl">
               Featured Hidden Gems
             </h2>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-muted-foreground text-lg">
               Handpicked destinations that will take your breath away
             </p>
           </div>
@@ -43,7 +43,7 @@ const FeaturedPlaces = () => {
         </div>
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default FeaturedPlaces;
+export default FeaturedPlaces

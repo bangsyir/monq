@@ -1,12 +1,12 @@
-import { Link } from "@tanstack/react-router";
-import { motion } from "framer-motion";
-import { MapPin, Star } from "lucide-react";
-import type { Place } from "@/types/place";
-import { Badge } from "@/components/ui/badge";
+import { Link } from "@tanstack/react-router"
+import { motion } from "framer-motion"
+import { MapPin, Star } from "lucide-react"
+import type { Place } from "@/types/place"
+import { Badge } from "@/components/ui/badge"
 
 interface PlaceCardProps {
-  place: Place;
-  index?: number;
+  place: Place
+  index?: number
 }
 const categoryLabels: Record<string, string> = {
   waterfall: "Waterfall",
@@ -15,13 +15,13 @@ const categoryLabels: Record<string, string> = {
   trail: "Trail",
   lake: "Lake",
   mountain: "Mountain",
-};
+}
 const difficultyColors: Record<string, string> = {
   easy: "bg-success border-success/20",
   moderate: "bg-warning border-warning/20",
   hard: "bg-accent border-accent/20",
   expert: "bg-destructive border-destructive/20",
-};
+}
 
 const PlaceCard = ({ place, index = 0 }: PlaceCardProps) => {
   return (
@@ -62,7 +62,7 @@ const PlaceCard = ({ place, index = 0 }: PlaceCardProps) => {
           {/* Featured Badge */}
           {place.isFeatured && (
             <div className="absolute top-3 left-3">
-              <Badge className="border-0 bg-accent text-accent-foreground shadow-md">
+              <Badge className="bg-accent text-accent-foreground border-0 shadow-md">
                 Featured
               </Badge>
             </div>
@@ -85,16 +85,16 @@ const PlaceCard = ({ place, index = 0 }: PlaceCardProps) => {
         {/* Content */}
         <div className="mt-3 space-y-1">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="line-clamp-1 font-semibold text-foreground transition-colors group-hover:text-primary">
+            <h3 className="text-foreground group-hover:text-primary line-clamp-1 font-semibold transition-colors">
               {place.name}
             </h3>
             <div className="flex shrink-0 items-center gap-1">
-              <Star className="h-4 w-4 fill-foreground text-foreground" />
-              <span className="font-medium text-sm">{place.rating}</span>
+              <Star className="fill-foreground text-foreground h-4 w-4" />
+              <span className="text-sm font-medium">{place.rating}</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-1 text-muted-foreground">
+          <div className="text-muted-foreground flex items-center gap-1">
             <MapPin className="h-3.5 w-3.5" />
             <span className="line-clamp-1 text-sm">
               {place.location.city}, {place.location.state}
@@ -117,18 +117,18 @@ const PlaceCard = ({ place, index = 0 }: PlaceCardProps) => {
               </Badge>
             )}
           </div>
-          <div className="flex items-center gap-3 text-muted-foreground text-sm">
+          <div className="text-muted-foreground flex items-center gap-3 text-sm">
             {place.distance && <span>{place.distance}</span>}
             {place.duration && <span>• {place.duration}</span>}
           </div>
 
-          <p className="line-clamp-2 pt-1 text-muted-foreground text-sm">
+          <p className="text-muted-foreground line-clamp-2 pt-1 text-sm">
             {place.description}
           </p>
         </div>
       </Link>
     </motion.div>
-  );
-};
+  )
+}
 
-export default PlaceCard;
+export default PlaceCard

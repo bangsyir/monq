@@ -74,6 +74,9 @@ function RouteComponent() {
   )
   const [newComment, setNewComment] = useState("")
 
+  // TODO: Implement actual authentication state
+  const isLoggedIn = false
+
   const handleAddComment = () => {
     if (newComment.trim()) {
       const comment: PlaceComment = {
@@ -343,16 +346,30 @@ function RouteComponent() {
                   <h3 className="text-foreground mb-4 font-semibold">
                     Leave a comment
                   </h3>
-                  <Textarea
-                    placeholder="Share your thoughts..."
-                    className="bg-background mb-4"
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                  />
-                  <Button onClick={handleAddComment}>Post Comment</Button>
-                  <p className="text-muted-foreground mt-3 text-sm">
-                    Please log in to post a comment.
-                  </p>
+                  {isLoggedIn ? (
+                    <>
+                      <Textarea
+                        placeholder="Share your thoughts..."
+                        className="bg-background mb-4"
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                      />
+                      <Button onClick={handleAddComment}>Post Comment</Button>
+                    </>
+                  ) : (
+                    <div className="bg-muted rounded-lg p-6 text-center">
+                      <p className="text-muted-foreground mb-3">
+                        Please log in to post a comment.
+                      </p>
+                      <button
+                        type="button"
+                        className="text-primary font-medium hover:underline"
+                        onClick={() => alert("Future: Open login dialog")}
+                      >
+                        Log in to comment
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Comment List */}
@@ -363,6 +380,7 @@ function RouteComponent() {
                       comment={comment}
                       index={index}
                       onReply={handleReply}
+                      isLoggedIn={isLoggedIn} // TODO: Use actual auth state
                     />
                   ))}
                   {comments.length === 0 && (

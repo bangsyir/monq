@@ -1,9 +1,9 @@
-import { Outlet, createFileRoute } from "@tanstack/react-router";
-import { Navbar } from "@/components/navbar";
+import { Outlet, createFileRoute } from "@tanstack/react-router"
+import { Navbar } from "@/components/navbar"
 
 export const Route = createFileRoute("/places")({
   component: RouteComponent,
-});
+})
 
 function RouteComponent() {
   return (
@@ -11,5 +11,5 @@ function RouteComponent() {
       <Navbar />
       <Outlet />
     </div>
-  );
+  )
 }

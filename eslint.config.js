@@ -1,11 +1,14 @@
 //  @ts-check
 
-import { tanstackConfig } from '@tanstack/eslint-config'
+import { tanstackConfig } from "@tanstack/eslint-config"
 
-export default [...tanstackConfig, {
-  "rules": {
-    "no-shadow": "off",
-    "@typescript-eslint/no-shadow": "off",
-    "@typescript-eslint/no-unnecessary-condition": "off"
-  }
-}]
+export default [
+  ...tanstackConfig,
+  {
+    rules: {
+      "no-shadow": "off",
+      "@typescript-eslint/no-shadow": "off",
+      "@typescript-eslint/no-unnecessary-condition": "off",
+    },
+  },
+]

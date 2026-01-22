@@ -1,15 +1,15 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { eq } from "drizzle-orm";
-import { ArrowLeft, Trash2, Upload } from "lucide-react";
-import { useRef, useState } from "react";
-import z from "zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { db } from "@/db";
-import { placeImages, places } from "@/db/schema";
-import { authAdminMiddleware } from "@/lib/auth-middleware";
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { createServerFn } from "@tanstack/react-start"
+import { eq } from "drizzle-orm"
+import { ArrowLeft, Trash2, Upload } from "lucide-react"
+import { useRef, useState } from "react"
+import z from "zod"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { db } from "@/db"
+import { placeImages, places } from "@/db/schema"
+import { authAdminMiddleware } from "@/lib/auth-middleware"
 
 const getPlaceImagesFn = createServerFn({ method: "GET" })
   .middleware([authAdminMiddleware])
@@ -25,9 +25,9 @@ const getPlaceImagesFn = createServerFn({ method: "GET" })
       with: {
         images: true,
       },
-    });
-    return place;
-  });
+    })
+    return place
+  })
 
 const addPlaceImageFn = createServerFn({ method: "POST" })
   .middleware([authAdminMiddleware])
@@ -46,9 +46,9 @@ const addPlaceImageFn = createServerFn({ method: "POST" })
         url: data.url,
         alt: data.alt || null,
       })
-      .returning();
-    return newImage[0];
-  });
+      .returning()
+    return newImage[0]
+  })
 
 const removePlaceImageFn = createServerFn({ method: "POST" })
   .middleware([authAdminMiddleware])
@@ -58,48 +58,48 @@ const removePlaceImageFn = createServerFn({ method: "POST" })
     }),
   )
   .handler(async ({ data }) => {
-    await db.delete(placeImages).where(eq(placeImages.id, data.imageId));
-    return { success: true };
-  });
+    await db.delete(placeImages).where(eq(placeImages.id, data.imageId))
+    return { success: true }
+  })
 
 export const Route = createFileRoute("/admin/places/$placeId/images")({
   ssr: false,
   component: RouteComponent,
   loader: async ({ params }) => {
-    const places = await getPlaceImagesFn({ data: params.placeId });
-    return places;
+    const places = await getPlaceImagesFn({ data: params.placeId })
+    return places
   },
-});
+})
 
 function RouteComponent() {
-  const place = Route.useLoaderData();
-  const navigate = useNavigate({ from: "/admin/places" });
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [newImageUrl, setNewImageUrl] = useState("");
-  const [newImageAlt, setNewImageAlt] = useState("");
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isAddingImage, setIsAddingImage] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
+  const place = Route.useLoaderData()
+  const navigate = useNavigate({ from: "/admin/places" })
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [newImageUrl, setNewImageUrl] = useState("")
+  const [newImageAlt, setNewImageAlt] = useState("")
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [isAddingImage, setIsAddingImage] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
 
   const handleBack = () => {
-    navigate({ to: "/admin/places" });
-  };
+    navigate({ to: "/admin/places" })
+  }
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+    const file = event.target.files?.[0]
     if (file) {
       if (file.type.startsWith("image/")) {
-        setSelectedFile(file);
+        setSelectedFile(file)
       } else {
-        setSelectedFile(null);
+        setSelectedFile(null)
       }
     }
-  };
+  }
 
   const handleAddImageByUrl = async () => {
-    if (!newImageUrl || !place?.id) return;
+    if (!newImageUrl || !place?.id) return
 
-    setIsAddingImage(true);
+    setIsAddingImage(true)
     try {
       await addPlaceImageFn({
         data: {
@@ -107,73 +107,73 @@ function RouteComponent() {
           url: newImageUrl,
           alt: newImageAlt,
         },
-      });
-      setNewImageUrl("");
-      setNewImageAlt("");
-      window.location.reload();
+      })
+      setNewImageUrl("")
+      setNewImageAlt("")
+      window.location.reload()
     } catch (error) {
-      console.error("Failed to add image:", error);
+      console.error("Failed to add image:", error)
     } finally {
-      setIsAddingImage(false);
+      setIsAddingImage(false)
     }
-  };
+  }
 
   const handleUploadAndAdd = async () => {
-    if (!selectedFile || !place?.id) return;
+    if (!selectedFile || !place?.id) return
 
-    setIsUploading(true);
+    setIsUploading(true)
     try {
-      const formData = new FormData();
-      formData.append("file", selectedFile);
+      const formData = new FormData()
+      formData.append("file", selectedFile)
 
       const uploadResponse = await fetch("/api/upload", {
         method: "POST",
         body: formData,
-      });
+      })
 
       if (!uploadResponse.ok) {
-        throw new Error("Upload failed");
+        throw new Error("Upload failed")
       }
 
-      const { url } = await uploadResponse.json();
+      const { url } = await uploadResponse.json()
 
-      setIsAddingImage(true);
+      setIsAddingImage(true)
       await addPlaceImageFn({
         data: {
           placeId: place.id,
           url,
           alt: newImageAlt || selectedFile.name,
         },
-      });
+      })
 
-      setSelectedFile(null);
-      setNewImageAlt("");
+      setSelectedFile(null)
+      setNewImageAlt("")
       if (fileInputRef.current) {
-        fileInputRef.current.value = "";
+        fileInputRef.current.value = ""
       }
 
-      window.location.reload();
+      window.location.reload()
     } catch (error) {
-      console.error("Failed to upload and add image:", error);
-      alert("Failed to upload image. Please try again.");
+      console.error("Failed to upload and add image:", error)
+      alert("Failed to upload image. Please try again.")
     } finally {
-      setIsUploading(false);
-      setIsAddingImage(false);
+      setIsUploading(false)
+      setIsAddingImage(false)
     }
-  };
+  }
 
   const handleRemoveImage = async (imageId: string) => {
-    if (!confirm("Are you sure you want to remove this image?")) return;
+    if (!confirm("Are you sure you want to remove this image?")) return
 
     try {
       await removePlaceImageFn({
         data: { imageId },
-      });
-      window.location.reload();
+      })
+      window.location.reload()
     } catch (error) {
-      console.error("Failed to remove image:", error);
+      console.error("Failed to remove image:", error)
     }
-  };
+  }
 
   return (
     <div>
@@ -182,13 +182,13 @@ function RouteComponent() {
         Back to Places
       </Button>
       <div className="mb-4">
-        <h1 className="mb-2 font-bold text-2xl">Manage Place Images</h1>
-        <div className="flex gap-4 text-gray-600 text-sm">
+        <h1 className="mb-2 text-2xl font-bold">Manage Place Images</h1>
+        <div className="flex gap-4 text-sm text-gray-600">
           <span>Add or remove images for {place?.name}</span>
         </div>
       </div>
       <div className="flex flex-col gap-6">
-        <div className="flex flex-col gap-1 align-center">
+        <div className="align-center flex flex-col gap-1">
           <div className="gap1.5 flex flex-col">
             <span className="font-semibold">Name</span>
             <span>{place?.name}</span>
@@ -247,7 +247,7 @@ function RouteComponent() {
                   className="w-full rounded border p-2"
                 />
                 {selectedFile && (
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-sm text-gray-600">
                     Selected: {selectedFile.name}
                   </p>
                 )}
@@ -300,5 +300,5 @@ function RouteComponent() {
         )}
       </div>
     </div>
-  );
+  )
 }

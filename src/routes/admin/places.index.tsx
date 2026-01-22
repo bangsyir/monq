@@ -1,17 +1,17 @@
-import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { asc, count, desc, like, or, sql } from "drizzle-orm";
-import { Edit, Image, MapPin, MoreHorizontal, Star } from "lucide-react";
-import { useState } from "react";
-import { z } from "zod";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router"
+import { createServerFn } from "@tanstack/react-start"
+import { asc, count, desc, like, or, sql } from "drizzle-orm"
+import { Edit, Image, MapPin, MoreHorizontal, Star } from "lucide-react"
+import { useState } from "react"
+import { z } from "zod"
+import { Button, buttonVariants } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
+} from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -20,9 +20,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { db } from "@/db";
-import { places } from "@/db/schema";
+} from "@/components/ui/table"
+import { db } from "@/db"
+import { places } from "@/db/schema"
 
 const PlaceQuerySchema = z.object({
   search: z.string().optional(),
@@ -30,33 +30,33 @@ const PlaceQuerySchema = z.object({
   offset: z.number().default(0),
   sortBy: z.enum(["name", "rating", "createdAt", "city"]).default("createdAt"),
   sortOrder: z.enum(["asc", "desc"]).default("desc"),
-});
+})
 
-type PlaceFilter = z.infer<typeof PlaceQuerySchema>;
+type PlaceFilter = z.infer<typeof PlaceQuerySchema>
 
 // Function to get total places count
 const getTotalPlacesCount = createServerFn({ method: "GET" }).handler(
   async () => {
-    const result = await db.select({ count: count() }).from(places);
-    return result[0]?.count || 0;
+    const result = await db.select({ count: count() }).from(places)
+    return result[0]?.count || 0
   },
-);
+)
 
 const getPlacesFn = createServerFn({ method: "GET" })
   .inputValidator(PlaceQuerySchema)
   .handler(async ({ data }) => {
-    const { search, limit, offset, sortBy, sortOrder } = data;
+    const { search, limit, offset, sortBy, sortOrder } = data
 
     // Build where conditions
     const whereConditions = search
       ? or(
-        like(places.name, `%${search}%`),
-        like(places.description, `%${search}%`),
-        like(places.city, `%${search}%`),
-        like(places.state, `%${search}%`),
-        like(places.country, `%${search}%`),
-      )
-      : undefined;
+          like(places.name, `%${search}%`),
+          like(places.description, `%${search}%`),
+          like(places.city, `%${search}%`),
+          like(places.state, `%${search}%`),
+          like(places.country, `%${search}%`),
+        )
+      : undefined
 
     // Optimize: Use a single query with subquery for better performance
     const query = db
@@ -86,7 +86,7 @@ const getPlacesFn = createServerFn({ method: "GET" })
         totalCount: sql<number>`count(*) over()`.mapWith(Number),
       })
       .from(places)
-      .where(whereConditions);
+      .where(whereConditions)
 
     // Determine sort column
     const sortColumn =
@@ -96,24 +96,24 @@ const getPlacesFn = createServerFn({ method: "GET" })
           ? places.rating
           : sortBy === "city"
             ? places.city
-            : places.createdAt;
+            : places.createdAt
 
     // Apply ordering, pagination and execute
     const result = await query
       .orderBy(sortOrder === "desc" ? desc(sortColumn) : asc(sortColumn))
       .limit(limit)
-      .offset(offset);
+      .offset(offset)
 
     // Extract count from first row (all rows have the same total count)
-    const totalCount = result[0]?.totalCount || 0;
+    const totalCount = result[0]?.totalCount || 0
 
     return {
       places: result,
       totalCount,
       offset,
       hasMore: offset + limit < totalCount,
-    };
-  });
+    }
+  })
 
 export const Route = createFileRoute("/admin/places/")({
   ssr: false,
@@ -130,33 +130,33 @@ export const Route = createFileRoute("/admin/places/")({
     const [placesData, totalPlacesCount] = await Promise.all([
       getPlacesFn({ data: deps }),
       getTotalPlacesCount(),
-    ]);
+    ])
 
     return {
       ...placesData,
       totalPlacesCount,
-    };
+    }
   },
   component: RouteComponent,
   notFoundComponent: () => <div>Not Found</div>,
-});
+})
 
 function RouteComponent() {
-  const data = Route.useLoaderData();
-  const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/admin/places" });
-  const [searchInput, setSearchInput] = useState(search.search || "");
+  const data = Route.useLoaderData()
+  const search = Route.useSearch()
+  const navigate = useNavigate({ from: "/admin/places" })
+  const [searchInput, setSearchInput] = useState(search.search || "")
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     navigate({
       search: {
         ...search,
         search: searchInput,
         offset: 0,
       },
-    });
-  };
+    })
+  }
 
   const handleSort = (sortBy: "name" | "rating" | "createdAt" | "city") => {
     navigate({
@@ -168,8 +168,8 @@ function RouteComponent() {
             ? "desc"
             : "asc",
       },
-    });
-  };
+    })
+  }
 
   const handlePageChange = (newOffset: number) => {
     navigate({
@@ -177,19 +177,19 @@ function RouteComponent() {
         ...search,
         offset: newOffset,
       },
-    });
-  };
+    })
+  }
 
   const handleUpdatePlace = (placeId: string) => {
-    navigate({ to: "/admin/places/$placeId/update", params: { placeId } });
-  };
+    navigate({ to: "/admin/places/$placeId/update", params: { placeId } })
+  }
 
   return (
     <div className="container mx-auto py-6">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="mb-2 font-bold text-2xl">Places</h1>
-          <div className="flex gap-4 text-gray-600 text-sm">
+          <h1 className="mb-2 text-2xl font-bold">Places</h1>
+          <div className="flex gap-4 text-sm text-gray-600">
             <span>
               Total Places: {data.totalPlacesCount || data.totalCount}
             </span>
@@ -266,7 +266,7 @@ function RouteComponent() {
               <TableCell>
                 <div className="font-medium">{place.name}</div>
                 {place.description && (
-                  <div className="max-w-xs truncate text-gray-600 text-sm">
+                  <div className="max-w-xs truncate text-sm text-gray-600">
                     {place.description}
                   </div>
                 )}
@@ -276,7 +276,7 @@ function RouteComponent() {
                   <Star className="h-4 w-4 text-yellow-400" />
                   <span>{place.rating?.toFixed(1) || "N/A"}</span>
                   {place.reviewCount > 0 && (
-                    <span className="text-gray-500 text-sm">
+                    <span className="text-sm text-gray-500">
                       ({place.reviewCount} reviews)
                     </span>
                   )}
@@ -293,7 +293,7 @@ function RouteComponent() {
                 </div>
               </TableCell>
               <TableCell>
-                <span className="rounded bg-gray-100 px-2 py-1 font-medium text-gray-800 text-xs">
+                <span className="rounded bg-gray-100 px-2 py-1 text-xs font-medium text-gray-800">
                   {place.difficulty || "N/A"}
                 </span>
               </TableCell>
@@ -343,7 +343,7 @@ function RouteComponent() {
 
       {/* Pagination Controls */}
       <div className="mt-6 flex items-center justify-between">
-        <div className="text-gray-700 text-sm">
+        <div className="text-sm text-gray-700">
           Showing {search.offset + 1} to{" "}
           {Math.min(search.offset + search.limit, data.totalCount)} of{" "}
           {data.totalCount} results
@@ -368,5 +368,5 @@ function RouteComponent() {
         </div>
       </div>
     </div>
-  );
+  )
 }

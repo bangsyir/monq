@@ -1,20 +1,20 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
-import { motion } from "framer-motion";
-import { Flag, LayoutDashboard, MapPin, TrendingUp, Users } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Link, createFileRoute } from "@tanstack/react-router"
+import { motion } from "framer-motion"
+import { Flag, LayoutDashboard, MapPin, TrendingUp, Users } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
 
 export const Route = createFileRoute("/admin/")({
   ssr: false,
   component: RouteComponent,
-});
+})
 // Mock data
 const stats = [
   { label: "Total Users", value: "2,847", change: "+12%", icon: Users },
   { label: "Total Places", value: "156", change: "+8%", icon: MapPin },
   { label: "Pending Reviews", value: "23", change: "-5%", icon: Flag },
   { label: "Page Views", value: "45.2K", change: "+24%", icon: TrendingUp },
-];
+]
 function RouteComponent() {
   return (
     <main className="pt-5">
@@ -26,10 +26,10 @@ function RouteComponent() {
         className="mb-8"
       >
         <div className="mb-2 flex items-center gap-3">
-          <div className="rounded-lg bg-primary/10 p-2">
-            <LayoutDashboard className="h-6 w-6 text-primary" />
+          <div className="bg-primary/10 rounded-lg p-2">
+            <LayoutDashboard className="text-primary h-6 w-6" />
           </div>
-          <h1 className="font-bold text-2xl text-foreground md:text-3xl">
+          <h1 className="text-foreground text-2xl font-bold md:text-3xl">
             Admin Dashboard
           </h1>
         </div>
@@ -50,12 +50,12 @@ function RouteComponent() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-muted-foreground text-sm">{stat.label}</p>
-                  <p className="font-bold text-2xl text-foreground">
+                  <p className="text-foreground text-2xl font-bold">
                     {stat.value}
                   </p>
                 </div>
-                <div className="rounded-xl bg-primary/10 p-3">
-                  <stat.icon className="h-6 w-6 text-primary" />
+                <div className="bg-primary/10 rounded-xl p-3">
+                  <stat.icon className="text-primary h-6 w-6" />
                 </div>
               </div>
               <div className="mt-2">
@@ -72,5 +72,5 @@ function RouteComponent() {
         ))}
       </motion.div>
     </main>
-  );
+  )
 }

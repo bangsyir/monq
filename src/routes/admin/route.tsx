@@ -3,9 +3,9 @@ import {
   createFileRoute,
   redirect,
   useRouterState,
-} from "@tanstack/react-router";
-import React from "react";
-import { AppSidebar } from "@/components/app-sidebar";
+} from "@tanstack/react-router"
+import React from "react"
+import { AppSidebar } from "@/components/app-sidebar"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -13,48 +13,48 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
+} from "@/components/ui/breadcrumb"
+import { Separator } from "@/components/ui/separator"
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { getSession } from "@/lib/auth-server-func";
+} from "@/components/ui/sidebar"
+import { getSession } from "@/lib/auth-server-func"
 
 export const Route = createFileRoute("/admin")({
   component: RouteComponent,
   beforeLoad: async () => {
-    const session = await getSession();
+    const session = await getSession()
     if (!session) {
-      throw redirect({ to: "/login" });
+      throw redirect({ to: "/login" })
     }
     if (session.user.role !== "admin") {
-      throw redirect({ to: "/" });
+      throw redirect({ to: "/" })
     }
-    return session;
+    return session
   },
-});
+})
 
 function RouteComponent() {
-  const routerState = useRouterState();
+  const routerState = useRouterState()
 
   const breadcrumbs = React.useMemo(() => {
-    const pathname = routerState.location.pathname;
-    const crumbs = [];
+    const pathname = routerState.location.pathname
+    const crumbs = []
 
     // Always include admin dashboard as first breadcrumb
     crumbs.push({
       label: "Dashboard",
       href: "/admin",
-    });
+    })
 
     // Manual route matching based on pathname
     if (pathname === "/admin/users" || pathname.startsWith("/admin/users/")) {
       crumbs.push({
         label: "Users",
         href: "/admin/users",
-      });
+      })
     }
 
     // Match dynamic user detail routes
@@ -63,7 +63,7 @@ function RouteComponent() {
       crumbs.push({
         label: "User Details",
         href: undefined, // Current page
-      });
+      })
     }
 
     // Match dynamic user update routes
@@ -72,7 +72,7 @@ function RouteComponent() {
       crumbs.push({
         label: "Update User",
         href: undefined, // Current page
-      });
+      })
     }
 
     // Add other admin routes here as needed
@@ -80,11 +80,11 @@ function RouteComponent() {
       crumbs.push({
         label: "Places",
         href: "/admin/places",
-      });
+      })
     }
 
-    return crumbs;
-  }, [routerState.location.pathname]);
+    return crumbs
+  }, [routerState.location.pathname])
 
   return (
     <SidebarProvider>
@@ -127,5 +127,5 @@ function RouteComponent() {
         </div>
       </SidebarInset>
     </SidebarProvider>
-  );
+  )
 }

@@ -1,11 +1,11 @@
-import { useForm } from "@tanstack/react-form";
-import { MapPin, Plus, Upload, X } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
-import { Label } from "./ui/label";
-import type { PlaceCategory } from "@/types/place";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { useForm } from "@tanstack/react-form"
+import { MapPin, Plus, Upload, X } from "lucide-react"
+import { useState } from "react"
+import { toast } from "sonner"
+import { Label } from "./ui/label"
+import type { PlaceCategory } from "@/types/place"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -13,24 +13,24 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@/components/ui/dialog"
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+} from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { addPlaceClientSchema } from "@/schema/place-schema";
-import { addPlace } from "@/serverFunction/place.function";
+} from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { addPlaceClientSchema } from "@/schema/place-schema"
+import { addPlace } from "@/serverFunction/place.function"
 
 const categoryOptions: Array<{ value: PlaceCategory; label: string }> = [
   { value: "waterfall", label: "Waterfall" },
@@ -39,17 +39,17 @@ const categoryOptions: Array<{ value: PlaceCategory; label: string }> = [
   { value: "trail", label: "Trail" },
   { value: "lake", label: "Lake" },
   { value: "mountain", label: "Mountain" },
-];
+]
 
 const difficulties = [
   { value: "easy", label: "Easy" },
   { value: "moderate", label: "Moderate" },
   { value: "hard", label: "Hard" },
   { value: "expert", label: "Expert" },
-];
+]
 
 const AddPlaceDialog = () => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false)
   // const [images, setImages] = useState<Array<File>>([]);
 
   const form = useForm({
@@ -72,29 +72,29 @@ const AddPlaceDialog = () => {
       onSubmit: addPlaceClientSchema,
     },
     onSubmit: async ({ value }) => {
-      const filesToUpload = value.images || [];
+      const filesToUpload = value.images || []
 
       const uploadedUrls = await Promise.all(
         filesToUpload.map(async (file) => {
-          const formData = new FormData();
-          formData.append("file", file);
+          const formData = new FormData()
+          formData.append("file", file)
 
           const response = await fetch("/api/upload", {
             method: "POST",
             body: formData,
-          });
-          if (!response.ok) throw new Error("Failed to upload image");
-          const result = await response.json();
-          return result.url as string;
+          })
+          if (!response.ok) throw new Error("Failed to upload image")
+          const result = await response.json()
+          return result.url as string
         }),
-      );
-      const { images: _, ...rest } = value;
+      )
+      const { images: _, ...rest } = value
       const data = {
         ...rest,
         images: uploadedUrls || [],
-      };
-      const insert = await addPlace({ data });
-      toast.success(insert.message);
+      }
+      const insert = await addPlace({ data })
+      toast.success(insert.message)
       // const uploadedUrls: Array<string> = [];
 
       // for (const file of value.images) {
@@ -120,11 +120,11 @@ const AddPlaceDialog = () => {
 
       // const insert = await addPlace({ data: data });
       // toast.success(insert.message);
-      setOpen(false);
-      form.reset();
+      setOpen(false)
+      form.reset()
       // setImages([]);
     },
-  });
+  })
 
   // const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   // 	if (e.target.files) {
@@ -142,7 +142,7 @@ const AddPlaceDialog = () => {
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-primary" />
+            <MapPin className="text-primary h-5 w-5" />
             Add a Hidden Gem
           </DialogTitle>
           <DialogDescription>
@@ -153,8 +153,8 @@ const AddPlaceDialog = () => {
 
         <form
           onSubmit={(e) => {
-            e.preventDefault();
-            form.handleSubmit();
+            e.preventDefault()
+            form.handleSubmit()
           }}
           className="space-y-6"
         >
@@ -165,7 +165,7 @@ const AddPlaceDialog = () => {
                 name="name"
                 children={(field) => {
                   const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                    field.state.meta.isTouched && !field.state.meta.isValid
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel htmlFor={field.name}>Place Name</FieldLabel>
@@ -182,7 +182,7 @@ const AddPlaceDialog = () => {
                         <FieldError errors={field.state.meta.errors} />
                       )}
                     </Field>
-                  );
+                  )
                 }}
               />
 
@@ -190,7 +190,7 @@ const AddPlaceDialog = () => {
                 name="description"
                 children={(field) => {
                   const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                    field.state.meta.isTouched && !field.state.meta.isValid
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel htmlFor={field.name}>Description</FieldLabel>
@@ -208,7 +208,7 @@ const AddPlaceDialog = () => {
                         <FieldError errors={field.state.meta.errors} />
                       )}
                     </Field>
-                  );
+                  )
                 }}
               />
 
@@ -217,7 +217,7 @@ const AddPlaceDialog = () => {
                   name="categories"
                   children={(field) => {
                     const isInvalid =
-                      field.state.meta.isTouched && !field.state.meta.isValid;
+                      field.state.meta.isTouched && !field.state.meta.isValid
                     return (
                       <div className="col-span-2 space-y-2">
                         <Label>Categories (select multiple)</Label>
@@ -242,9 +242,9 @@ const AddPlaceDialog = () => {
                                         field.state.value.filter(
                                           (c) => c !== cat,
                                         ),
-                                      );
+                                      )
                                     }}
-                                    className="ml-1 rounded-full p-0.5 hover:bg-muted"
+                                    className="hover:bg-muted ml-1 rounded-full p-0.5"
                                   >
                                     <X className="h-3 w-3" />
                                   </button>
@@ -269,7 +269,7 @@ const AddPlaceDialog = () => {
                                     field.handleChange([
                                       ...field.state.value,
                                       cat.value,
-                                    ]);
+                                    ])
                                   }}
                                   className="text-xs"
                                 >
@@ -282,7 +282,7 @@ const AddPlaceDialog = () => {
                           <FieldError errors={field.state.meta.errors} />
                         )}
                       </div>
-                    );
+                    )
                   }}
                 />
 
@@ -290,7 +290,7 @@ const AddPlaceDialog = () => {
                   name="difficulty"
                   children={(field) => {
                     const isInvalid =
-                      field.state.meta.isTouched && !field.state.meta.isValid;
+                      field.state.meta.isTouched && !field.state.meta.isValid
                     return (
                       <Field data-invalid={isInvalid}>
                         <FieldLabel htmlFor={field.name}>
@@ -322,7 +322,7 @@ const AddPlaceDialog = () => {
                           <FieldError errors={field.state.meta.errors} />
                         )}
                       </Field>
-                    );
+                    )
                   }}
                 />
               </div>
@@ -330,13 +330,13 @@ const AddPlaceDialog = () => {
 
             {/* Location */}
             <div className="space-y-4">
-              <h3 className="font-medium text-foreground text-sm">Location</h3>
+              <h3 className="text-foreground text-sm font-medium">Location</h3>
 
               <form.Field
                 name="address"
                 children={(field) => {
                   const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                    field.state.meta.isTouched && !field.state.meta.isValid
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel htmlFor={field.name}>Address</FieldLabel>
@@ -353,7 +353,7 @@ const AddPlaceDialog = () => {
                         <FieldError errors={field.state.meta.errors} />
                       )}
                     </Field>
-                  );
+                  )
                 }}
               />
 
@@ -362,7 +362,7 @@ const AddPlaceDialog = () => {
                   name="city"
                   children={(field) => {
                     const isInvalid =
-                      field.state.meta.isTouched && !field.state.meta.isValid;
+                      field.state.meta.isTouched && !field.state.meta.isValid
                     return (
                       <Field data-invalid={isInvalid}>
                         <FieldLabel htmlFor={field.name}>City</FieldLabel>
@@ -379,7 +379,7 @@ const AddPlaceDialog = () => {
                           <FieldError errors={field.state.meta.errors} />
                         )}
                       </Field>
-                    );
+                    )
                   }}
                 />
 
@@ -387,7 +387,7 @@ const AddPlaceDialog = () => {
                   name="state"
                   children={(field) => {
                     const isInvalid =
-                      field.state.meta.isTouched && !field.state.meta.isValid;
+                      field.state.meta.isTouched && !field.state.meta.isValid
                     return (
                       <Field data-invalid={isInvalid}>
                         <FieldLabel htmlFor={field.name}>State</FieldLabel>
@@ -404,7 +404,7 @@ const AddPlaceDialog = () => {
                           <FieldError errors={field.state.meta.errors} />
                         )}
                       </Field>
-                    );
+                    )
                   }}
                 />
 
@@ -412,7 +412,7 @@ const AddPlaceDialog = () => {
                   name="country"
                   children={(field) => {
                     const isInvalid =
-                      field.state.meta.isTouched && !field.state.meta.isValid;
+                      field.state.meta.isTouched && !field.state.meta.isValid
                     return (
                       <Field data-invalid={isInvalid}>
                         <FieldLabel htmlFor={field.name}>Country</FieldLabel>
@@ -429,7 +429,7 @@ const AddPlaceDialog = () => {
                           <FieldError errors={field.state.meta.errors} />
                         )}
                       </Field>
-                    );
+                    )
                   }}
                 />
               </div>
@@ -439,7 +439,7 @@ const AddPlaceDialog = () => {
                   name="latitude"
                   children={(field) => {
                     const isInvalid =
-                      field.state.meta.isTouched && !field.state.meta.isValid;
+                      field.state.meta.isTouched && !field.state.meta.isValid
                     return (
                       <Field data-invalid={isInvalid}>
                         <FieldLabel htmlFor={field.name}>Latitude</FieldLabel>
@@ -456,7 +456,7 @@ const AddPlaceDialog = () => {
                           <FieldError errors={field.state.meta.errors} />
                         )}
                       </Field>
-                    );
+                    )
                   }}
                 />
 
@@ -464,7 +464,7 @@ const AddPlaceDialog = () => {
                   name="longitude"
                   children={(field) => {
                     const isInvalid =
-                      field.state.meta.isTouched && !field.state.meta.isValid;
+                      field.state.meta.isTouched && !field.state.meta.isValid
                     return (
                       <Field data-invalid={isInvalid}>
                         <FieldLabel htmlFor={field.name}>Longitude</FieldLabel>
@@ -481,7 +481,7 @@ const AddPlaceDialog = () => {
                           <FieldError errors={field.state.meta.errors} />
                         )}
                       </Field>
-                    );
+                    )
                   }}
                 />
               </div>
@@ -493,7 +493,7 @@ const AddPlaceDialog = () => {
                 name="duration"
                 children={(field) => {
                   const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                    field.state.meta.isTouched && !field.state.meta.isValid
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel htmlFor={field.name}>
@@ -512,7 +512,7 @@ const AddPlaceDialog = () => {
                         <FieldError errors={field.state.meta.errors} />
                       )}
                     </Field>
-                  );
+                  )
                 }}
               />
 
@@ -520,7 +520,7 @@ const AddPlaceDialog = () => {
                 name="distance"
                 children={(field) => {
                   const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                    field.state.meta.isTouched && !field.state.meta.isValid
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel htmlFor={field.name}>
@@ -539,7 +539,7 @@ const AddPlaceDialog = () => {
                         <FieldError errors={field.state.meta.errors} />
                       )}
                     </Field>
-                  );
+                  )
                 }}
               />
             </div>
@@ -547,15 +547,15 @@ const AddPlaceDialog = () => {
               name="images"
               children={(field) => {
                 const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
+                  field.state.meta.isTouched && !field.state.meta.isValid
                 return (
                   <Field data-invalid={isInvalid}>
                     <FieldLabel htmlFor={field.name}>
                       Photos (Optional)
                     </FieldLabel>
-                    <div className="rounded-lg border-2 border-border border-dashed p-6 text-center">
-                      <Upload className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
-                      <p className="mb-2 text-muted-foreground text-sm">
+                    <div className="border-border rounded-lg border-2 border-dashed p-6 text-center">
+                      <Upload className="text-muted-foreground mx-auto mb-2 h-8 w-8" />
+                      <p className="text-muted-foreground mb-2 text-sm">
                         Drag and drop images or click to browse
                       </p>
 
@@ -568,8 +568,8 @@ const AddPlaceDialog = () => {
                         type="file"
                         multiple
                         onChange={(e) => {
-                          const files = Array.from(e.target.files || []);
-                          field.handleChange(files);
+                          const files = Array.from(e.target.files || [])
+                          field.handleChange(files)
                           // handleImageChange(e);
                         }}
                         className="mx-auto max-w-xs"
@@ -585,7 +585,7 @@ const AddPlaceDialog = () => {
                       {/* )} */}
                     </div>
                   </Field>
-                );
+                )
               }}
             />
           </FieldGroup>
@@ -606,7 +606,7 @@ const AddPlaceDialog = () => {
         </form>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}
 
-export default AddPlaceDialog;
+export default AddPlaceDialog

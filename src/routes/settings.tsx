@@ -3,29 +3,29 @@ import {
   createFileRoute,
   useCanGoBack,
   useRouter,
-} from "@tanstack/react-router";
-import { Bell, Camera, ChevronsLeft, Lock, LogOut, User } from "lucide-react";
-import React from "react";
-import { toast } from "sonner";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button, buttonVariants } from "@/components/ui/button";
+} from "@tanstack/react-router"
+import { Bell, Camera, ChevronsLeft, Lock, LogOut, User } from "lucide-react"
+import React from "react"
+import { toast } from "sonner"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button, buttonVariants } from "@/components/ui/button"
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Separator } from "@/components/ui/separator"
+import { Switch } from "@/components/ui/switch"
+import { Textarea } from "@/components/ui/textarea"
 
 export const Route = createFileRoute("/settings")({
-  loader: async () => { },
+  loader: async () => {},
   component: RouteComponent,
-});
+})
 
 function RouteComponent() {
   const [profileData, setProfileData] = React.useState({
@@ -33,7 +33,7 @@ function RouteComponent() {
     email: "alex@example.com",
     bio: "Adventure seeker & nature lover.",
     location: "Portland, Oregon",
-  });
+  })
 
   const [notifications, setNotifications] = React.useState({
     emailNotifications: true,
@@ -41,28 +41,28 @@ function RouteComponent() {
     weeklyDigest: false,
     newFollowers: true,
     placeRecommendations: true,
-  });
+  })
 
   const [privacy, setPrivacy] = React.useState({
     profilePublic: true,
     showLocation: true,
     showVisitedPlaces: true,
-  });
+  })
 
-  const router = useRouter();
-  const canGoBack = useCanGoBack();
+  const router = useRouter()
+  const canGoBack = useCanGoBack()
 
   const handleSaveProfile = () => {
-    toast.success("Profile updated successfully!");
-  };
+    toast.success("Profile updated successfully!")
+  }
 
   const handleSaveNotifications = () => {
-    toast.success("Notification preferences saved!");
-  };
+    toast.success("Notification preferences saved!")
+  }
 
   const handleSavePrivacy = () => {
-    toast.success("Privacy settings updated!");
-  };
+    toast.success("Privacy settings updated!")
+  }
 
   return (
     <main className="pt-10 pb-20">
@@ -83,10 +83,10 @@ function RouteComponent() {
             Back
           </Link>
         )}
-        <h1 className="mb-2 font-bold text-2xl text-foreground md:text-3xl">
+        <h1 className="text-foreground mb-2 text-2xl font-bold md:text-3xl">
           Settings
         </h1>
-        <p className="mb-8 text-muted-foreground">
+        <p className="text-muted-foreground mb-8">
           Manage your account preferences
         </p>
 
@@ -95,8 +95,8 @@ function RouteComponent() {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-3">
-                <div className="rounded-lg bg-primary/10 p-2">
-                  <User className="h-5 w-5 text-primary" />
+                <div className="bg-primary/10 rounded-lg p-2">
+                  <User className="text-primary h-5 w-5" />
                 </div>
                 <div>
                   <CardTitle>Profile Information</CardTitle>
@@ -183,8 +183,8 @@ function RouteComponent() {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-3">
-                <div className="rounded-lg bg-accent/10 p-2">
-                  <Bell className="h-5 w-5 text-accent" />
+                <div className="bg-accent/10 rounded-lg p-2">
+                  <Bell className="text-accent h-5 w-5" />
                 </div>
                 <div>
                   <CardTitle>Notifications</CardTitle>
@@ -197,7 +197,7 @@ function RouteComponent() {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-foreground">
+                  <p className="text-foreground font-medium">
                     Email Notifications
                   </p>
                   <p className="text-muted-foreground text-sm">
@@ -217,7 +217,7 @@ function RouteComponent() {
               <Separator />
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-foreground">
+                  <p className="text-foreground font-medium">
                     Push Notifications
                   </p>
                   <p className="text-muted-foreground text-sm">
@@ -237,7 +237,7 @@ function RouteComponent() {
               <Separator />
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-foreground">Weekly Digest</p>
+                  <p className="text-foreground font-medium">Weekly Digest</p>
                   <p className="text-muted-foreground text-sm">
                     Get a weekly summary of new places
                   </p>
@@ -255,7 +255,7 @@ function RouteComponent() {
               <Separator />
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-foreground">New Followers</p>
+                  <p className="text-foreground font-medium">New Followers</p>
                   <p className="text-muted-foreground text-sm">
                     When someone follows you
                   </p>
@@ -281,8 +281,8 @@ function RouteComponent() {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-3">
-                <div className="rounded-lg bg-primary/10 p-2">
-                  <Lock className="h-5 w-5 text-primary" />
+                <div className="bg-primary/10 rounded-lg p-2">
+                  <Lock className="text-primary h-5 w-5" />
                 </div>
                 <div>
                   <CardTitle>Privacy</CardTitle>
@@ -295,7 +295,7 @@ function RouteComponent() {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-foreground">Public Profile</p>
+                  <p className="text-foreground font-medium">Public Profile</p>
                   <p className="text-muted-foreground text-sm">
                     Allow others to see your profile
                   </p>
@@ -310,7 +310,7 @@ function RouteComponent() {
               <Separator />
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-foreground">Show Location</p>
+                  <p className="text-foreground font-medium">Show Location</p>
                   <p className="text-muted-foreground text-sm">
                     Display your location on your profile
                   </p>
@@ -325,7 +325,7 @@ function RouteComponent() {
               <Separator />
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-foreground">
+                  <p className="text-foreground font-medium">
                     Show Visited Places
                   </p>
                   <p className="text-muted-foreground text-sm">
@@ -355,7 +355,7 @@ function RouteComponent() {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-foreground">
+                  <p className="text-foreground font-medium">
                     Log out of all devices
                   </p>
                   <p className="text-muted-foreground text-sm">
@@ -370,7 +370,7 @@ function RouteComponent() {
               <Separator />
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-foreground">Delete Account</p>
+                  <p className="text-foreground font-medium">Delete Account</p>
                   <p className="text-muted-foreground text-sm">
                     Permanently delete your account and data
                   </p>
@@ -382,5 +382,5 @@ function RouteComponent() {
         </div>
       </div>
     </main>
-  );
+  )
 }

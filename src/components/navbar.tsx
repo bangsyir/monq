@@ -1,30 +1,30 @@
-import { Link, useNavigate } from "@tanstack/react-router";
-import { Loader } from "lucide-react";
-import LoginDialog from "./login-dialog";
-import { ThemeToggle } from "./theme-toggle";
-import { AuthUserDropdown } from "./user-dropdown";
-import { authClient } from "@/lib/auth-client";
+import { Link, useNavigate } from "@tanstack/react-router"
+import { Loader } from "lucide-react"
+import LoginDialog from "./login-dialog"
+import { ThemeToggle } from "./theme-toggle"
+import { AuthUserDropdown } from "./user-dropdown"
+import { authClient } from "@/lib/auth-client"
 
 export function Navbar() {
-  const { data: session, isPending } = authClient.useSession();
-  const navigate = useNavigate();
+  const { data: session, isPending } = authClient.useSession()
+  const navigate = useNavigate()
   const handleLogout = async () => {
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          navigate({ to: "/" });
+          navigate({ to: "/" })
         },
       },
-    });
-  };
+    })
+  }
   return (
-    <nav className="sticky top-0 z-50 border-border border-b bg-background/95 pt-2 pb-2 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container relative mx-auto flex items-center justify-between px-4">
+    <nav className="border-border bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 border-b pt-2 pb-2 backdrop-blur">
+      <div className="relative container mx-auto flex items-center justify-between px-4">
         <Link
           to="/"
           className="flex items-center gap-2 self-center font-medium"
         >
-          <div className="flex size-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
+          <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
             <Loader className="size-4" />
           </div>
           monq.
@@ -45,5 +45,5 @@ export function Navbar() {
         </div>
       </div>
     </nav>
-  );
+  )
 }
