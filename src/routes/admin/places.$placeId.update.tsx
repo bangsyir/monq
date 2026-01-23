@@ -1,9 +1,8 @@
 import { useForm } from "@tanstack/react-form"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { ArrowLeft, MapPin, Trash2, X } from "lucide-react"
+import { ArrowLeft, MapPin, X } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
-import type { PlaceCategory } from "@/types/place"
 import { Button } from "@/components/ui/button"
 import {
   Field,
@@ -22,15 +21,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { getPlaceById, updatePlace } from "@/serverFunction/place.function"
-
-const categoryOptions: Array<{ value: PlaceCategory; label: string }> = [
-  { value: "waterfall", label: "Waterfall" },
-  { value: "campsite", label: "Campsite" },
-  { value: "hiking", label: "Hiking" },
-  { value: "trail", label: "Trail" },
-  { value: "lake", label: "Lake" },
-  { value: "mountain", label: "Mountain" },
-]
+import { getCategories } from "@/serverFunction/category.function"
 
 const difficulties = [
   { value: "easy", label: "Easy" },
@@ -42,25 +33,24 @@ const difficulties = [
 export const Route = createFileRoute("/admin/places/$placeId/update")({
   ssr: false,
   loader: async ({ params }) => {
-    const place = getPlaceById({ data: params.placeId })
-    return place
+    const categories = await getCategories()
+    const place = await getPlaceById({ data: params.placeId })
+    return { place, categories }
   },
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const place = Route.useLoaderData()
+  const { place, categories: categoryOptions } = Route.useLoaderData()
   const params = Route.useParams()
   const navigate = useNavigate({ from: "/admin/places" })
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [existingImages, setExistingImages] = useState<
-    Array<{ id: string; url: string }>
-  >([])
+
   const form = useForm({
     defaultValues: {
       name: "",
       description: "",
-      categories: [] as Array<string>,
+      categories: [] as Array<{ id: string; name: string; icon: string }>,
       address: "",
       city: "",
       state: "",
@@ -70,20 +60,16 @@ function RouteComponent() {
       difficulty: "",
       duration: "",
       distance: "",
+      amenities: [] as Array<{ name: string; icon: string }>,
     },
 
     onSubmit: async ({ value }) => {
       setIsSubmitting(true)
-
+      const { categories, ...rest } = value
+      const categoryList = categories.map((c) => c.id)
       try {
-        const { ...rest } = value
-        const data = {
-          ...rest,
-          images: [...(existingImages?.map((img) => img.url) || [])],
-        }
-
         const update = await updatePlace({
-          data: { id: params.placeId, ...data },
+          data: { id: params.placeId, categories: categoryList, ...rest },
         })
         toast.success(update.message)
         navigate({ to: "/admin/places" })
@@ -181,7 +167,7 @@ function RouteComponent() {
               <div className="grid grid-cols-2 gap-4">
                 <form.Field
                   name="categories"
-                  defaultValue={place?.categories.map((c) => c.category)}
+                  defaultValue={place?.placeCategories.map((c) => c.category)}
                   children={(field) => {
                     const isInvalid =
                       field.state.meta.isTouched && !field.state.meta.isValid
@@ -194,13 +180,10 @@ function RouteComponent() {
                             <div className="flex flex-wrap gap-2">
                               {field.state.value.map((cat) => (
                                 <div
-                                  key={cat}
+                                  key={cat.id}
                                   className="bg-secondary text-secondary-foreground inline-flex items-center gap-1 rounded-full px-3 py-1"
                                 >
-                                  {
-                                    categoryOptions.find((c) => c.value === cat)
-                                      ?.label
-                                  }
+                                  {cat.name}
                                   <button
                                     type="button"
                                     onClick={() => {
@@ -218,12 +201,14 @@ function RouteComponent() {
                               ))}
                             </div>
                           )}
-
-                          {/* Category selector */}
+                          Category selector
                           <div className="flex flex-wrap gap-2">
                             {categoryOptions
                               .filter(
-                                (cat) => !field.state.value.includes(cat.value),
+                                (cat) =>
+                                  !field.state.value.some(
+                                    (ex) => ex.id === cat.id,
+                                  ),
                               )
                               .map((cat) => (
                                 <Button
@@ -234,12 +219,12 @@ function RouteComponent() {
                                   onClick={() => {
                                     field.handleChange([
                                       ...field.state.value,
-                                      cat.value,
+                                      cat,
                                     ])
                                   }}
                                   className="text-xs"
                                 >
-                                  + {cat.label}
+                                  + {cat.name}
                                 </Button>
                               ))}
                           </div>
@@ -543,17 +528,6 @@ function RouteComponent() {
                           alt={image.alt || "Place image"}
                           className="h-24 w-full rounded-md border object-cover"
                         />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setExistingImages((prev) =>
-                              prev.filter((img) => img.id !== image.id),
-                            )
-                          }}
-                          className="absolute top-1 right-1 rounded-full bg-red-500 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </button>
                       </div>
                     ))}
                   </div>

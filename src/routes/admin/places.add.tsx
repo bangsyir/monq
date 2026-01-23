@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { ArrowLeft, MapPin, Upload, X } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
-import type { PlaceCategory } from "@/types/place"
+
 import { Button } from "@/components/ui/button"
 
 import {
@@ -25,15 +25,7 @@ import { Textarea } from "@/components/ui/textarea"
 
 import { addPlaceClientSchema } from "@/schema/place-schema"
 import { addPlace } from "@/serverFunction/place.function"
-
-const categoryOptions: Array<{ value: PlaceCategory; label: string }> = [
-  { value: "waterfall", label: "Waterfall" },
-  { value: "campsite", label: "Campsite" },
-  { value: "hiking", label: "Hiking" },
-  { value: "trail", label: "Trail" },
-  { value: "lake", label: "Lake" },
-  { value: "mountain", label: "Mountain" },
-]
+import { getCategories } from "@/serverFunction/category.function"
 
 const difficulties = [
   { value: "easy", label: "Easy" },
@@ -62,9 +54,14 @@ const amenityIcons = [
 export const Route = createFileRoute("/admin/places/add")({
   ssr: false,
   component: RouteComponent,
+  loader: async () => {
+    const categories = await getCategories()
+    return categories
+  },
 })
 
 function RouteComponent() {
+  const categoryOptions = Route.useLoaderData()
   const navigate = useNavigate({ from: "/admin/places" })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -131,7 +128,7 @@ function RouteComponent() {
   }
   return (
     <div className="container mx-auto py-6">
-      <Button variant="ghost" onClick={handleBack} className="mb-4">
+      <Button variant="outline" onClick={handleBack} className="mb-4">
         <ArrowLeft className="mr-2 h-4 w-4" />
         Back to Users
       </Button>
@@ -224,7 +221,11 @@ function RouteComponent() {
                                 >
                                   {
                                     categoryOptions.find((c) => c.value === cat)
-                                      ?.label
+                                      ?.icon
+                                  }{" "}
+                                  {
+                                    categoryOptions.find((c) => c.value === cat)
+                                      ?.name
                                   }
                                   <button
                                     type="button"
@@ -264,7 +265,7 @@ function RouteComponent() {
                                   }}
                                   className="text-xs"
                                 >
-                                  + {cat.label}
+                                  {cat.icon} {cat.name}
                                 </Button>
                               ))}
                           </div>
@@ -587,10 +588,11 @@ function RouteComponent() {
                         {/* Add new amenity */}
                         <div className="space-y-2">
                           <div className="flex gap-2">
-                            <select
-                              className="border-input bg-background flex-1 rounded-md border px-3 py-2 text-sm"
-                              onChange={(e) => {
-                                const selectedIcon = e.target.value
+                            <Select
+                              name={field.name}
+                              items={amenityIcons}
+                              onValueChange={(value) => {
+                                const selectedIcon = value
                                 if (selectedIcon) {
                                   const icon = amenityIcons.find(
                                     (i) => i.value === selectedIcon,
@@ -600,25 +602,60 @@ function RouteComponent() {
                                       ...field.state.value,
                                       { name: icon.label, icon: icon.value },
                                     ])
-                                    e.target.value = ""
+                                    value = ""
                                   }
                                 }
                               }}
                             >
-                              <option value="">Add amenity...</option>
-                              {amenityIcons
-                                .filter(
-                                  (icon) =>
-                                    !field.state.value.some(
-                                      (amenity) => amenity.icon === icon.value,
-                                    ),
-                                )
-                                .map((icon) => (
-                                  <option key={icon.value} value={icon.value}>
-                                    {icon.icon} {icon.label}
-                                  </option>
+                              <SelectTrigger
+                                id={field.name}
+                                aria-invalid={isInvalid}
+                                className="border-input bg-background flex-1 rounded-md border px-3 py-2 text-sm"
+                              >
+                                <SelectValue placeholder="Select one" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="">None</SelectItem>
+                                {amenityIcons.map((a) => (
+                                  <SelectItem key={a.value} value={a.value}>
+                                    {a.icon} {a.label}
+                                  </SelectItem>
                                 ))}
-                            </select>
+                              </SelectContent>
+                            </Select>
+
+                            {/* <select */}
+                            {/*   className="border-input bg-background flex-1 rounded-md border px-3 py-2 text-sm" */}
+                            {/*   onChange={(e) => { */}
+                            {/*     const selectedIcon = e.target.value */}
+                            {/*     if (selectedIcon) { */}
+                            {/*       const icon = amenityIcons.find( */}
+                            {/*         (i) => i.value === selectedIcon, */}
+                            {/*       ) */}
+                            {/*       if (icon) { */}
+                            {/*         field.handleChange([ */}
+                            {/*           ...field.state.value, */}
+                            {/*           { name: icon.label, icon: icon.value }, */}
+                            {/*         ]) */}
+                            {/*         e.target.value = "" */}
+                            {/*       } */}
+                            {/*     } */}
+                            {/*   }} */}
+                            {/* > */}
+                            {/*   <option value="">Add amenity...</option> */}
+                            {/*   {amenityIcons */}
+                            {/*     .filter( */}
+                            {/*       (icon) => */}
+                            {/*         !field.state.value.some( */}
+                            {/*           (amenity) => amenity.icon === icon.value, */}
+                            {/*         ), */}
+                            {/*     ) */}
+                            {/*     .map((icon) => ( */}
+                            {/*       <option key={icon.value} value={icon.value}> */}
+                            {/*         {icon.icon} {icon.label} */}
+                            {/*       </option> */}
+                            {/*     ))} */}
+                            {/* </select> */}
                           </div>
                         </div>
                       </div>

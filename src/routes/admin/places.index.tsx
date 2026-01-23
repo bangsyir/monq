@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/table"
 import { db } from "@/db"
 import { places } from "@/db/schema"
+import { cn } from "@/lib/utils"
 
 const PlaceQuerySchema = z.object({
   search: z.string().optional(),
@@ -111,6 +112,7 @@ const getPlacesFn = createServerFn({ method: "GET" })
       places: result,
       totalCount,
       offset,
+      limit,
       hasMore: offset + limit < totalCount,
     }
   })
@@ -199,7 +201,7 @@ function RouteComponent() {
         <div>
           <Link
             to="/admin/places/add"
-            className={buttonVariants({ variant: "outline" })}
+            className={cn(buttonVariants({ variant: "outline" }))}
           >
             Add place
           </Link>
