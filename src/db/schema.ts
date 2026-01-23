@@ -176,9 +176,15 @@ export const placeCategories = pgTable(
     placeId: uuid("place_id")
       .notNull()
       .references(() => places.id, { onDelete: "cascade" }),
-    category: text("category").notNull(),
+    categoryId: uuid("category_id")
+      .notNull()
+      .references(() => categories.id, { onDelete: "cascade" }),
   },
-  (table) => [index("category_place_id_idx").on(table.placeId)],
+  (table) => [
+    index("category_place_id_idx").on(table.placeId),
+    index("category_category_id_idx").on(table.categoryId),
+    index("place_category_unique_idx").on(table.placeId, table.categoryId),
+  ],
 )
 /**
  * PLACE IMAGES TABLE
@@ -288,7 +294,7 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
 }))
 
 export const categoriesRelations = relations(categories, ({ many }) => ({
-  places: many(places),
+  placeCategories: many(placeCategories),
 }))
 
 export const placesRelations = relations(places, ({ one, many }) => ({
@@ -296,7 +302,7 @@ export const placesRelations = relations(places, ({ one, many }) => ({
     fields: [places.userId],
     references: [users.id],
   }),
-  categories: many(placeCategories),
+  placeCategories: many(placeCategories),
   images: many(placeImages),
   reviews: many(reviews),
   comments: many(comments),
@@ -314,6 +320,10 @@ export const placeCategoriesRelations = relations(
     place: one(places, {
       fields: [placeCategories.placeId],
       references: [places.id],
+    }),
+    category: one(categories, {
+      fields: [placeCategories.categoryId],
+      references: [categories.id],
     }),
   }),
 )
