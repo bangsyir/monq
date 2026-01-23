@@ -37,14 +37,12 @@ export const addPlaceClientSchema = z.object({
   duration: z.string(),
   distance: z.string(),
   images: z.array(z.file()).nullable(),
-  amenities: z
-    .array(
-      z.object({
-        name: z.string().min(1, "Amenity name is required"),
-        icon: z.string().min(1, "Amenity icon is required"),
-      }),
-    )
-    .default([]),
+  amenities: z.array(
+    z.object({
+      name: z.string().min(1, "Amenity name is required"),
+      icon: z.string().min(1, "Amenity icon is required"),
+    }),
+  ),
 })
 
 export type AddPlaceClient = z.infer<typeof addPlaceClientSchema>
@@ -115,13 +113,14 @@ export const updatePlaceClientSchema = addPlaceClientSchema
     difficulty: true,
     duration: true,
     distance: true,
-    images: true,
     amenities: true,
   })
 
-export const updatePlaceServerSchema = addPlaceServerSchema.extend({
-  id: z.uuid(),
-})
+export const updatePlaceServerSchema = addPlaceServerSchema
+  .extend({
+    id: z.uuid(),
+  })
+  .omit({ images: true })
 
 export type UpdatePlaceClient = z.infer<typeof updatePlaceClientSchema>
 export type UpdatePlaceServer = z.infer<typeof updatePlaceServerSchema>
