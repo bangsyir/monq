@@ -137,7 +137,7 @@ function RouteComponent() {
         {/* Back Button */}
         <div className="container mx-auto px-4 py-4">
           <Link to="/places" search={{ cat: "all" }}>
-            <Button variant="ghost" className="gap-2">
+            <Button variant="outline" className="gap-2">
               <ArrowLeft className="h-4 w-4" />
               Back to places
             </Button>
@@ -159,9 +159,9 @@ function RouteComponent() {
               />
             </motion.div>
             <div className="hidden grid-cols-2 gap-2 md:grid">
-              {[...Array(4)].map((a, i) => (
+              {[...Array(4)].map((_, i) => (
                 <motion.div
-                  key={a}
+                  key={i}
                   initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: (i + 1) * 0.1 }}
