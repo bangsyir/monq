@@ -69,7 +69,11 @@ export async function getPlaceById(placeId: string) {
   const place = await db.query.places.findFirst({
     where: eq(places.id, placeId),
     with: {
-      categories: true,
+      placeCategories: {
+        with: {
+          category: true,
+        },
+      },
       images: true,
     },
   })
