@@ -71,6 +71,7 @@ pnpm dlx shadcn@latest add [component-name]
 
 - Place reusable components in `src/components/`
 - UI components from shadcn go in `src/components/ui/`
+- Don't modified `src/components/ui/`
 - Use compound component patterns for complex UIs
 - Implement proper TypeScript props interfaces
 

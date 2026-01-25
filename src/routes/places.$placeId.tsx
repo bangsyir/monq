@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { mockComments, mockPlaces } from "@/data/mock-places"
+import ImageGallery from "@/components/image-gallery"
 
 const amenityIcons: Record<string, React.ReactNode> = {
   car: <Car className="h-5 w-5" />,
@@ -146,36 +147,7 @@ function RouteComponent() {
 
         {/* Image Gallery */}
         <div className="container mx-auto mb-8 px-4">
-          <div className="grid grid-cols-1 gap-2 overflow-hidden rounded-2xl md:grid-cols-2">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="aspect-4/3 md:aspect-square"
-            >
-              <img
-                src={place.images[0]?.url}
-                alt={place.name}
-                className="h-full w-full object-cover"
-              />
-            </motion.div>
-            <div className="hidden grid-cols-2 gap-2 md:grid">
-              {[...Array(4)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: (i + 1) * 0.1 }}
-                  className="bg-muted aspect-square"
-                >
-                  <img
-                    src={place.images[i % place.images.length]?.url}
-                    alt={place.name}
-                    className="h-full w-full object-cover"
-                  />
-                </motion.div>
-              ))}
-            </div>
-          </div>
+          <ImageGallery images={place.images} placeName={place.name} />
         </div>
 
         {/* Content */}

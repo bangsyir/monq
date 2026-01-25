@@ -4,6 +4,18 @@ import { Flag, LayoutDashboard, MapPin, TrendingUp, Users } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+
 export const Route = createFileRoute("/admin/")({
   ssr: false,
   component: RouteComponent,
@@ -71,6 +83,38 @@ function RouteComponent() {
           </Card>
         ))}
       </motion.div>
+      <DialogDemo />
     </main>
+  )
+}
+
+function DialogDemo() {
+  return (
+    <Dialog>
+      <form>
+        <DialogTrigger
+          render={<Button variant="outline">Open Dialog</Button>}
+        />
+        <DialogContent className="fixed inset-0 h-screen w-screen max-w-none translate-x-0 translate-y-0 rounded-none border-0">
+          <DialogHeader>
+            <DialogTitle>Edit profile</DialogTitle>
+            <DialogDescription>
+              Make changes to your profile here. Click save when you&apos;re
+              done.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid w-full gap-4">
+            <div className="grid gap-3">
+              <Label htmlFor="name-1">Name</Label>
+              <Input id="name-1" name="name" defaultValue="Pedro Duarte" />
+            </div>
+            <div className="grid gap-3">
+              <Label htmlFor="username-1">Username</Label>
+              <Input id="username-1" name="username" defaultValue="@peduarte" />
+            </div>
+          </div>
+        </DialogContent>
+      </form>
+    </Dialog>
   )
 }
