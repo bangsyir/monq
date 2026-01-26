@@ -75,7 +75,31 @@ pnpm dlx shadcn@latest add [component-name]
 - Use compound component patterns for complex UIs
 - Implement proper TypeScript props interfaces
 
-## Database & API
+## Please follow this for tanstack start server function
+
+```ts
+export const getData = createServerFn().handler(async () => {
+  return { message: "Hello from server!" }
+})
+// In a route loader
+export const Route = createFileRoute("/posts")({
+  loader: () => getData(),
+})
+
+// In a component
+function PostList() {
+  const getPosts = useServerFn(getData)
+
+  const { data } = useQuery({
+    queryKey: ["posts"],
+    queryFn: () => getPosts(),
+  })
+}
+```
+
+```
+
+```
 
 ### Schema Changes
 

@@ -7,6 +7,7 @@ import {
 import { Bell, Camera, ChevronsLeft, Lock, LogOut, User } from "lucide-react"
 import React from "react"
 import { toast } from "sonner"
+import { useQuery, useMutation } from "@tanstack/react-query"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button, buttonVariants } from "@/components/ui/button"
 import {
@@ -20,19 +21,43 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
-import { Textarea } from "@/components/ui/textarea"
+
+import { getUserProfile, updateUserProfile } from "@/lib/user-profile-server-fn"
 
 export const Route = createFileRoute("/settings")({
-  loader: async () => {},
+  loader: () => getUserProfile(),
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const { data: userData } = useQuery({
+    queryKey: ["user-profile"],
+    queryFn: getUserProfile,
+    initialData: null,
+  })
+
   const [profileData, setProfileData] = React.useState({
-    name: "Alex Thompson",
-    email: "alex@example.com",
-    bio: "Adventure seeker & nature lover.",
-    location: "Portland, Oregon",
+    name: "",
+    email: "",
+  })
+
+  React.useEffect(() => {
+    if (userData) {
+      setProfileData({
+        name: userData.name || "",
+        email: userData.email || "",
+      })
+    }
+  }, [userData])
+
+  const updateProfileMutation = useMutation({
+    mutationFn: updateUserProfile,
+    onSuccess: () => {
+      toast.success("Profile updated successfully!")
+    },
+    onError: () => {
+      toast.error("Failed to update profile")
+    },
   })
 
   const [notifications, setNotifications] = React.useState({
@@ -53,7 +78,10 @@ function RouteComponent() {
   const canGoBack = useCanGoBack()
 
   const handleSaveProfile = () => {
-    toast.success("Profile updated successfully!")
+    updateProfileMutation.mutate({
+      name: profileData.name,
+      email: profileData.email,
+    } as any)
   }
 
   const handleSaveNotifications = () => {
@@ -110,8 +138,10 @@ function RouteComponent() {
               {/* Avatar */}
               <div className="flex items-center gap-4">
                 <Avatar className="h-20 w-20">
-                  <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop" />
-                  <AvatarFallback>AT</AvatarFallback>
+                  <AvatarImage src={userData?.image || ""} />
+                  <AvatarFallback>
+                    {userData?.name?.charAt(0) || "U"}
+                  </AvatarFallback>
                 </Avatar>
                 <Button variant="outline" className="gap-2">
                   <Camera className="h-4 w-4" />
@@ -147,32 +177,6 @@ function RouteComponent() {
                     }
                   />
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="bio">Bio</Label>
-                <Textarea
-                  id="bio"
-                  value={profileData.bio}
-                  onChange={(e) =>
-                    setProfileData({ ...profileData, bio: e.target.value })
-                  }
-                  placeholder="Tell us about yourself..."
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="location">Location</Label>
-                <Input
-                  id="location"
-                  value={profileData.location}
-                  onChange={(e) =>
-                    setProfileData({
-                      ...profileData,
-                      location: e.target.value,
-                    })
-                  }
-                />
               </div>
 
               <Button onClick={handleSaveProfile}>Save Changes</Button>
