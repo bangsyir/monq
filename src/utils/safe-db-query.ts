@@ -13,7 +13,7 @@ export type TDbResult<TData> = [TData, null] | [null, TAppError]
 export async function safeDbQuery<TData>(
   promise: Promise<TData>,
 ): Promise<TDbResult<TData>> {
-  const [data, error] = await tryCatch<TData, TDatabaseError | Error>(promise)
+  const [data, error] = await tryCatch<TData, TDatabaseError>(promise)
   if (error) {
     return [null, { message: getFriendlyDbMessage(error), error: error }]
   }

@@ -1,4 +1,5 @@
-import { isDatabaseError } from "@/types/database"
+import type { DrizzleQueryError } from "drizzle-orm"
+import type { PostgresError } from "postgres"
 
 export const DB_ERROR_CODES = {
   UNIQUE_VIOLATION: "23505",
@@ -12,12 +13,14 @@ export type TDbErrorCode = (typeof DB_ERROR_CODES)[keyof typeof DB_ERROR_CODES]
 /**
  * Translates a DB error code into a user-friendly message.
  */
-export function getFriendlyDbMessage(error: unknown): string {
-  if (!isDatabaseError(error)) return "An unexpected error occurred."
-
-  switch (error.code) {
+export function getFriendlyDbMessage(
+  error: DrizzleQueryError & { cause: PostgresError },
+): string {
+  // if (!isDatabaseError(error)) return "An unexpected error occurred."
+  const uniqueField = error.cause.constraint_name?.split("_")[1]
+  switch (error.cause.code) {
     case DB_ERROR_CODES.UNIQUE_VIOLATION:
-      return "This record already exists."
+      return `This ${uniqueField} already exists.`
     case DB_ERROR_CODES.FOREIGN_KEY_VIOLATION:
       return "This action relates to a record that doesn't exist."
     case DB_ERROR_CODES.NOT_NULL_VIOLATION:
