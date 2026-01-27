@@ -30,6 +30,7 @@ export const users = pgTable(
     banned: boolean("banned").default(false),
     banReason: text("ban_reason"),
     banExpires: timestamp("ban_expires"),
+    username: text("username").unique(),
   },
   (table) => [index("user_id_idx").on(table.id)],
 )
