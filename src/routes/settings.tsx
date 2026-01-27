@@ -75,13 +75,11 @@ function RouteComponent() {
         await updateUserProfile({
           data: value,
         })
-        toast.success("Profile updated successfully!", {
-          className: "bg-green-500 text-primary",
-        })
+        toast.success("Profile updated successfully!")
       } catch (error) {
-        toast.error("Failed to update profile", {
-          className: "bg-red-500 text-primary",
-        })
+        if (error instanceof Error) {
+          toast.error(error.message)
+        }
       }
     },
   })
