@@ -1,17 +1,24 @@
 import { Link, useNavigate } from "@tanstack/react-router"
 import { Loader } from "lucide-react"
+import { toast } from "sonner"
 import LoginDialog from "./login-dialog"
 import { ThemeToggle } from "./theme-toggle"
 import { AuthUserDropdown } from "./user-dropdown"
 import { authClient } from "@/lib/auth-client"
 
-export function Navbar() {
-  const { data: session, isPending } = authClient.useSession()
+export function Navbar({
+  username,
+  role,
+}: {
+  username: string | undefined
+  role: string
+}) {
   const navigate = useNavigate()
   const handleLogout = async () => {
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
+          toast.success("Logged out successfully")
           navigate({ to: "/" })
         },
       },
@@ -32,11 +39,10 @@ export function Navbar() {
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          {isPending ? (
-            <div>Loading...</div>
-          ) : session ? (
+          {username ? (
             <AuthUserDropdown
-              name={session.user.name}
+              name={username}
+              role={role}
               handleLogout={handleLogout}
             />
           ) : (

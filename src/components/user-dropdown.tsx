@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router"
-import { User } from "lucide-react"
+import { LogOut, Settings, ShieldUser, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -8,15 +8,16 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
 export function AuthUserDropdown({
   name,
+  role,
   handleLogout,
 }: {
-  name: string
+  name: string | undefined
+  role: string
   handleLogout: () => void
 }) {
   return (
@@ -34,18 +35,24 @@ export function AuthUserDropdown({
         </div>
         {name}
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="start">
+      <DropdownMenuContent align="start">
         <DropdownMenuGroup>
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          {role === "admin" && (
+            <DropdownMenuItem render={<Link to="/admin" />}>
+              <ShieldUser />
+              Admin
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem render={<Link to="/settings" />}>
+            <Settings />
             Settings
-            <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>
+          <LogOut />
           Log out
-          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -1,6 +1,6 @@
-import { Link, createFileRoute } from "@tanstack/react-router"
+import { createFileRoute } from "@tanstack/react-router"
 import { motion } from "framer-motion"
-import { Flag, LayoutDashboard, MapPin, TrendingUp, Users } from "lucide-react"
+import { Flag, MapPin, TrendingUp, Users } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 
@@ -18,7 +18,6 @@ const stats = [
 function RouteComponent() {
   return (
     <main className="pt-5">
-      <Link to="/dashboard">dashboard</Link>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -26,9 +25,6 @@ function RouteComponent() {
         className="mb-8"
       >
         <div className="mb-2 flex items-center gap-3">
-          <div className="bg-primary/10 rounded-lg p-2">
-            <LayoutDashboard className="text-primary h-6 w-6" />
-          </div>
           <h1 className="text-foreground text-2xl font-bold md:text-3xl">
             Admin Dashboard
           </h1>

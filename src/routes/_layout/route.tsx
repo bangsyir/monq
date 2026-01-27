@@ -8,12 +8,12 @@ import {
 import { GalleryVerticalEnd, LogOut } from "lucide-react"
 import { buttonVariants } from "@/components/ui/button"
 import { authClient } from "@/lib/auth-client"
-import { getSession } from "@/lib/auth-server-func"
+import { getSessionUser } from "@/lib/auth-server-func"
 
 export const Route = createFileRoute("/_layout")({
   component: RouteComponent,
   beforeLoad: async ({ location }) => {
-    const session = await getSession()
+    const session = await getSessionUser()
     if (!session) {
       throw redirect({
         to: "/login",

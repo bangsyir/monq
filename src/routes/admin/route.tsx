@@ -20,19 +20,17 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { getSession } from "@/lib/auth-server-func"
 
 export const Route = createFileRoute("/admin")({
   component: RouteComponent,
-  beforeLoad: async () => {
-    const session = await getSession()
-    if (!session) {
+  loader: ({ context }) => {
+    if (!context.user) {
       throw redirect({ to: "/login" })
     }
-    if (session.user.role !== "admin") {
+    if (context.user.role !== "admin") {
       throw redirect({ to: "/" })
     }
-    return session
+    return { user: context.user }
   },
 })
 
@@ -85,10 +83,11 @@ function RouteComponent() {
 
     return crumbs
   }, [routerState.location.pathname])
-
+  const loaderData = Route.useLoaderData()
+  const { role, ...restData } = loaderData.user
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar user={restData} />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />

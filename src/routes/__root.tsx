@@ -11,12 +11,28 @@ import appCss from "../styles.css?url"
 import type { QueryClient } from "@tanstack/react-query"
 import { Toaster } from "@/components/ui/sonner"
 import { ThemeProvider } from "@/components/theme-provider"
+import { getSessionUser } from "@/lib/auth-server-func"
 
 interface MyRouterContext {
   queryClient: QueryClient
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
+  beforeLoad: async () => {
+    const { user } = await getSessionUser()
+    if (!user) {
+      return { user: null }
+    }
+    return {
+      user: {
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        image: user.image,
+        role: user.role,
+      },
+    }
+  },
   head: () => ({
     meta: [
       {
@@ -89,7 +105,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             TanStackQueryDevtools,
           ]}
         />
-        <Toaster />
+        <Toaster richColors position="top-center" />
         <Scripts />
       </body>
     </html>

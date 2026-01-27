@@ -5,12 +5,17 @@ import { Navbar } from "@/components/navbar"
 
 export const Route = createFileRoute("/")({
   component: App,
+  loader: ({ context }) => {
+    const user = context?.user
+    return { user: { username: user?.username, role: user?.role } }
+  },
 })
 
 function App() {
+  const { user } = Route.useLoaderData()
   return (
     <div className="min-h-screen">
-      <Navbar />
+      <Navbar username={user?.username} role={user.role!} />
       <HeroSection />
       <FeaturedPlaces />
     </div>

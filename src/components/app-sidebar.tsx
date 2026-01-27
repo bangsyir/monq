@@ -5,9 +5,11 @@ import {
   MapPin,
   Users,
 } from "lucide-react"
+import { NavUser } from "./sidebar-nav-user"
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -44,8 +46,16 @@ const data = {
     },
   ],
 }
-
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+type UserProfileType = {
+  name: string
+  username: string
+  image: string | null | undefined
+  email: string
+}
+export function AppSidebar({
+  user,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & { user: UserProfileType }) {
   const routerState = useRouterState()
 
   const isActive = (url: string) => {
@@ -94,6 +104,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroup>
         ))}
       </SidebarContent>
+      <SidebarFooter>
+        <NavUser user={user} />
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   )
