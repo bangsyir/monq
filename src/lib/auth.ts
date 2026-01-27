@@ -11,6 +11,15 @@ export const auth = betterAuth({
     schema: schema,
     usePlural: true,
   }),
+  user: {
+    additionalFields: {
+      username: {
+        type: "string",
+        required: true,
+        input: true,
+      },
+    },
+  },
   advanced: {
     database: {
       generateId: "uuid",
@@ -20,6 +29,11 @@ export const auth = betterAuth({
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      mapProfileToUser: (profile) => {
+        return {
+          username: profile.email.split("@")[0],
+        }
+      },
     },
   },
   trustedOrigins: ["http://localhost:3000"],
