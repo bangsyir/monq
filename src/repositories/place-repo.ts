@@ -32,31 +32,6 @@ export async function insertPlace(
     .returning({ id: places.id, title: places.name })
 }
 
-// export async function updatePlace(
-// 	data: Omit<InsertPlace, "userId">,
-// 	userId: string,
-// ) {
-// 	return await db
-// 		.update(places)
-// 		.set({
-// 			userId: userId,
-// 			name: data.name,
-// 			description: data.description,
-// 			address: data.address,
-// 			city: data.city,
-// 			state: data.state,
-// 			country: data.country,
-// 			latitude: data.latitude,
-// 			longitude: data.longitude,
-// 			difficulty: data.difficulty,
-// 			duration: data.duration,
-// 			distance: data.distance,
-// 			rating: 0,
-// 		})
-// 		.where(eq(places.id, data.id))
-// 		.returning({ id: places.id, title: places.name });
-// }
-
 export function insertCategories(data: Array<InsertCategories>) {
   return db.insert(placeCategories).values(data)
 }
