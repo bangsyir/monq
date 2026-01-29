@@ -1,12 +1,19 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { createServerFn, useServerFn } from "@tanstack/react-start"
 import { eq } from "drizzle-orm"
 import { ArrowLeft, Save } from "lucide-react"
+import { createServerFn, useServerFn } from "@tanstack/react-start"
 import { useState } from "react"
 import { z } from "zod"
+import { users } from "@/db/schema"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -19,7 +26,6 @@ import {
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { db } from "@/db"
-import { users } from "@/db/schema"
 
 const UpdateUserSchema = z.object({
   userId: z.string().min(1, "user id required"),
@@ -79,7 +85,7 @@ export const Route = createFileRoute("/admin/users_/$userId/update")({
 
 function RouteComponent() {
   const { user } = Route.useLoaderData()
-  const navigate = useNavigate({ from: "/admin/users" })
+  const navigate = useNavigate({ from: "/admin/users/" })
   const updateUserMutation = useServerFn(updateUserFn)
 
   const [formData, setFormData] = useState({
@@ -138,9 +144,9 @@ function RouteComponent() {
   }
 
   return (
-    <div className="container mx-auto py-6">
+    <div className="mx-auto py-6">
       <div className="mb-6">
-        <Button variant="ghost" onClick={handleBack} className="mb-4">
+        <Button variant="outline" onClick={handleBack} className="mb-4">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Users
         </Button>
@@ -148,17 +154,22 @@ function RouteComponent() {
         <h1 className="text-2xl font-bold">Update User</h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="max-w-2xl">
-        <Card>
+      <form onSubmit={handleSubmit} className="w-full space-y-6 lg:w-1/2">
+        <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="flex items-center gap-3">
-              <Avatar className="h-12 w-12">
-                <AvatarImage src={user.image || ""} alt={user.name} />
-                <AvatarFallback>
-                  {user.name?.charAt(0)?.toUpperCase() || "U"}
+            <CardTitle className="flex items-center gap-4">
+              <Avatar className="border-border h-16 w-16 border-2">
+                <AvatarImage src={user.image!} />
+                <AvatarFallback className="bg-secondary text-secondary-foreground text-lg">
+                  {user.username?.slice(0, 2) || "U"}
                 </AvatarFallback>
               </Avatar>
-              {user.name}
+              <div>
+                <CardTitle className="text-foreground">User Profile</CardTitle>
+                <CardDescription className="text-muted-foreground">
+                  ID: {user.id}
+                </CardDescription>
+              </div>{" "}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -193,12 +204,10 @@ function RouteComponent() {
                   <div className="text-sm text-red-600">{errors.email}</div>
                 )}
               </div>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="role">Role</Label>
                 <Select
+                  id="role"
                   value={formData.role}
                   onValueChange={(value) => handleInputChange("role", value)}
                   disabled={isSubmitting}
@@ -211,89 +220,139 @@ function RouteComponent() {
                     <SelectItem value="admin">Admin</SelectItem>
                   </SelectContent>
                 </Select>
+                {errors.role && (
+                  <div className="text-sm text-red-600">{errors.role}</div>
+                )}
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="emailVerified">Email Verified</Label>
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="emailVerified"
-                    checked={formData.emailVerified}
-                    onCheckedChange={(checked) =>
-                      handleInputChange("emailVerified", checked)
-                    }
-                    disabled={isSubmitting}
-                  />
-                  <Label htmlFor="emailVerified" className="text-sm">
-                    {formData.emailVerified ? "Verified" : "Not Verified"}
-                  </Label>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="banned"
-                  checked={formData.banned}
-                  onCheckedChange={(checked) =>
-                    handleInputChange("banned", checked)
-                  }
-                  disabled={isSubmitting}
-                />
-                <Label htmlFor="banned" className="text-sm">
-                  {formData.banned ? "User is banned" : "User is active"}
-                </Label>
-              </div>
-
-              {formData.banned && (
-                <div className="space-y-4 border-l-2 border-gray-200 pl-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="banReason">Ban Reason</Label>
-                    <Textarea
-                      id="banReason"
-                      value={formData.banReason}
-                      onChange={(e) =>
-                        handleInputChange("banReason", e.target.value)
-                      }
-                      placeholder="Reason for banning this user..."
-                      disabled={isSubmitting}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="banExpires">Ban Expires (optional)</Label>
-                    <Input
-                      id="banExpires"
-                      type="date"
-                      value={formData.banExpires}
-                      onChange={(e) =>
-                        handleInputChange("banExpires", e.target.value)
-                      }
-                      disabled={isSubmitting}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="flex gap-3 pt-4">
-              <Button type="submit" disabled={isSubmitting} className="flex-1">
-                <Save className="mr-2 h-4 w-4" />
-                {isSubmitting ? "Saving..." : "Save Changes"}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleBack}
-                disabled={isSubmitting}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
             </div>
           </CardContent>
         </Card>
+        <Card className="border-border bg-card">
+          <CardHeader>
+            <CardTitle className="text-foreground">Account Settings</CardTitle>
+            <CardDescription className="text-muted-foreground">
+              Manage verification status and access control
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="border-border bg-muted/30 flex items-center justify-between rounded-lg border p-4">
+              <div className="flex-1">
+                <Label
+                  htmlFor="emailVerified"
+                  className="text-foreground font-medium"
+                >
+                  Email Verified
+                </Label>
+                <p className="text-muted-foreground text-sm">
+                  Mark this user&apos;s email as verified
+                </p>
+              </div>
+              <Switch
+                id="emailVerified"
+                checked={formData.emailVerified}
+                onCheckedChange={(checked) =>
+                  handleInputChange("emailVerified", checked)
+                }
+              />
+            </div>
+
+            <div className="border-border bg-muted/30 flex items-center justify-between rounded-lg border p-4">
+              <div className="flex-1">
+                <Label htmlFor="banned" className="text-foreground font-medium">
+                  Ban User
+                </Label>
+                <p className="text-muted-foreground text-sm">
+                  Restrict this user from accessing the platform
+                </p>
+              </div>
+              <Switch
+                id="banned"
+                checked={formData.banned}
+                onCheckedChange={(checked) =>
+                  handleInputChange("banned", checked)
+                }
+              />
+            </div>
+            {formData.banned && (
+              <div className="space-y-4 border-l-2 border-gray-200 pl-6">
+                <div className="space-y-2">
+                  <Label htmlFor="banReason">Ban Reason</Label>
+                  <Textarea
+                    id="banReason"
+                    value={formData.banReason}
+                    onChange={(e) =>
+                      handleInputChange("banReason", e.target.value)
+                    }
+                    placeholder="Reason for banning this user..."
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="banExpires">Ban Expires (optional)</Label>
+                  <Input
+                    id="banExpires"
+                    type="date"
+                    value={formData.banExpires}
+                    onChange={(e) =>
+                      handleInputChange("banExpires", e.target.value)
+                    }
+                    disabled={isSubmitting}
+                  />
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+        <Card className="border-border bg-card">
+          <CardHeader>
+            <CardTitle className="text-foreground">Metadata</CardTitle>
+            <CardDescription className="text-muted-foreground">
+              Read-only information about this user
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex justify-between">
+              <span className="text-foreground text-sm font-medium">
+                Created At
+              </span>
+              <span className="text-muted-foreground text-sm">
+                {new Date(user.createdAt).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-foreground text-sm font-medium">
+                User ID
+              </span>
+              <code className="text-muted-foreground text-sm">{user.id}</code>
+            </div>
+          </CardContent>
+        </Card>
+        <div>
+          <div className="flex gap-3">
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="text-foreground flex-1 bg-emerald-600 hover:bg-emerald-700"
+            >
+              <Save className="mr-2 h-4 w-4" />
+              {isSubmitting ? "Saving..." : "Save Changes"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleBack}
+              disabled={isSubmitting}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
       </form>
     </div>
   )

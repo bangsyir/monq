@@ -1,13 +1,30 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { Link, createFileRoute } from "@tanstack/react-router"
 import { createServerFn } from "@tanstack/react-start"
 import { eq } from "drizzle-orm"
-import { ArrowLeft, Ban, Calendar, Mail, Shield, User } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  ArrowLeft,
+  Ban,
+  Calendar,
+  CheckCircle2,
+  Mail,
+  Pencil,
+  Shield,
+  User,
+  XCircle,
+} from "lucide-react"
+import { users } from "@/db/schema"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { db } from "@/db"
-import { users } from "@/db/schema"
+import { Separator } from "@/components/ui/separator"
 
 const getUserFn = createServerFn({ method: "GET" })
   .inputValidator((data: { userId: string }) => data)
@@ -32,150 +49,205 @@ export const Route = createFileRoute("/admin/users/$userId")({
 
 function RouteComponent() {
   const { user } = Route.useLoaderData()
-  const navigate = useNavigate({ from: "/admin/users" })
 
   if (!user) {
     return <div>User not found</div>
   }
 
-  const handleBack = () => {
-    navigate({ to: "/admin/users", search: true })
+  const formatDate = (dateString: Date) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  }
+
+  const getRoleBadgeVariant = (role: string) => {
+    switch (role) {
+      case "admin":
+        return "default"
+      case "moderator":
+        return "secondary"
+      default:
+        return "outline"
+    }
   }
 
   return (
     <div className="container mx-auto py-6">
       <div className="mb-6">
-        <Button variant="ghost" onClick={handleBack} className="mb-4">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Users
-        </Button>
+        <Link to="/admin/users">
+          <Button variant="outline" className="mb-4">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Users
+          </Button>
+        </Link>
 
-        <h1 className="text-2xl font-bold">User Details</h1>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Profile Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-3">
-              <Avatar className="h-12 w-12">
-                <AvatarImage src={user.image || ""} alt={user.name} />
-                <AvatarFallback>
-                  {user.name?.charAt(0)?.toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
-              {user.name}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center gap-3">
-              <User className="h-4 w-4 text-gray-500" />
-              <span className="font-medium">Full Name:</span>
-              <span>{user.name}</span>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Mail className="h-4 w-4 text-gray-500" />
-              <span className="font-medium">Email:</span>
-              <span>{user.email}</span>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Shield className="h-4 w-4 text-gray-500" />
-              <span className="font-medium">Role:</span>
-              <Badge
-                variant={user.role === "admin" ? "destructive" : "secondary"}
-              >
-                {user.role || "user"}
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Status & Activity Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Status & Activity</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center gap-3">
-              <Shield className="h-4 w-4 text-gray-500" />
-              <span className="font-medium">Email Verified:</span>
-              <Badge variant={user.emailVerified ? "default" : "secondary"}>
-                {user.emailVerified ? "Verified" : "Not Verified"}
-              </Badge>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Ban className="h-4 w-4 text-gray-500" />
-              <span className="font-medium">Account Status:</span>
-              <Badge variant={user.banned ? "destructive" : "default"}>
-                {user.banned ? "Banned" : "Active"}
-              </Badge>
-            </div>
-
-            {user.banReason && (
-              <div className="flex items-start gap-3">
-                <Ban className="mt-1 h-4 w-4 text-gray-500" />
-                <span className="font-medium">Ban Reason:</span>
-                <span className="text-sm text-gray-600">{user.banReason}</span>
-              </div>
-            )}
-
-            {user.banExpires && (
-              <div className="flex items-center gap-3">
-                <Calendar className="h-4 w-4 text-gray-500" />
-                <span className="font-medium">Ban Expires:</span>
-                <span>{new Date(user.banExpires).toLocaleDateString()}</span>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Timestamps Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Account Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center gap-3">
-              <Calendar className="h-4 w-4 text-gray-500" />
-              <span className="font-medium">User ID:</span>
-              <span className="font-mono text-xs text-gray-600">{user.id}</span>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Calendar className="h-4 w-4 text-gray-500" />
-              <span className="font-medium">Created:</span>
-              <span>{new Date(user.createdAt).toLocaleString()}</span>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Calendar className="h-4 w-4 text-gray-500" />
-              <span className="font-medium">Last Updated:</span>
-              <span>{new Date(user.updatedAt).toLocaleString()}</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Actions Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Actions</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Button
-              className="w-full"
-              onClick={() =>
-                navigate({
-                  to: "/admin/users/$userId/update",
-                  params: { userId: user.id },
-                })
-              }
-            >
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-foreground text-3xl font-semibold tracking-tight text-balance">
+              User Details
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              View complete information for this user
+            </p>
+          </div>
+          <Link to="/admin/users/$userId/update" params={{ userId: user.id }}>
+            <Button>
+              <Pencil className="mr-2 h-4 w-4" />
               Edit User
             </Button>
-            {/* Add more actions as needed */}
+          </Link>
+        </div>
+      </div>
+
+      <div className="space-y-6">
+        <Card className="border-border bg-card">
+          <CardHeader>
+            <div className="flex items-center gap-4">
+              <Avatar className="border-border h-16 w-16 border-2">
+                <AvatarFallback className="bg-secondary text-secondary-foreground text-lg">
+                  {user.username!.slice(0, 2)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <CardTitle className="text-foreground text-2xl">
+                  {user.name}
+                </CardTitle>
+                <CardDescription className="text-muted-foreground">
+                  @{user.username}
+                </CardDescription>
+              </div>
+              <div className="flex gap-2">
+                <Badge
+                  variant={getRoleBadgeVariant(user.role!)}
+                  className="capitalize"
+                >
+                  {user.role}
+                </Badge>
+                {user.banned ? (
+                  <Badge variant="destructive">Banned</Badge>
+                ) : (
+                  <Badge
+                    variant="outline"
+                    className="border-border text-foreground"
+                  >
+                    Active
+                  </Badge>
+                )}
+              </div>
+            </div>
+          </CardHeader>
+        </Card>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          <Card className="border-border bg-card">
+            <CardHeader>
+              <CardTitle className="text-foreground">
+                Contact Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-start gap-3">
+                <Mail className="text-muted-foreground mt-0.5 h-5 w-5" />
+                <div className="flex-1">
+                  <p className="text-foreground text-sm font-medium">
+                    Email Address
+                  </p>
+                  <p className="text-muted-foreground text-sm">{user.email}</p>
+                  <div className="mt-1 flex items-center gap-1.5">
+                    {user.emailVerified ? (
+                      <>
+                        <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+                        <span className="text-xs text-green-500">Verified</span>
+                      </>
+                    ) : (
+                      <>
+                        <XCircle className="text-muted-foreground h-3.5 w-3.5" />
+                        <span className="text-muted-foreground text-xs">
+                          Not verified
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <Separator className="bg-border" />
+
+              <div className="flex items-start gap-3">
+                <User className="text-muted-foreground mt-0.5 h-5 w-5" />
+                <div className="flex-1">
+                  <p className="text-foreground text-sm font-medium">
+                    Username
+                  </p>
+                  <p className="text-muted-foreground text-sm">
+                    @{user.username}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border bg-card">
+            <CardHeader>
+              <CardTitle className="text-foreground">Account Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-start gap-3">
+                <Calendar className="text-muted-foreground mt-0.5 h-5 w-5" />
+                <div className="flex-1">
+                  <p className="text-foreground text-sm font-medium">
+                    Created At
+                  </p>
+                  <p className="text-muted-foreground text-sm">
+                    {formatDate(user.createdAt)}
+                  </p>
+                </div>
+              </div>
+
+              <Separator className="bg-border" />
+
+              <div className="flex items-start gap-3">
+                <Shield className="text-muted-foreground mt-0.5 h-5 w-5" />
+                <div className="flex-1">
+                  <p className="text-foreground text-sm font-medium">Role</p>
+                  <p className="text-muted-foreground text-sm capitalize">
+                    {user.role}
+                  </p>
+                </div>
+              </div>
+
+              <Separator className="bg-border" />
+
+              <div className="flex items-start gap-3">
+                <Ban className="text-muted-foreground mt-0.5 h-5 w-5" />
+                <div className="flex-1">
+                  <p className="text-foreground text-sm font-medium">
+                    Account Status
+                  </p>
+                  <p className="text-muted-foreground text-sm">
+                    {user.banned ? "Account is banned" : "Account is active"}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card className="border-border bg-card">
+          <CardHeader>
+            <CardTitle className="text-foreground">User ID</CardTitle>
+            <CardDescription className="text-muted-foreground">
+              Unique identifier for this user
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="bg-muted rounded-lg px-4 py-3">
+              <code className="text-foreground text-sm">{user.id}</code>
+            </div>
           </CardContent>
         </Card>
       </div>

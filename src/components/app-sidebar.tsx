@@ -90,13 +90,12 @@ export function AppSidebar({
               <SidebarMenu>
                 {item.items.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      isActive={isActive(item.url)}
-                      render={<Link to={item.url} />}
-                    >
-                      {item.icon}
-                      {item.title}
-                    </SidebarMenuButton>
+                    <Link to={item.url}>
+                      <SidebarMenuButton isActive={isActive(item.url)}>
+                        {item.icon}
+                        {item.title}
+                      </SidebarMenuButton>
+                    </Link>
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>
