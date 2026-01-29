@@ -35,7 +35,8 @@ export function NavUser({
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger
-            render={<SidebarMenuButton size="lg" variant="outline" />}
+            render={<SidebarMenuButton size="lg" />}
+            className="border"
           >
             <Avatar className="h-8 w-8 rounded-lg grayscale">
               <AvatarImage src={user.image!} alt={user.name} />
