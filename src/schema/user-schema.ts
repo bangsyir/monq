@@ -5,3 +5,14 @@ export const updateUserSchema = z.object({
   username: z.string().min(5),
   email: z.email(),
 })
+
+export const UserQuerySchema = z.object({
+  search: z.string().optional(),
+  page: z.coerce.number().optional(),
+  sortBy: z
+    .enum(["name", "email", "createdAt", "role"])
+    .default("createdAt")
+    .optional(),
+  sortOrder: z.enum(["asc", "desc"]).default("desc").optional(),
+})
+export type UserFilter = z.infer<typeof UserQuerySchema>

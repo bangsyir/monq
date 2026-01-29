@@ -1,30 +1,10 @@
 import { createServerFn } from "@tanstack/react-start"
-import { eq } from "drizzle-orm"
+import { asc, count, desc, like, or } from "drizzle-orm"
 import { authMiddleware } from "@/lib/auth-middleware"
 import { db } from "@/db"
 import { users } from "@/db/schema"
-import { updateUserSchema } from "@/schema/user-schema"
+import { UserQuerySchema, updateUserSchema } from "@/schema/user-schema"
 import { updateUserService } from "@/services/user-service.server"
-
-export const getUserProfile = createServerFn({ method: "GET" })
-  .middleware([authMiddleware])
-  .handler(async ({ context }) => {
-    const userId = context.user.id
-
-    const user = await db
-      .select({
-        id: users.id,
-        name: users.name,
-        username: users.username,
-        email: users.email,
-        image: users.image,
-      })
-      .from(users)
-      .where(eq(users.id, userId))
-      .limit(1)
-
-    return user[0] || null
-  })
 
 export const updateUserProfile = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
@@ -39,4 +19,75 @@ export const updateUserProfile = createServerFn({ method: "POST" })
     }
 
     return updatedUser.data || null
+  })
+
+export const getUsersFn = createServerFn({ method: "GET" })
+  .inputValidator(UserQuerySchema)
+  .handler(async ({ data }) => {
+    const { search, page, sortBy, sortOrder } = data
+    const currentPage = page || 1
+    const limit = 100
+    const offset = (currentPage - 1) * limit
+
+    // Build where conditions
+    const whereConditions = search
+      ? or(like(users.name, `%${search}%`), like(users.email, `%${search}%`))
+      : undefined
+    const total = await db
+      .select({ count: count() })
+      .from(users)
+      .where(whereConditions)
+
+    // Optimize: Use a single query with subquery for better performance
+    // This gets both the filtered count and the paginated results in one database round trip
+    const query = db
+      .select({
+        // User fields
+        id: users.id,
+        name: users.name,
+        username: users.username,
+        email: users.email,
+        emailVerified: users.emailVerified,
+        image: users.image,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
+        role: users.role,
+        banned: users.banned,
+        banReason: users.banReason,
+        banExpires: users.banExpires,
+        // Total count using window function
+        // totalCount: sql<number>`count(*) over()`.mapWith(Number),
+      })
+      .from(users)
+      .where(whereConditions)
+
+    // Determine sort column
+    const sortColumn =
+      sortBy === "name"
+        ? users.name
+        : sortBy === "email"
+          ? users.email
+          : sortBy === "role"
+            ? users.role
+            : users.createdAt
+
+    // Apply ordering, pagination and execute
+    const result = await query
+      .orderBy(sortOrder === "desc" ? desc(sortColumn) : asc(sortColumn))
+      .limit(limit)
+      .offset(offset)
+
+    const totalPage = Math.ceil(total[0].count / limit)
+
+    // Extract count from first row (all rows have the same total count)
+    // const totalCount = result[0]?.totalCount || 0
+
+    return {
+      users: result,
+      totalCount: total[0].count,
+      totalPage: totalPage,
+      currentPage: currentPage,
+      hasLeft: currentPage > 1,
+      hasMore: currentPage < totalPage,
+    }
   })

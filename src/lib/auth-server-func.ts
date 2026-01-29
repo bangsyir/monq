@@ -19,6 +19,7 @@ export const getSessionUser = createServerFn({ method: "GET" }).handler(
     const { user } = session
     return {
       user: {
+        id: user.id,
         name: user.name,
         username: user.username,
         email: user.email,
