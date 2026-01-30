@@ -55,8 +55,6 @@ export const getUsersFn = createServerFn({ method: "GET" })
         banned: users.banned,
         banReason: users.banReason,
         banExpires: users.banExpires,
-        // Total count using window function
-        // totalCount: sql<number>`count(*) over()`.mapWith(Number),
       })
       .from(users)
       .where(whereConditions)

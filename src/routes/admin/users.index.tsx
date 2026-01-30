@@ -1,6 +1,6 @@
+import { useState } from "react"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { Edit, Eye, MoreHorizontal } from "lucide-react"
-import { useState } from "react"
 import type { UserFilter } from "@/schema/user-schema"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -47,7 +47,7 @@ function RouteComponent() {
   const { usersData: data } = Route.useLoaderData()
   const search = Route.useSearch()
 
-  const navigate = useNavigate({ from: "/admin/users" })
+  const navigate = useNavigate({ from: "/admin/users/" })
   const [searchInput, setSearchInput] = useState(search.search || "")
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()

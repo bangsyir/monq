@@ -1,6 +1,4 @@
-import { Link, createFileRoute } from "@tanstack/react-router"
 import { createServerFn } from "@tanstack/react-start"
-import { eq } from "drizzle-orm"
 import {
   ArrowLeft,
   Ban,
@@ -12,8 +10,11 @@ import {
   User,
   XCircle,
 } from "lucide-react"
-import { users } from "@/db/schema"
+import { eq } from "drizzle-orm"
+import { Link, createFileRoute } from "@tanstack/react-router"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { db } from "@/db"
+import { users } from "@/db/schema"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -23,7 +24,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { db } from "@/db"
 import { Separator } from "@/components/ui/separator"
 
 const getUserFn = createServerFn({ method: "GET" })
@@ -79,7 +79,7 @@ function RouteComponent() {
     <div className="container mx-auto py-6">
       <div className="mb-6">
         <Link to="/admin/users">
-          <Button variant="outline" className="mb-4">
+          <Button variant="ghost" className="mb-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Users
           </Button>

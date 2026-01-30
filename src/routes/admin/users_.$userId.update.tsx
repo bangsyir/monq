@@ -4,6 +4,7 @@ import { ArrowLeft, Save } from "lucide-react"
 import { createServerFn, useServerFn } from "@tanstack/react-start"
 import { useState } from "react"
 import { z } from "zod"
+import { toast } from "sonner"
 import { users } from "@/db/schema"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -80,7 +81,6 @@ export const Route = createFileRoute("/admin/users_/$userId/update")({
     return { user }
   },
   component: RouteComponent,
-  notFoundComponent: () => <div>User not found</div>,
 })
 
 function RouteComponent() {
@@ -121,7 +121,6 @@ function RouteComponent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    setErrors({})
 
     try {
       const result = await updateUserMutation({
@@ -133,11 +132,12 @@ function RouteComponent() {
 
       if (result) {
         navigate({ to: "/admin/users", search: true })
+        toast.success("Succes update user")
       } else {
-        setErrors({ general: "Failed to update user" })
+        toast.error("Failed to update user")
       }
     } catch (error) {
-      setErrors({ general: "An error occurred while updating user" })
+      toast.error("An error occurred while updating user")
     } finally {
       setIsSubmitting(false)
     }
@@ -146,7 +146,7 @@ function RouteComponent() {
   return (
     <div className="mx-auto py-6">
       <div className="mb-6">
-        <Button variant="outline" onClick={handleBack} className="mb-4">
+        <Button variant="ghost" onClick={handleBack} className="mb-4">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Users
         </Button>
