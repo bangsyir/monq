@@ -7,9 +7,10 @@ export const addPlaceClientSchema = z.object({
     .min(10, "Description must be at least 10 characters")
     .max(1000),
   categories: z.array(z.string()).min(1, "Select at least one category"),
-  address: z.string().min(5, "Address is required"),
+  streetAddress: z.string().min(5, "Street address is required"),
+  postcode: z.number().min(5, "Invalid postcode"),
   city: z.string().min(2, "City is required"),
-  state: z.string().min(2, "State is required"),
+  stateProvince: z.string().min(2, "State is required"),
   country: z.string().min(2, "Country is required"),
   latitude: z
     .string()
@@ -54,9 +55,10 @@ export const addPlaceServerSchema = z.object({
     .min(10, "Description must be at least 10 characters")
     .max(1000),
   categories: z.array(z.string()).min(1, "Select at least one category"),
-  address: z.string().min(5, "Address is required"),
+  streetAddress: z.string().min(5, "Street address is required"),
+  postcode: z.number().min(5, "Invalid postcode"),
   city: z.string().min(2, "City is required"),
-  state: z.string().min(2, "State is required"),
+  stateProvince: z.string().min(2, "State is required"),
   country: z.string().min(2, "Country is required"),
   latitude: z
     .string()
@@ -104,9 +106,10 @@ export const updatePlaceClientSchema = addPlaceClientSchema
     name: true,
     description: true,
     categories: true,
-    address: true,
+    streetAddress: true,
+    postcode: true,
     city: true,
-    state: true,
+    stateProvince: true,
     country: true,
     latitude: true,
     longitude: true,
