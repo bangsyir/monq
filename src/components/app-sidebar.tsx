@@ -6,6 +6,7 @@ import {
   Users,
 } from "lucide-react"
 import { NavUser } from "./sidebar-nav-user"
+import { ThemeToggle } from "./theme-toggle"
 import {
   Sidebar,
   SidebarContent,
@@ -104,6 +105,7 @@ export function AppSidebar({
         ))}
       </SidebarContent>
       <SidebarFooter>
+        <ThemeToggle />
         <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
