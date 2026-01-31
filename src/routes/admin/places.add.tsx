@@ -1,6 +1,6 @@
 import { useForm } from "@tanstack/react-form"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { ArrowLeft, MapPin, Upload, X } from "lucide-react"
+import { ChevronsLeft, MapPin, Upload, X } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
@@ -26,6 +26,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { addPlaceClientSchema } from "@/schema/place-schema"
 import { addPlace } from "@/serverFunction/place.function"
 import { getCategories } from "@/serverFunction/category.function"
+import { Separator } from "@/components/ui/separator"
 
 const difficulties = [
   { value: "easy", label: "Easy" },
@@ -70,9 +71,10 @@ function RouteComponent() {
       name: "",
       description: "",
       categories: [] as Array<string>,
-      address: "",
+      streetAddress: "",
+      postcode: 0,
       city: "",
-      state: "",
+      stateProvince: "",
       country: "",
       latitude: "",
       longitude: "",
@@ -128,9 +130,9 @@ function RouteComponent() {
   }
   return (
     <div className="container mx-auto py-6">
-      <Button variant="outline" onClick={handleBack} className="mb-4">
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Users
+      <Button variant="ghost" onClick={handleBack} className="mb-4">
+        <ChevronsLeft className="h-5 w-5" />
+        Back to Places
       </Button>
       <div className="mb-6">
         <h1 className="mb-2 text-2xl font-bold">Add Place</h1>
@@ -282,11 +284,11 @@ function RouteComponent() {
 
             {/* Location */}
             <div className="space-y-4">
-              <h3 className="text-foreground text-sm font-medium">Location</h3>
-
+              <h3 className="text-foreground text-sm font-bold">Location</h3>
+              <Separator />
               <div className="grid grid-cols-3 gap-4">
                 <form.Field
-                  name="address"
+                  name="streetAddress"
                   children={(field) => {
                     const isInvalid =
                       field.state.meta.isTouched && !field.state.meta.isValid
@@ -334,15 +336,42 @@ function RouteComponent() {
                     )
                   }}
                 />
-
                 <form.Field
-                  name="state"
+                  name="postcode"
                   children={(field) => {
                     const isInvalid =
                       field.state.meta.isTouched && !field.state.meta.isValid
                     return (
                       <Field data-invalid={isInvalid}>
-                        <FieldLabel htmlFor={field.name}>State</FieldLabel>
+                        <FieldLabel htmlFor={field.name}>Postcode</FieldLabel>
+                        <Input
+                          id={field.name}
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) =>
+                            field.handleChange(Number(e.target.value))
+                          }
+                          aria-invalid={isInvalid}
+                          placeholder="12300"
+                        />
+                        {isInvalid && (
+                          <FieldError errors={field.state.meta.errors} />
+                        )}
+                      </Field>
+                    )
+                  }}
+                />
+                <form.Field
+                  name="stateProvince"
+                  children={(field) => {
+                    const isInvalid =
+                      field.state.meta.isTouched && !field.state.meta.isValid
+                    return (
+                      <Field data-invalid={isInvalid}>
+                        <FieldLabel htmlFor={field.name}>
+                          State/Province
+                        </FieldLabel>
                         <Input
                           id={field.name}
                           name={field.name}
@@ -441,6 +470,8 @@ function RouteComponent() {
 
             {/* Optional Details */}
             <div className="space-y-4">
+              <h3 className="text-sm font-bold">Optional Details</h3>
+              <Separator />
               <div className="grid grid-cols-2 gap-4">
                 <form.Field
                   name="difficulty"
@@ -623,39 +654,6 @@ function RouteComponent() {
                                 ))}
                               </SelectContent>
                             </Select>
-
-                            {/* <select */}
-                            {/*   className="border-input bg-background flex-1 rounded-md border px-3 py-2 text-sm" */}
-                            {/*   onChange={(e) => { */}
-                            {/*     const selectedIcon = e.target.value */}
-                            {/*     if (selectedIcon) { */}
-                            {/*       const icon = amenityIcons.find( */}
-                            {/*         (i) => i.value === selectedIcon, */}
-                            {/*       ) */}
-                            {/*       if (icon) { */}
-                            {/*         field.handleChange([ */}
-                            {/*           ...field.state.value, */}
-                            {/*           { name: icon.label, icon: icon.value }, */}
-                            {/*         ]) */}
-                            {/*         e.target.value = "" */}
-                            {/*       } */}
-                            {/*     } */}
-                            {/*   }} */}
-                            {/* > */}
-                            {/*   <option value="">Add amenity...</option> */}
-                            {/*   {amenityIcons */}
-                            {/*     .filter( */}
-                            {/*       (icon) => */}
-                            {/*         !field.state.value.some( */}
-                            {/*           (amenity) => amenity.icon === icon.value, */}
-                            {/*         ), */}
-                            {/*     ) */}
-                            {/*     .map((icon) => ( */}
-                            {/*       <option key={icon.value} value={icon.value}> */}
-                            {/*         {icon.icon} {icon.label} */}
-                            {/*       </option> */}
-                            {/*     ))} */}
-                            {/* </select> */}
                           </div>
                         </div>
                       </div>
@@ -678,7 +676,7 @@ function RouteComponent() {
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel htmlFor={field.name}>
-                        Photos (Optional)
+                        Images (Optional)
                       </FieldLabel>
                       <div className="border-border rounded-lg border-2 border-dashed p-6 text-center">
                         <Upload className="text-muted-foreground mx-auto mb-2 h-8 w-8" />

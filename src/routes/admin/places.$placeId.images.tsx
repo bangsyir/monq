@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { createServerFn } from "@tanstack/react-start"
 import { eq } from "drizzle-orm"
-import { ArrowLeft, Trash2, Upload } from "lucide-react"
+import { ChevronsLeft, Trash2, Upload } from "lucide-react"
 import { useRef, useState } from "react"
 import z from "zod"
 import { Button } from "@/components/ui/button"
@@ -177,8 +177,8 @@ function RouteComponent() {
 
   return (
     <div>
-      <Button variant="outline" onClick={handleBack} className="mt-5 mb-4">
-        <ArrowLeft className="mr-2 h-4 w-4" />
+      <Button variant="ghost" onClick={handleBack} className="mt-5 mb-4">
+        <ChevronsLeft className="h-5 w-5" />
         Back to Places
       </Button>
       <div className="mb-4">

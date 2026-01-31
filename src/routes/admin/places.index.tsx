@@ -54,7 +54,7 @@ const getPlacesFn = createServerFn({ method: "GET" })
           like(places.name, `%${search}%`),
           like(places.description, `%${search}%`),
           like(places.city, `%${search}%`),
-          like(places.state, `%${search}%`),
+          like(places.stateProvince, `%${search}%`),
           like(places.country, `%${search}%`),
         )
       : undefined
@@ -68,9 +68,9 @@ const getPlacesFn = createServerFn({ method: "GET" })
         description: places.description,
         latitude: places.latitude,
         longitude: places.longitude,
-        address: places.address,
+        address: places.streetAddress,
         city: places.city,
-        state: places.state,
+        state: places.stateProvince,
         country: places.country,
         rating: places.rating,
         reviewCount: places.reviewCount,

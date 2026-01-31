@@ -1,6 +1,6 @@
 import { useForm } from "@tanstack/react-form"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { ArrowLeft, MapPin, X } from "lucide-react"
+import { ChevronsLeft, MapPin, X } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -51,9 +51,10 @@ function RouteComponent() {
       name: "",
       description: "",
       categories: [] as Array<{ id: string; name: string; icon: string }>,
-      address: "",
+      streetAddress: "",
+      postcode: 0,
       city: "",
-      state: "",
+      stateProvince: "",
       country: "",
       latitude: "",
       longitude: "",
@@ -88,8 +89,8 @@ function RouteComponent() {
 
   return (
     <div>
-      <Button variant="outline" onClick={handleBack} className="mt-5 mb-4">
-        <ArrowLeft className="mr-2 h-4 w-4" />
+      <Button variant="ghost" onClick={handleBack} className="mt-5 mb-4">
+        <ChevronsLeft className="h-5 w-5" />
         Back to Places
       </Button>
       <div className="mb-6">
@@ -245,8 +246,8 @@ function RouteComponent() {
 
               <div className="grid grid-cols-3 gap-4">
                 <form.Field
-                  name="address"
-                  defaultValue={place?.address || ""}
+                  name="streetAddress"
+                  defaultValue={place?.streetAddress || ""}
                   children={(field) => {
                     const isInvalid =
                       field.state.meta.isTouched && !field.state.meta.isValid
@@ -262,6 +263,32 @@ function RouteComponent() {
                           aria-invalid={isInvalid}
                           placeholder="Street address or landmark"
                           defaultValue={field.state.value}
+                        />
+                        {isInvalid && (
+                          <FieldError errors={field.state.meta.errors} />
+                        )}
+                      </Field>
+                    )
+                  }}
+                />
+                <form.Field
+                  name="postcode"
+                  children={(field) => {
+                    const isInvalid =
+                      field.state.meta.isTouched && !field.state.meta.isValid
+                    return (
+                      <Field data-invalid={isInvalid}>
+                        <FieldLabel htmlFor={field.name}>Postcode</FieldLabel>
+                        <Input
+                          id={field.name}
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) =>
+                            field.handleChange(Number(e.target.value))
+                          }
+                          aria-invalid={isInvalid}
+                          placeholder="12300"
                         />
                         {isInvalid && (
                           <FieldError errors={field.state.meta.errors} />
@@ -299,8 +326,8 @@ function RouteComponent() {
                 />
 
                 <form.Field
-                  name="state"
-                  defaultValue={place?.state || ""}
+                  name="stateProvince"
+                  defaultValue={place?.stateProvince || ""}
                   children={(field) => {
                     const isInvalid =
                       field.state.meta.isTouched && !field.state.meta.isValid
