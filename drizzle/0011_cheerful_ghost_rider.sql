@@ -1,0 +1,1 @@
+ALTER TABLE "places" RENAME COLUMN "address" TO "street_address";

@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm"
+import { relations, sql } from "drizzle-orm"
 import {
   boolean,
   index,
@@ -132,9 +132,10 @@ export const places = pgTable(
     // Location fields (flattened from JSON object)
     latitude: real("latitude"),
     longitude: real("longitude"),
-    address: text("address"),
+    streetAddress: text("street_address"),
     city: text("city"),
-    state: text("state"),
+    postcode: integer("postcode"),
+    stateProvince: text("state_province"),
     country: text("country"),
 
     rating: real("rating").notNull(),
@@ -144,12 +145,18 @@ export const places = pgTable(
     duration: text("duration"), // e.g., "3-4 hours"
     distance: text("distance"), // e.g., "5.2 miles"
     elevation: text("elevation"), // e.g., "1,200 ft"
-
+    openingHours: text("opening_hours")
+      .array()
+      .default(sql`'{}'::text[]`),
     // Using a native Postgres array for seasons
-    bestSeason: text("best_season").array(),
+    bestSeason: text("best_season")
+      .array()
+      .default(sql`'{}'::text[]`),
 
     // Amenities as JSON array (matches mock data structure)
-    amenities: text("amenities").array(),
+    amenities: text("amenities")
+      .array()
+      .default(sql`'{}'::text[]`),
 
     isFeatured: boolean("is_featured").default(false),
     createdAt: timestamp("created_at", {
