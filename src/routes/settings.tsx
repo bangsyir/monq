@@ -96,14 +96,14 @@ function RouteComponent() {
       <div className="container mx-auto max-w-4xl px-4">
         <div className="pb-4">
           {canGoBack ? (
-            <Button variant="outline" onClick={() => router.history.back()}>
+            <Button variant="ghost" onClick={() => router.history.back()}>
               <ChevronsLeft className="h-5 w-5" />
               Go back
             </Button>
           ) : (
             <Link
               className={buttonVariants({
-                variant: "outline",
+                variant: "ghost",
               })}
               to="/"
             >

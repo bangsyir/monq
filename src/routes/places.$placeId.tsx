@@ -1,10 +1,10 @@
 import { Link, createFileRoute, useParams } from "@tanstack/react-router"
 import { motion } from "framer-motion"
 import {
-  ArrowLeft,
   Bike,
   Calendar,
   Car,
+  ChevronsLeft,
   Clock,
   Dog,
   ExternalLink,
@@ -23,7 +23,7 @@ import { useState } from "react"
 import type { PlaceComment } from "@/types/place"
 import CommentCard from "@/components/comment-card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { mockComments, mockPlaces } from "@/data/mock-places"
@@ -125,8 +125,13 @@ function RouteComponent() {
           <h1 className="text-foreground mb-2 text-2xl font-bold">
             Place not found
           </h1>
-          <Link to="/places" search={{ cat: "all" }}>
-            <Button>Back to places</Button>
+          <Link
+            to="/places"
+            search={{ cat: "all" }}
+            className={buttonVariants({ variant: "ghost" })}
+          >
+            <ChevronsLeft className="h-5 w-5" />
+            Back to places
           </Link>
         </div>
       </div>
@@ -137,11 +142,13 @@ function RouteComponent() {
       <main>
         {/* Back Button */}
         <div className="container mx-auto px-4 py-4">
-          <Link to="/places" search={{ cat: "all" }}>
-            <Button variant="outline" className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Back to places
-            </Button>
+          <Link
+            to="/places"
+            search={{ cat: "all" }}
+            className={buttonVariants({ variant: "ghost" })}
+          >
+            <ChevronsLeft className="h-5 w-5" />
+            Back to places
           </Link>
         </div>
 
