@@ -24,11 +24,11 @@
     "@tanstack/react-form": "^1.28.0",
     "@tanstack/react-query": "^5.90.20",
     "@tanstack/react-query-devtools": "^5.91.2",
-    "@tanstack/react-router": "^1.157.16",
-    "@tanstack/react-router-devtools": "^1.157.16",
-    "@tanstack/react-router-ssr-query": "^1.157.16",
-    "@tanstack/react-start": "^1.157.16",
-    "@tanstack/router-plugin": "^1.157.16",
+    "@tanstack/react-router": "^1.157.17",
+    "@tanstack/react-router-devtools": "^1.157.17",
+    "@tanstack/react-router-ssr-query": "^1.157.17",
+    "@tanstack/react-start": "^1.157.17",
+    "@tanstack/router-plugin": "^1.157.17",
     "better-auth": "^1.4.10",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -80,6 +80,11 @@
     "web-vitals": "^5.1.0"
   },
   "trustedDependencies": [
+    "@prisma/client",
+    "better-sqlite3",
+    "esbuild",
+    "msw",
+    "sharp",
     "unrs-resolver"
   ]
 }
