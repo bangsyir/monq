@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { eq } from "drizzle-orm"
-import { ArrowLeft, Save } from "lucide-react"
+import { ChevronsLeft, Save } from "lucide-react"
 import { createServerFn, useServerFn } from "@tanstack/react-start"
 import { useState } from "react"
 import { z } from "zod"
@@ -147,7 +147,7 @@ function RouteComponent() {
     <div className="mx-auto py-6">
       <div className="mb-6">
         <Button variant="ghost" onClick={handleBack} className="mb-4">
-          <ArrowLeft className="mr-2 h-4 w-4" />
+          <ChevronsLeft className="h-5 w-5" />
           Back to Users
         </Button>
 

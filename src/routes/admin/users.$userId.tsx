@@ -1,9 +1,9 @@
 import { createServerFn } from "@tanstack/react-start"
 import {
-  ArrowLeft,
   Ban,
   Calendar,
   CheckCircle2,
+  ChevronsLeft,
   Mail,
   Pencil,
   Shield,
@@ -80,7 +80,7 @@ function RouteComponent() {
       <div className="mb-6">
         <Link to="/admin/users">
           <Button variant="ghost" className="mb-4">
-            <ArrowLeft className="mr-2 h-4 w-4" />
+            <ChevronsLeft className="h-5 w-5" />
             Back to Users
           </Button>
         </Link>
