@@ -1,15 +1,21 @@
 import { createServerFn } from "@tanstack/react-start"
 import { z } from "zod"
+import { count, ilike, or } from "drizzle-orm"
 import { authMiddleware } from "@/lib/auth-middleware"
 import {
+  PlaceQuerySchema,
   addPlaceServerSchema,
   updatePlaceServerSchema,
 } from "@/schema/place-schema"
 import {
   createPlace,
   getPlace,
+  getPlaces,
+  getTotalPlaces,
   updatePlaceService,
 } from "@/services/places-service.server"
+import { db } from "@/db"
+import { places } from "@/db/schema"
 
 export const addPlace = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
@@ -44,4 +50,54 @@ export const updatePlace = createServerFn({ method: "POST" })
       throw new Error(result.error.message)
     }
     return result
+  })
+
+// Function to get total places count
+export const getTotalPlacesCount = createServerFn({ method: "GET" }).handler(
+  async () => {
+    const result = await db.select({ count: count() }).from(places)
+    return result[0].count || 0
+  },
+)
+
+export const getPlacesFn = createServerFn({ method: "GET" })
+  .inputValidator(PlaceQuerySchema)
+  .handler(async ({ data }) => {
+    const { search, page, sortBy, sortOrder } = data
+    const currentPage = page || 1
+    const limit = 100
+    const offset = (currentPage - 1) * limit
+    // Build where conditions
+    const whereConditions = search
+      ? or(
+          ilike(places.name, `%${search}%`),
+          ilike(places.description, `%${search}%`),
+          ilike(places.city, `%${search}%`),
+          ilike(places.stateProvince, `%${search}%`),
+          ilike(places.country, `%${search}%`),
+        )
+      : undefined
+    const totalPlaces = await getTotalPlaces({ filter: whereConditions })
+    if (totalPlaces.error) {
+      throw new Error(totalPlaces.message, { cause: totalPlaces.error })
+    }
+    const result = await getPlaces({
+      filter: whereConditions,
+      limit,
+      offset,
+      sortBy,
+      sortOrder,
+    })
+    if (result.error) {
+      throw new Error(result.error.message, { cause: result.error.cause })
+    }
+    const totalPage = Math.ceil(Number(totalPlaces.data?.count) / limit)
+    return {
+      places: result.data,
+      totalCount: totalPlaces.data?.count,
+      currentPage: currentPage,
+      totalPage: totalPage,
+      hasLeft: currentPage > 1,
+      hasMore: currentPage < totalPage,
+    }
   })

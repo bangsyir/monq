@@ -1,9 +1,7 @@
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router"
-import { createServerFn } from "@tanstack/react-start"
-import { asc, count, desc, like, or, sql } from "drizzle-orm"
 import { Edit, Image, MapPin, MoreHorizontal, Star } from "lucide-react"
 import { useState } from "react"
-import { z } from "zod"
+import type { PlaceFilter } from "@/schema/place-schema"
 import { Button, buttonVariants } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -21,122 +19,24 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { db } from "@/db"
-import { places } from "@/db/schema"
 import { cn } from "@/lib/utils"
-
-const PlaceQuerySchema = z.object({
-  search: z.string().optional(),
-  limit: z.number().default(10),
-  offset: z.number().default(0),
-  sortBy: z.enum(["name", "rating", "createdAt", "city"]).default("createdAt"),
-  sortOrder: z.enum(["asc", "desc"]).default("desc"),
-})
-
-type PlaceFilter = z.infer<typeof PlaceQuerySchema>
-
-// Function to get total places count
-const getTotalPlacesCount = createServerFn({ method: "GET" }).handler(
-  async () => {
-    const result = await db.select({ count: count() }).from(places)
-    return result[0]?.count || 0
-  },
-)
-
-const getPlacesFn = createServerFn({ method: "GET" })
-  .inputValidator(PlaceQuerySchema)
-  .handler(async ({ data }) => {
-    const { search, limit, offset, sortBy, sortOrder } = data
-
-    // Build where conditions
-    const whereConditions = search
-      ? or(
-          like(places.name, `%${search}%`),
-          like(places.description, `%${search}%`),
-          like(places.city, `%${search}%`),
-          like(places.stateProvince, `%${search}%`),
-          like(places.country, `%${search}%`),
-        )
-      : undefined
-
-    // Optimize: Use a single query with subquery for better performance
-    const query = db
-      .select({
-        // Place fields
-        id: places.id,
-        name: places.name,
-        description: places.description,
-        latitude: places.latitude,
-        longitude: places.longitude,
-        address: places.streetAddress,
-        city: places.city,
-        state: places.stateProvince,
-        country: places.country,
-        rating: places.rating,
-        reviewCount: places.reviewCount,
-        difficulty: places.difficulty,
-        duration: places.duration,
-        distance: places.distance,
-        elevation: places.elevation,
-        bestSeason: places.bestSeason,
-        isFeatured: places.isFeatured,
-        createdAt: places.createdAt,
-        updatedAt: places.updatedAt,
-        userId: places.userId,
-        // Total count using window function
-        totalCount: sql<number>`count(*) over()`.mapWith(Number),
-      })
-      .from(places)
-      .where(whereConditions)
-
-    // Determine sort column
-    const sortColumn =
-      sortBy === "name"
-        ? places.name
-        : sortBy === "rating"
-          ? places.rating
-          : sortBy === "city"
-            ? places.city
-            : places.createdAt
-
-    // Apply ordering, pagination and execute
-    const result = await query
-      .orderBy(sortOrder === "desc" ? desc(sortColumn) : asc(sortColumn))
-      .limit(limit)
-      .offset(offset)
-
-    // Extract count from first row (all rows have the same total count)
-    const totalCount = result[0]?.totalCount || 0
-
-    return {
-      places: result,
-      totalCount,
-      offset,
-      limit,
-      hasMore: offset + limit < totalCount,
-    }
-  })
+import { getPlacesFn } from "@/serverFunction/place.function"
 
 export const Route = createFileRoute("/admin/places/")({
   ssr: false,
   validateSearch: () => ({}) as PlaceFilter,
-  loaderDeps: ({ search: { search, limit, offset, sortBy, sortOrder } }) => ({
+  loaderDeps: ({ search: { search, page, sortBy, sortOrder } }) => ({
     search,
-    limit,
-    offset,
+    page,
     sortBy,
     sortOrder,
   }),
   loader: async ({ deps }) => {
     // Run both queries in parallel for better performance
-    const [placesData, totalPlacesCount] = await Promise.all([
-      getPlacesFn({ data: deps }),
-      getTotalPlacesCount(),
-    ])
+    const [placesData] = await Promise.all([getPlacesFn({ data: deps })])
 
     return {
-      ...placesData,
-      totalPlacesCount,
+      placesData,
     }
   },
   component: RouteComponent,
@@ -144,18 +44,17 @@ export const Route = createFileRoute("/admin/places/")({
 })
 
 function RouteComponent() {
-  const data = Route.useLoaderData()
+  const { placesData } = Route.useLoaderData()
   const search = Route.useSearch()
   const navigate = useNavigate({ from: "/admin/places" })
-  const [searchInput, setSearchInput] = useState(search.search || "")
 
+  const [searchInput, setSearchInput] = useState(search.search || "")
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     navigate({
       search: {
         ...search,
         search: searchInput,
-        offset: 0,
       },
     })
   }
@@ -173,17 +72,20 @@ function RouteComponent() {
     })
   }
 
-  const handlePageChange = (newOffset: number) => {
+  const handleNext = (currentPage: number) => {
     navigate({
       search: {
-        ...search,
-        offset: newOffset,
+        page: currentPage + 1,
       },
     })
   }
 
-  const handleUpdatePlace = (placeId: string) => {
-    navigate({ to: "/admin/places/$placeId/update", params: { placeId } })
+  const handlePrev = (currentPage: number) => {
+    navigate({
+      search: {
+        page: currentPage - 1,
+      },
+    })
   }
 
   return (
@@ -192,10 +94,10 @@ function RouteComponent() {
         <div>
           <h1 className="mb-2 text-2xl font-bold">Places</h1>
           <div className="flex gap-4 text-sm text-gray-600">
-            <span>
-              Total Places: {data.totalPlacesCount || data.totalCount}
-            </span>
-            {search.search && <span>Filtered Results: {data.totalCount}</span>}
+            <span>Total Places: {placesData.totalCount}</span>
+            {search.search && (
+              <span>Filtered Results: {placesData.totalCount}</span>
+            )}
           </div>
         </div>
         <div>
@@ -207,7 +109,6 @@ function RouteComponent() {
           </Link>
         </div>
       </div>
-
       {/* Search Form */}
       <form onSubmit={handleSearch} className="mb-6">
         <div className="flex gap-2">
@@ -220,7 +121,6 @@ function RouteComponent() {
           <Button type="submit">Search</Button>
         </div>
       </form>
-
       <Table>
         <TableCaption>A list of all places in the system.</TableCaption>
         <TableHeader>
@@ -263,7 +163,7 @@ function RouteComponent() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data?.places?.map((place) => (
+          {placesData.places.map((place) => (
             <TableRow key={place.id}>
               <TableCell>
                 <div className="font-medium">{place.name}</div>
@@ -319,7 +219,12 @@ function RouteComponent() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem
-                      onClick={() => handleUpdatePlace(place.id)}
+                      render={
+                        <Link
+                          to={"/admin/places/$placeId/update"}
+                          params={{ placeId: place.id }}
+                        />
+                      }
                     >
                       <Edit className="mr-2 h-4 w-4" />
                       Edit Place
@@ -342,31 +247,26 @@ function RouteComponent() {
           ))}
         </TableBody>
       </Table>
-
-      {/* Pagination Controls */}
+      Pagination Controls
       <div className="mt-6 flex items-center justify-between">
         <div className="text-sm text-gray-700">
-          Showing {search.offset + 1} to{" "}
-          {Math.min(search.offset + search.limit, data.totalCount)} of{" "}
-          {data.totalCount} results
+          {placesData.totalCount} results
         </div>
         <div className="flex gap-2">
-          <button
-            onClick={() =>
-              handlePageChange(Math.max(0, search.offset - search.limit))
-            }
-            disabled={data.offset === 0}
-            className="rounded-md border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+          <Button
+            onClick={() => handlePrev(placesData.currentPage)}
+            disabled={!placesData.hasLeft}
+            className="hover:cursor-pointer"
           >
             Previous
-          </button>
-          <button
-            onClick={() => handlePageChange(search.offset + search.limit)}
-            disabled={!data.hasMore}
-            className="rounded-md border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+          </Button>
+          <Button
+            onClick={() => handleNext(placesData.currentPage)}
+            disabled={!placesData.hasMore}
+            className="hover:cursor-pointer"
           >
             Next
-          </button>
+          </Button>
         </div>
       </div>
     </div>

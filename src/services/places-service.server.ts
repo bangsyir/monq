@@ -1,3 +1,5 @@
+import { asc, count, desc } from "drizzle-orm"
+import type { SQL } from "drizzle-orm"
 import type { AddPlaceServer, UpdatePlaceServer } from "@/schema/place-schema"
 import {
   deletePlaceCategories,
@@ -9,7 +11,7 @@ import {
 } from "@/repositories/place-repo"
 import { safeDbQuery } from "@/utils/safe-db-query"
 import { db } from "@/db"
-import { categories } from "@/db/schema"
+import { categories, places } from "@/db/schema"
 
 // Utility function to convert amenities objects to string format for database
 function convertAmenitiesToStrings(
@@ -18,18 +20,6 @@ function convertAmenitiesToStrings(
   return amenities ? amenities.map((a) => `${a.name}:${a.icon}`) : []
 }
 
-// Utility function to convert string amenities back to objects for frontend
-// function convertAmenitiesToObjects(
-//   amenities?: Array<string>,
-// ): Array<{ name: string; icon: string }> {
-//   return amenities
-//     ? amenities.map((a) => {
-//         const [name, icon] = a.split(":")
-//         return { name, icon }
-//       })
-//     : []
-// }
-//
 // Helper function to get category IDs by names
 async function getCategoryIdsByName(
   categoryNames: Array<string>,
@@ -50,9 +40,9 @@ export async function createPlace(data: AddPlaceServer, userId: string) {
   const dataMap = {
     name: data.name,
     description: data.description,
-    address: data.address,
+    address: data.streetAddress,
     city: data.city,
-    state: data.state,
+    state: data.stateProvince,
     country: data.country,
     latitude: Number(data.latitude),
     longitude: Number(data.longitude),
@@ -140,4 +130,80 @@ export async function updatePlaceService(
   }
 
   return { message: "Successful update place", error: null }
+}
+
+export async function getTotalPlaces({
+  filter,
+}: {
+  filter: SQL<unknown> | undefined
+}) {
+  const [total, totalErr] = await safeDbQuery(
+    db.select({ count: count() }).from(places).where(filter),
+  )
+  if (totalErr) {
+    return { message: totalErr.message, error: totalErr.error.cause }
+  }
+  return { message: "success get total", data: { count: total[0].count } }
+}
+
+export async function getPlaces({
+  filter,
+  sortBy,
+  sortOrder,
+  limit,
+  offset,
+}: {
+  filter: SQL<unknown> | undefined
+  sortBy: string
+  sortOrder: string
+  limit: number
+  offset: number
+}) {
+  // Determine sort column
+  const sortColumn =
+    sortBy === "name"
+      ? places.name
+      : sortBy === "rating"
+        ? places.rating
+        : sortBy === "city"
+          ? places.city
+          : places.createdAt
+
+  // Optimize: Use a single query with subquery for better performance
+  const [result, resultErr] = await safeDbQuery(
+    db
+      .select({
+        // Place fields
+        id: places.id,
+        name: places.name,
+        description: places.description,
+        latitude: places.latitude,
+        longitude: places.longitude,
+        address: places.streetAddress,
+        city: places.city,
+        state: places.stateProvince,
+        country: places.country,
+        rating: places.rating,
+        reviewCount: places.reviewCount,
+        difficulty: places.difficulty,
+        duration: places.duration,
+        distance: places.distance,
+        elevation: places.elevation,
+        bestSeason: places.bestSeason,
+        isFeatured: places.isFeatured,
+        createdAt: places.createdAt,
+        updatedAt: places.updatedAt,
+        userId: places.userId,
+        // Total count using window function
+      })
+      .from(places)
+      .where(filter)
+      .orderBy(sortOrder === "desc" ? desc(sortColumn) : asc(sortColumn))
+      .limit(limit)
+      .offset(offset),
+  )
+  if (resultErr) {
+    return { message: resultErr.message, error: resultErr.error }
+  }
+  return { message: "Success", data: result }
 }
