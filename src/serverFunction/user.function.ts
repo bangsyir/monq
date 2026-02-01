@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start"
-import { asc, count, desc, like, or } from "drizzle-orm"
+import { asc, count, desc, ilike, or } from "drizzle-orm"
 import { authMiddleware } from "@/lib/auth-middleware"
 import { db } from "@/db"
 import { users } from "@/db/schema"
@@ -31,7 +31,7 @@ export const getUsersFn = createServerFn({ method: "GET" })
 
     // Build where conditions
     const whereConditions = search
-      ? or(like(users.name, `%${search}%`), like(users.email, `%${search}%`))
+      ? or(ilike(users.name, `%${search}%`), ilike(users.email, `%${search}%`))
       : undefined
     const total = await db
       .select({ count: count() })
