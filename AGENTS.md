@@ -24,7 +24,6 @@ bun db:studio     # Open Drizzle Studio for database management
 
 ### Import Organization
 
-- Eslint automatically organizes imports on save
 - Use path aliases: `@/components/*`, `@/lib/utils`, `@/hooks/*`
 - Order: external libraries → internal modules → relative imports
 
@@ -51,13 +50,8 @@ bun db:studio     # Open Drizzle Studio for database management
 - Log errors appropriately but don't expose sensitive data
 - Use Zod for runtime validation and error reporting
 
-## UI Development
-
-### Shadcn/UI Components
-
 ```bash
-# Install new components (always use latest version)
-pnpm dlx shadcn@latest add [component-name]
+
 ```
 
 ### Styling with Tailwind v4
@@ -115,14 +109,6 @@ function PostList() {
 - Cache strategies via query keys
 - Optimistic updates for better UX
 
-## Testing Guidelines
-
-- Place tests alongside components (`Component.test.tsx`) or in `__tests__` directories
-- Use Vitest with React Testing Library
-- Test user behavior, not implementation details
-- Mock external dependencies and API calls
-- Ensure accessibility in component tests
-
 ## Performance Considerations
 
 - Use React.memo() for expensive components
@@ -138,3 +124,9 @@ function PostList() {
 - Use environment variables for configuration
 - Implement proper authentication checks
 - Sanitize user-generated content
+
+## Follow the project rules path
+
+- `src/serverFunction/` for store "createServerFn"
+- `src/services/` for store app logic
+- `src/repositories/` for handle access to the table
