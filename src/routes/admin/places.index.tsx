@@ -1,6 +1,7 @@
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router"
 import { Edit, MapPin, MoreHorizontal, Star } from "lucide-react"
 import { useState } from "react"
+import type { RegisteredRouter, RouteById } from "@tanstack/react-router"
 import type { PlaceFilter } from "@/schema/place-schema"
 import { Button, buttonVariants } from "@/components/ui/button"
 import {
@@ -21,6 +22,7 @@ import {
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 import { getPlacesFn } from "@/serverFunction/place.function"
+import { PlacesLoadingSkeleton } from "@/components/places-loading-skeleton"
 
 export const Route = createFileRoute("/admin/places/")({
   ssr: false,
@@ -32,21 +34,28 @@ export const Route = createFileRoute("/admin/places/")({
     sortOrder,
   }),
   loader: async ({ deps }) => {
-    // Run both queries in parallel for better performance
-    const [placesData] = await Promise.all([getPlacesFn({ data: deps })])
-
+    const placesDataPromise = await getPlacesFn({ data: deps })
     return {
-      placesData,
+      placesData: placesDataPromise,
     }
   },
   component: RouteComponent,
+  pendingComponent: PlacesLoadingSkeleton,
   notFoundComponent: () => <div>Not Found</div>,
 })
 
-function RouteComponent() {
-  const { placesData } = Route.useLoaderData()
+type PlacesDataType = RouteById<
+  RegisteredRouter["routeTree"],
+  "/admin/places/"
+>["types"]["loaderData"]["placesData"]
+
+function PlacesContent({
+  placesData,
+}: {
+  placesData: Awaited<PlacesDataType>
+}) {
   const search = Route.useSearch()
-  const navigate = useNavigate({ from: "/admin/places" })
+  const navigate = useNavigate({ from: "/admin/places/" })
 
   const [searchInput, setSearchInput] = useState(search.search || "")
   const handleSearch = (e: React.FormEvent) => {
@@ -74,6 +83,7 @@ function RouteComponent() {
 
   const handleNext = (currentPage: number) => {
     navigate({
+      to: "/admin/places",
       search: {
         page: currentPage + 1,
       },
@@ -89,7 +99,7 @@ function RouteComponent() {
   }
 
   return (
-    <div className="container mx-auto py-6">
+    <>
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="mb-2 text-2xl font-bold">Places</h1>
@@ -118,7 +128,12 @@ function RouteComponent() {
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search by name, description, location..."
           />
-          <Button type="submit">Search</Button>
+          <Button
+            type="submit"
+            className="bg-success hover:bg-success/90 rounded-md px-4 py-2 text-white transition-colors"
+          >
+            Search
+          </Button>
         </div>
       </form>
       <Table>
@@ -236,7 +251,7 @@ function RouteComponent() {
           ))}
         </TableBody>
       </Table>
-      Pagination Controls
+      {/* Pagination Controls */}
       <div className="mt-6 flex items-center justify-between">
         <div className="text-sm text-gray-700">
           {placesData.totalCount} results
@@ -258,6 +273,15 @@ function RouteComponent() {
           </Button>
         </div>
       </div>
+    </>
+  )
+}
+
+function RouteComponent() {
+  const { placesData } = Route.useLoaderData()
+  return (
+    <div className="container mx-auto py-6">
+      <PlacesContent placesData={placesData} />
     </div>
   )
 }

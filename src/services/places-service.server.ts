@@ -196,8 +196,8 @@ export async function getPlaces({
   offset,
 }: {
   filter: SQL<unknown> | undefined
-  sortBy: string
-  sortOrder: string
+  sortBy: string | undefined
+  sortOrder: string | undefined
   limit: number
   offset: number
 }) {

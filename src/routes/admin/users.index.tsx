@@ -1,6 +1,7 @@
-import { useState } from "react"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { Edit, Eye, MoreHorizontal } from "lucide-react"
+import { useState } from "react"
+import type { RegisteredRouter, RouteById } from "@tanstack/react-router"
 import type { UserFilter } from "@/schema/user-schema"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -21,6 +22,12 @@ import {
 } from "@/components/ui/table"
 import { getUsersFn } from "@/serverFunction/user.function"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { UsersLoadingSkeleton } from "@/components/users-loading-skeleton"
+
+type UsersDataType = RouteById<
+  RegisteredRouter["routeTree"],
+  "/admin/users/"
+>["types"]["loaderData"]["usersData"]
 
 export const Route = createFileRoute("/admin/users/")({
   ssr: false,
@@ -32,23 +39,21 @@ export const Route = createFileRoute("/admin/users/")({
     sortOrder,
   }),
   loader: async ({ deps }) => {
-    // Run both queries in parallel for better performance
-    const usersData = await getUsersFn({ data: deps })
-
+    const usersDataPromise = await getUsersFn({ data: deps })
     return {
-      usersData,
+      usersData: usersDataPromise,
     }
   },
   component: RouteComponent,
+  pendingComponent: UsersLoadingSkeleton,
   notFoundComponent: () => <div>Not Found</div>,
 })
 
-function RouteComponent() {
-  const { usersData: data } = Route.useLoaderData()
+function UsersContent({ usersData }: { usersData: Awaited<UsersDataType> }) {
   const search = Route.useSearch()
-
   const navigate = useNavigate({ from: "/admin/users/" })
   const [searchInput, setSearchInput] = useState(search.search || "")
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     navigate({
@@ -71,6 +76,7 @@ function RouteComponent() {
       },
     })
   }
+
   const handleViewUser = (userId: string) => {
     navigate({ to: "/admin/users/$userId", params: { userId } })
   }
@@ -80,18 +86,28 @@ function RouteComponent() {
   }
 
   const handleNext = () => {
-    navigate({ to: "/admin/users", search: { page: data.currentPage + 1 } })
+    navigate({
+      to: "/admin/users",
+      search: { page: usersData.currentPage + 1 },
+    })
   }
+
   const handlePrev = () => {
-    navigate({ to: "/admin/users", search: { page: data.currentPage - 1 } })
+    navigate({
+      to: "/admin/users",
+      search: { page: usersData.currentPage - 1 },
+    })
   }
+
   return (
-    <div className="container mx-auto py-6">
+    <>
       <div className="mb-6">
         <h1 className="mb-2 text-2xl font-bold">Users</h1>
         <div className="flex gap-4 text-sm text-gray-600">
-          <span>Total Users: {data.totalCount}</span>
-          {search.search && <span>Filtered Results: {data.totalCount}</span>}
+          <span>Total Users: {usersData.totalCount}</span>
+          {search.search && (
+            <span>Filtered Results: {usersData.totalCount}</span>
+          )}
         </div>
       </div>
       {/* Search Form */}
@@ -102,11 +118,10 @@ function RouteComponent() {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search by name or email..."
-            className="flex-1 rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
           <Button
             type="submit"
-            className="rounded-md bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600"
+            className="bg-success hover:bg-success/90 rounded-md px-4 py-2 text-white transition-colors"
           >
             Search
           </Button>
@@ -155,18 +170,18 @@ function RouteComponent() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data?.users?.map((user) => (
+          {usersData.users.map((user) => (
             <TableRow key={user.id}>
               <TableCell>
                 {user.image && (
                   <Avatar>
                     <AvatarImage
                       src={user.image}
-                      alt={user.username!}
+                      alt={user.username || "User"}
                       className="grayscale"
                     />
                     <AvatarFallback>
-                      {user.username!.slice(0, 2) || "US"}
+                      {user.username?.slice(0, 2) || "US"}
                     </AvatarFallback>
                   </Avatar>
                 )}
@@ -230,24 +245,36 @@ function RouteComponent() {
       </Table>
       {/* Pagination Controls */}
       <div className="mt-6 flex items-center justify-between">
-        <div className="text-sm text-gray-700">{data.totalCount} results</div>
+        <div className="text-sm text-gray-700">
+          {usersData.totalCount} results
+        </div>
         <div className="flex gap-2">
           <Button
             variant="outline"
             onClick={handlePrev}
-            disabled={!data.hasLeft}
+            disabled={!usersData.hasLeft}
           >
             Previous
           </Button>
           <Button
             variant="outline"
             onClick={handleNext}
-            disabled={!data.hasMore}
+            disabled={!usersData.hasMore}
           >
             Next
           </Button>
         </div>
       </div>
+    </>
+  )
+}
+
+function RouteComponent() {
+  const { usersData } = Route.useLoaderData()
+
+  return (
+    <div className="container mx-auto py-6">
+      <UsersContent usersData={usersData} />
     </div>
   )
 }

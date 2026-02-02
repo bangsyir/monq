@@ -118,8 +118,11 @@ export type UpdatePlaceServer = z.infer<typeof updatePlaceServerSchema>
 export const PlaceQuerySchema = z.object({
   search: z.string().optional(),
   page: z.coerce.number().optional(),
-  sortBy: z.enum(["name", "rating", "createdAt", "city"]).default("createdAt"),
-  sortOrder: z.enum(["asc", "desc"]).default("desc"),
+  sortBy: z
+    .enum(["name", "rating", "createdAt", "city"])
+    .default("createdAt")
+    .optional(),
+  sortOrder: z.enum(["asc", "desc"]).default("desc").optional(),
 })
 
 export type PlaceFilter = z.infer<typeof PlaceQuerySchema>
