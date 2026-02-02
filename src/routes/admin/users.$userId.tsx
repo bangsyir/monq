@@ -12,7 +12,7 @@ import {
 } from "lucide-react"
 import { eq } from "drizzle-orm"
 import { Link, createFileRoute } from "@tanstack/react-router"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { db } from "@/db"
 import { users } from "@/db/schema"
 import { Badge } from "@/components/ui/badge"
@@ -108,6 +108,7 @@ function RouteComponent() {
           <CardHeader>
             <div className="flex items-center gap-4">
               <Avatar className="border-border h-16 w-16 border-2">
+                <AvatarImage src={user.image || ""} />
                 <AvatarFallback className="bg-secondary text-secondary-foreground text-lg">
                   {user.username!.slice(0, 2)}
                 </AvatarFallback>
