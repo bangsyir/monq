@@ -1,7 +1,7 @@
 import { useForm } from "@tanstack/react-form"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { ChevronsLeft, MapPin, Upload, X } from "lucide-react"
-import { useState } from "react"
+import { ChevronsLeft, Images, Link2, MapPin, Upload, X } from "lucide-react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -26,7 +26,9 @@ import { Textarea } from "@/components/ui/textarea"
 import { addPlaceClientSchema } from "@/schema/place-schema"
 import { addPlace } from "@/serverFunction/place.function"
 import { getCategories } from "@/serverFunction/category.function"
+import { getDefaultImages } from "@/serverFunction/gallery.function"
 import { Separator } from "@/components/ui/separator"
+import { amenitiesData } from "@/data/amenities"
 
 const difficulties = [
   { value: "easy", label: "Easy" },
@@ -35,36 +37,128 @@ const difficulties = [
   { value: "expert", label: "Expert" },
 ]
 
-const amenityIcons = [
-  { value: "car", label: "Car", icon: "🚗" },
-  { value: "toilet", label: "Restrooms", icon: "🚻" },
-  { value: "waves", label: "Swimming", icon: "🌊" },
-  { value: "flame", label: "Fire Pit", icon: "🔥" },
-  { value: "table", label: "Picnic Table", icon: "🪵" },
-  { value: "sunrise", label: "Ocean View", icon: "🌅" },
-  { value: "mountain", label: "Scenic Overlook", icon: "⛰️" },
-  { value: "dog", label: "Dog Friendly", icon: "🐕" },
-  { value: "bike", label: "Bike Allowed", icon: "🚲" },
-  { value: "sailboat", label: "Kayaking", icon: "⛵" },
-  { value: "fish", label: "Fishing", icon: "🐟" },
-  { value: "tent", label: "Camping", icon: "⛺" },
-  { value: "mountain-snow", label: "Technical Climb", icon: "🏔️" },
-  { value: "signpost", label: "Trail Markers", icon: "🪧" },
-]
+// const amenityIcons = [
+//   { value: "car", label: "Car", icon: "🚗" },
+//   { value: "toilet", label: "Restrooms", icon: "🚻" },
+//   { value: "waves", label: "Swimming", icon: "🌊" },
+//   { value: "flame", label: "Fire Pit", icon: "🔥" },
+//   { value: "table", label: "Picnic Table", icon: "🪵" },
+//   { value: "sunrise", label: "Ocean View", icon: "🌅" },
+//   { value: "mountain", label: "Scenic Overlook", icon: "⛰️" },
+//   { value: "dog", label: "Dog Friendly", icon: "🐕" },
+//   { value: "bike", label: "Bike Allowed", icon: "🚲" },
+//   { value: "sailboat", label: "Kayaking", icon: "⛵" },
+//   { value: "fish", label: "Fishing", icon: "🐟" },
+//   { value: "tent", label: "Camping", icon: "⛺" },
+//   { value: "mountain-snow", label: "Technical Climb", icon: "🏔️" },
+//   { value: "signpost", label: "Trail Markers", icon: "🪧" },
+// ]
 
 export const Route = createFileRoute("/admin/places/add")({
   ssr: false,
   component: RouteComponent,
   loader: async () => {
     const categories = await getCategories()
-    return categories
+    const defaultImages = await getDefaultImages()
+    return {
+      categories,
+      defaultImages,
+    }
   },
 })
 
+type ImageUploadMode = "file" | "url" | "gallery"
+
+const STORAGE_KEY = "place-add-image-urls"
+
 function RouteComponent() {
-  const categoryOptions = Route.useLoaderData()
+  const { categories: categoryOptions, defaultImages } = Route.useLoaderData()
   const navigate = useNavigate({ from: "/admin/places" })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [uploadMode, setUploadMode] = useState<ImageUploadMode>("file")
+  const [imageUrls, setImageUrls] = useState<Array<string>>([])
+  const [urlInput, setUrlInput] = useState("")
+  const [isUploading, setIsUploading] = useState(false)
+
+  // Load persisted image URLs from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (stored) {
+      try {
+        const urls = JSON.parse(stored) as Array<string>
+        setImageUrls(urls)
+      } catch {
+        localStorage.removeItem(STORAGE_KEY)
+      }
+    }
+  }, [])
+
+  // Persist image URLs to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(imageUrls))
+  }, [imageUrls])
+
+  const handleFileUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return
+
+    setIsUploading(true)
+    const filesArray = Array.from(files)
+
+    try {
+      const uploadedUrls = await Promise.all(
+        filesArray.map(async (file) => {
+          const formData = new FormData()
+          formData.append("file", file)
+
+          const response = await fetch("/api/upload", {
+            method: "POST",
+            body: formData,
+          })
+          if (!response.ok) throw new Error("Failed to upload image")
+          const result = await response.json()
+          return result.url as string
+        }),
+      )
+
+      setImageUrls((prev) => [...prev, ...uploadedUrls])
+      toast.success(`Uploaded ${uploadedUrls.length} image(s) successfully`)
+    } catch (error) {
+      console.error("Error uploading images:", error)
+      toast.error("Failed to upload one or more images")
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  const handleAddUrl = () => {
+    if (!urlInput.trim()) {
+      toast.error("Please enter a valid URL")
+      return
+    }
+
+    // Basic URL validation
+    try {
+      new URL(urlInput)
+    } catch {
+      toast.error("Please enter a valid URL")
+      return
+    }
+
+    setImageUrls((prev) => [...prev, urlInput.trim()])
+    setUrlInput("")
+    toast.success("Image URL added")
+  }
+
+  const handleRemoveImage = (index: number) => {
+    setImageUrls((prev) => prev.filter((_, i) => i !== index))
+    toast.success("Image removed")
+  }
+
+  const clearAllImages = () => {
+    setImageUrls([])
+    localStorage.removeItem(STORAGE_KEY)
+    toast.success("All images cleared")
+  }
 
   const form = useForm({
     defaultValues: {
@@ -82,7 +176,7 @@ function RouteComponent() {
       duration: "",
       distance: "",
       images: [] as Array<File> | null,
-      amenities: [] as Array<{ name: string; icon: string }>,
+      amenities: [] as Array<string>,
     },
     validators: {
       onSubmit: addPlaceClientSchema,
@@ -91,30 +185,18 @@ function RouteComponent() {
       setIsSubmitting(true)
 
       try {
-        const filesToUpload = value.images || []
-
-        const uploadedUrls = await Promise.all(
-          filesToUpload.map(async (file) => {
-            const formData = new FormData()
-            formData.append("file", file)
-
-            const response = await fetch("/api/upload", {
-              method: "POST",
-              body: formData,
-            })
-            if (!response.ok) throw new Error("Failed to upload image")
-            const result = await response.json()
-            return result.url as string
-          }),
-        )
-
         const { images: _, ...rest } = value
         const data = {
           ...rest,
-          images: uploadedUrls || [],
+          images: imageUrls.length > 0 ? imageUrls : [],
         }
 
         const insert = await addPlace({ data })
+
+        // Clear stored images after successful submission
+        localStorage.removeItem(STORAGE_KEY)
+        setImageUrls([])
+
         toast.success(insert.message)
         navigate({ to: "/admin/places" })
       } catch (error) {
@@ -592,12 +674,12 @@ function RouteComponent() {
                               >
                                 <span>
                                   {
-                                    amenityIcons.find(
-                                      (icon) => icon.value === amenity.icon,
+                                    amenitiesData.find(
+                                      (icon) => icon.value === amenity,
                                     )?.icon
                                   }
                                 </span>
-                                {amenity.name}
+                                {amenity}
                                 <button
                                   type="button"
                                   onClick={() => {
@@ -621,17 +703,17 @@ function RouteComponent() {
                           <div className="flex gap-2">
                             <Select
                               name={field.name}
-                              items={amenityIcons}
+                              items={amenitiesData}
                               onValueChange={(value) => {
                                 const selectedIcon = value
                                 if (selectedIcon) {
-                                  const icon = amenityIcons.find(
+                                  const icon = amenitiesData.find(
                                     (i) => i.value === selectedIcon,
                                   )
                                   if (icon) {
                                     field.handleChange([
                                       ...field.state.value,
-                                      { name: icon.label, icon: icon.value },
+                                      icon.value,
                                     ])
                                     value = ""
                                   }
@@ -647,7 +729,7 @@ function RouteComponent() {
                               </SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="">None</SelectItem>
-                                {amenityIcons.map((a) => (
+                                {amenitiesData.map((a) => (
                                   <SelectItem key={a.value} value={a.value}>
                                     {a.icon} {a.label}
                                   </SelectItem>
@@ -668,44 +750,220 @@ function RouteComponent() {
 
             {/* Images */}
             <div className="space-y-4">
-              <form.Field
-                name="images"
-                children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid
-                  return (
-                    <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor={field.name}>
-                        Images (Optional)
-                      </FieldLabel>
-                      <div className="border-border rounded-lg border-2 border-dashed p-6 text-center">
-                        <Upload className="text-muted-foreground mx-auto mb-2 h-8 w-8" />
-                        <p className="text-muted-foreground mb-2 text-sm">
-                          Drag and drop images or click to browse
-                        </p>
+              <Field>
+                <FieldLabel>Images (Optional)</FieldLabel>
 
-                        <Input
-                          id={field.name}
-                          name={field.name}
-                          onBlur={field.handleBlur}
-                          onChange={(e) => {
-                            const files = Array.from(e.target.files || [])
-                            field.handleChange(files)
-                          }}
-                          aria-invalid={isInvalid}
-                          accept="image/*"
-                          type="file"
-                          multiple
-                          className="mx-auto max-w-xs"
-                        />
-                        {isInvalid && (
-                          <FieldError errors={field.state.meta.errors} />
-                        )}
-                      </div>
-                    </Field>
-                  )
-                }}
-              />
+                {/* Upload Mode Toggle */}
+                <div className="bg-muted mb-4 inline-flex rounded-lg p-1">
+                  <button
+                    type="button"
+                    onClick={() => setUploadMode("file")}
+                    className={`inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                      uploadMode === "file"
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <Upload className="h-4 w-4" />
+                    Upload Files
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUploadMode("url")}
+                    className={`inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                      uploadMode === "url"
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <Link2 className="h-4 w-4" />
+                    Add URL
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUploadMode("gallery")}
+                    className={`inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                      uploadMode === "gallery"
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <Images className="h-4 w-4" />
+                    Gallery
+                  </button>
+                </div>
+
+                {/* File Upload Mode */}
+                {uploadMode === "file" && (
+                  <div className="space-y-3">
+                    <div className="border-border rounded-lg border-2 border-dashed p-6 text-center">
+                      <Upload className="text-muted-foreground mx-auto mb-2 h-8 w-8" />
+                      <p className="text-muted-foreground mb-2 text-sm">
+                        Drag and drop images or click to browse
+                      </p>
+                      <Input
+                        accept="image/*"
+                        type="file"
+                        multiple
+                        disabled={isUploading}
+                        onChange={(e) => handleFileUpload(e.target.files)}
+                        className="mx-auto max-w-xs"
+                      />
+                      {isUploading && (
+                        <p className="text-muted-foreground mt-2 text-sm">
+                          Uploading...
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* URL Input Mode */}
+                {uploadMode === "url" && (
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                      <Input
+                        type="url"
+                        placeholder="https://example.com/image.jpg"
+                        value={urlInput}
+                        onChange={(e) => setUrlInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault()
+                            handleAddUrl()
+                          }
+                        }}
+                        className="flex-1"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleAddUrl}
+                        disabled={!urlInput.trim()}
+                      >
+                        Add
+                      </Button>
+                    </div>
+                    <p className="text-muted-foreground text-xs">
+                      Press Enter or click Add to add the URL
+                    </p>
+                  </div>
+                )}
+
+                {/* Gallery Selection Mode */}
+                {uploadMode === "gallery" && (
+                  <div className="space-y-3">
+                    <p className="text-muted-foreground text-sm">
+                      Select images from the gallery
+                    </p>
+                    <div className="grid max-h-[300px] grid-cols-3 gap-3 overflow-y-auto rounded-lg border p-3">
+                      {defaultImages && defaultImages.length > 0 ? (
+                        defaultImages.map(
+                          (image: { name: string; path: string }) => (
+                            <button
+                              key={image.path}
+                              type="button"
+                              onClick={() => {
+                                if (!imageUrls.includes(image.path)) {
+                                  setImageUrls((prev) => [...prev, image.path])
+                                  toast.success(`${image.name} added`)
+                                } else {
+                                  toast.info(`${image.name} already selected`)
+                                }
+                              }}
+                              className={`group relative aspect-square overflow-hidden rounded-lg border-2 transition-all hover:scale-105 ${
+                                imageUrls.includes(image.path)
+                                  ? "border-primary ring-primary/20 ring-2"
+                                  : "hover:border-muted border-transparent"
+                              }`}
+                            >
+                              <img
+                                src={image.path}
+                                alt={image.name}
+                                className="h-full w-full object-cover"
+                              />
+                              {imageUrls.includes(image.path) && (
+                                <div className="bg-primary/20 absolute inset-0 flex items-center justify-center">
+                                  <div className="bg-primary rounded-full p-1 text-white">
+                                    <svg
+                                      className="h-4 w-4"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M5 13l4 4L19 7"
+                                      />
+                                    </svg>
+                                  </div>
+                                </div>
+                              )}
+                              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-1">
+                                <p className="text-center text-xs text-white">
+                                  {image.name}
+                                </p>
+                              </div>
+                            </button>
+                          ),
+                        )
+                      ) : (
+                        <p className="text-muted-foreground col-span-3 py-8 text-center">
+                          No images available in gallery
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Preview Grid */}
+                {imageUrls.length > 0 && (
+                  <div className="mt-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium">
+                        {imageUrls.length} image
+                        {imageUrls.length !== 1 ? "s" : ""} added
+                      </p>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={clearAllImages}
+                        className="text-destructive hover:text-destructive h-auto px-2 py-1"
+                      >
+                        Clear all
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                      {imageUrls.map((url, index) => (
+                        <div
+                          key={index}
+                          className="bg-muted group relative aspect-square overflow-hidden rounded-lg"
+                        >
+                          <img
+                            src={url}
+                            alt={`Preview ${index + 1}`}
+                            className="h-full w-full object-cover"
+                            onError={(e) => {
+                              ;(e.target as HTMLImageElement).src =
+                                "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f3f4f6'/%3E%3Ctext x='50' y='50' font-family='Arial' font-size='12' fill='%239ca3af' text-anchor='middle' dy='.3em'%3EInvalid Image%3C/text%3E%3C/svg%3E"
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveImage(index)}
+                            className="absolute top-1 right-1 rounded-full bg-black/50 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </Field>
             </div>
           </FieldGroup>
 
