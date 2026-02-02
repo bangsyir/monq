@@ -37,23 +37,6 @@ const difficulties = [
   { value: "expert", label: "Expert" },
 ]
 
-// const amenityIcons = [
-//   { value: "car", label: "Car", icon: "🚗" },
-//   { value: "toilet", label: "Restrooms", icon: "🚻" },
-//   { value: "waves", label: "Swimming", icon: "🌊" },
-//   { value: "flame", label: "Fire Pit", icon: "🔥" },
-//   { value: "table", label: "Picnic Table", icon: "🪵" },
-//   { value: "sunrise", label: "Ocean View", icon: "🌅" },
-//   { value: "mountain", label: "Scenic Overlook", icon: "⛰️" },
-//   { value: "dog", label: "Dog Friendly", icon: "🐕" },
-//   { value: "bike", label: "Bike Allowed", icon: "🚲" },
-//   { value: "sailboat", label: "Kayaking", icon: "⛵" },
-//   { value: "fish", label: "Fishing", icon: "🐟" },
-//   { value: "tent", label: "Camping", icon: "⛺" },
-//   { value: "mountain-snow", label: "Technical Climb", icon: "🏔️" },
-//   { value: "signpost", label: "Trail Markers", icon: "🪧" },
-// ]
-
 export const Route = createFileRoute("/admin/places/add")({
   ssr: false,
   component: RouteComponent,
