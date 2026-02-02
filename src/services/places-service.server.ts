@@ -13,13 +13,6 @@ import { safeDbQuery } from "@/utils/safe-db-query"
 import { db } from "@/db"
 import { categories, places } from "@/db/schema"
 
-// Utility function to convert amenities objects to string format for database
-function convertAmenitiesToStrings(
-  amenities?: Array<{ name: string; icon: string }>,
-): Array<string> {
-  return amenities ? amenities.map((a) => `${a.name}:${a.icon}`) : []
-}
-
 // Helper function to get category IDs by names
 async function getCategoryIdsByName(
   categoryNames: Array<string>,
@@ -40,9 +33,10 @@ export async function createPlace(data: AddPlaceServer, userId: string) {
   const dataMap = {
     name: data.name,
     description: data.description,
-    address: data.streetAddress,
+    streetAddress: data.streetAddress,
+    postcode: data.postcode,
     city: data.city,
-    state: data.stateProvince,
+    stateProvince: data.stateProvince,
     country: data.country,
     latitude: Number(data.latitude),
     longitude: Number(data.longitude),
@@ -50,7 +44,7 @@ export async function createPlace(data: AddPlaceServer, userId: string) {
     duration: data.duration,
     distance: data.distance,
     rating: 0,
-    amenities: convertAmenitiesToStrings(data.amenities),
+    amenities: data.amenities,
   }
   const [addPlace, addPlaceError] = await safeDbQuery(
     insertPlace(dataMap, userId),
@@ -94,7 +88,7 @@ export async function updatePlaceService(
   data: UpdatePlaceServer,
   userId: string,
 ) {
-  const { id, categories, longitude, latitude, amenities, ...placeData } = data
+  const { id, categories, longitude, latitude, images, ...placeData } = data
 
   const newPlaceData = {
     ...placeData,
@@ -110,7 +104,7 @@ export async function updatePlaceService(
     return { message: null, error: updateError }
   }
 
-  if (categories.length !== 0) {
+  if (categories && categories.length !== 0) {
     const [_, deleteCategoriesError] = await safeDbQuery(
       deletePlaceCategories(id),
     )
@@ -129,7 +123,55 @@ export async function updatePlaceService(
     }
   }
 
+  // Handle images update
+  if (images !== undefined) {
+    // Delete existing images
+    const { deletePlaceImages } = await import("@/repositories/place-repo")
+    const [__, deleteImagesError] = await safeDbQuery(deletePlaceImages(id))
+    if (deleteImagesError) {
+      return { message: null, error: deleteImagesError }
+    }
+
+    // Insert new images if any
+    if (images && images.length > 0) {
+      const imageData = images.map((url: string) => {
+        return { placeId: id, url, alt: placeData.name || "Place image" }
+      })
+      const [___, addImagesErr] = await safeDbQuery(insertImage(imageData))
+      if (addImagesErr) {
+        return { message: null, error: addImagesErr }
+      }
+    }
+  }
+
   return { message: "Successful update place", error: null }
+}
+
+// Separate service for updating place images only
+export async function updatePlaceImagesService(
+  placeId: string,
+  images: Array<string>,
+) {
+  const { deletePlaceImages } = await import("@/repositories/place-repo")
+
+  // Delete existing images
+  const [_, deleteImagesError] = await safeDbQuery(deletePlaceImages(placeId))
+  if (deleteImagesError) {
+    return { message: null, error: deleteImagesError }
+  }
+
+  // Insert new images if any
+  if (images && images.length > 0) {
+    const imageData = images.map((url: string) => {
+      return { placeId, url, alt: "Place image" }
+    })
+    const [__, addImagesErr] = await safeDbQuery(insertImage(imageData))
+    if (addImagesErr) {
+      return { message: null, error: addImagesErr }
+    }
+  }
+
+  return { message: "Images updated successfully", error: null }
 }
 
 export async function getTotalPlaces({

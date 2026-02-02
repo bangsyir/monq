@@ -12,6 +12,7 @@ import {
   getPlace,
   getPlaces,
   getTotalPlaces,
+  updatePlaceImagesService,
   updatePlaceService,
 } from "@/services/places-service.server"
 import { db } from "@/db"
@@ -46,6 +47,23 @@ export const updatePlace = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const userId = context.user.id
     const result = await updatePlaceService(data, userId)
+    if (result.error) {
+      throw new Error(result.error.message)
+    }
+    return result
+  })
+
+// Separate server function for updating place images only
+export const updatePlaceImages = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .inputValidator(
+    z.object({
+      placeId: z.string(),
+      images: z.array(z.string()),
+    }),
+  )
+  .handler(async ({ data }) => {
+    const result = await updatePlaceImagesService(data.placeId, data.images)
     if (result.error) {
       throw new Error(result.error.message)
     }
