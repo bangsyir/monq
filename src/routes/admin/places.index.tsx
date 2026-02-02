@@ -1,5 +1,5 @@
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router"
-import { Edit, Image, MapPin, MoreHorizontal, Star } from "lucide-react"
+import { Edit, MapPin, MoreHorizontal, Star } from "lucide-react"
 import { useState } from "react"
 import type { PlaceFilter } from "@/schema/place-schema"
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -228,17 +228,6 @@ function RouteComponent() {
                     >
                       <Edit className="mr-2 h-4 w-4" />
                       Edit Place
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      render={
-                        <Link
-                          to="/admin/places/$placeId/images"
-                          params={{ placeId: place.id }}
-                        />
-                      }
-                    >
-                      <Image className="mr-2 h-4 w-4" />
-                      Edit Image
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
