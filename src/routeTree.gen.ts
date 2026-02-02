@@ -20,7 +20,6 @@ import { Route as PlacesIndexRouteImport } from './routes/places.index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as PlacesPlaceIdRouteImport } from './routes/places.$placeId'
 import { Route as ApiUploadRouteImport } from './routes/api/upload'
-import { Route as AdminPlacesRouteImport } from './routes/admin/places'
 import { Route as AdminGalleryRouteImport } from './routes/admin/gallery'
 import { Route as LayoutDashboardRouteImport } from './routes/_layout/dashboard'
 import { Route as AdminUsersIndexRouteImport } from './routes/admin/users.index'
@@ -85,11 +84,6 @@ const ApiUploadRoute = ApiUploadRouteImport.update({
   path: '/api/upload',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminPlacesRoute = AdminPlacesRouteImport.update({
-  id: '/places',
-  path: '/places',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
 const AdminGalleryRoute = AdminGalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
@@ -106,9 +100,9 @@ const AdminUsersIndexRoute = AdminUsersIndexRouteImport.update({
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminPlacesIndexRoute = AdminPlacesIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminPlacesRoute,
+  id: '/places/',
+  path: '/places/',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
@@ -121,9 +115,9 @@ const AdminUsersUserIdRoute = AdminUsersUserIdRouteImport.update({
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminPlacesAddRoute = AdminPlacesAddRouteImport.update({
-  id: '/add',
-  path: '/add',
-  getParentRoute: () => AdminPlacesRoute,
+  id: '/places/add',
+  path: '/places/add',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminUsersUserIdUpdateRoute = AdminUsersUserIdUpdateRouteImport.update({
   id: '/users_/$userId/update',
@@ -132,9 +126,9 @@ const AdminUsersUserIdUpdateRoute = AdminUsersUserIdUpdateRouteImport.update({
 } as any)
 const AdminPlacesPlaceIdUpdateRoute =
   AdminPlacesPlaceIdUpdateRouteImport.update({
-    id: '/$placeId/update',
-    path: '/$placeId/update',
-    getParentRoute: () => AdminPlacesRoute,
+    id: '/places/$placeId/update',
+    path: '/places/$placeId/update',
+    getParentRoute: () => AdminRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -146,7 +140,6 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/dashboard': typeof LayoutDashboardRoute
   '/admin/gallery': typeof AdminGalleryRoute
-  '/admin/places': typeof AdminPlacesRouteWithChildren
   '/api/upload': typeof ApiUploadRoute
   '/places/$placeId': typeof PlacesPlaceIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -189,7 +182,6 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/_layout/dashboard': typeof LayoutDashboardRoute
   '/admin/gallery': typeof AdminGalleryRoute
-  '/admin/places': typeof AdminPlacesRouteWithChildren
   '/api/upload': typeof ApiUploadRoute
   '/places/$placeId': typeof PlacesPlaceIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -213,7 +205,6 @@ export interface FileRouteTypes {
     | '/settings'
     | '/dashboard'
     | '/admin/gallery'
-    | '/admin/places'
     | '/api/upload'
     | '/places/$placeId'
     | '/admin/'
@@ -255,7 +246,6 @@ export interface FileRouteTypes {
     | '/settings'
     | '/_layout/dashboard'
     | '/admin/gallery'
-    | '/admin/places'
     | '/api/upload'
     | '/places/$placeId'
     | '/admin/'
@@ -360,13 +350,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiUploadRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/places': {
-      id: '/admin/places'
-      path: '/places'
-      fullPath: '/admin/places'
-      preLoaderRoute: typeof AdminPlacesRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
     '/admin/gallery': {
       id: '/admin/gallery'
       path: '/gallery'
@@ -390,10 +373,10 @@ declare module '@tanstack/react-router' {
     }
     '/admin/places/': {
       id: '/admin/places/'
-      path: '/'
+      path: '/places'
       fullPath: '/admin/places/'
       preLoaderRoute: typeof AdminPlacesIndexRouteImport
-      parentRoute: typeof AdminPlacesRoute
+      parentRoute: typeof AdminRouteRoute
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -411,10 +394,10 @@ declare module '@tanstack/react-router' {
     }
     '/admin/places/add': {
       id: '/admin/places/add'
-      path: '/add'
+      path: '/places/add'
       fullPath: '/admin/places/add'
       preLoaderRoute: typeof AdminPlacesAddRouteImport
-      parentRoute: typeof AdminPlacesRoute
+      parentRoute: typeof AdminRouteRoute
     }
     '/admin/users_/$userId/update': {
       id: '/admin/users_/$userId/update'
@@ -425,10 +408,10 @@ declare module '@tanstack/react-router' {
     }
     '/admin/places/$placeId/update': {
       id: '/admin/places/$placeId/update'
-      path: '/$placeId/update'
+      path: '/places/$placeId/update'
       fullPath: '/admin/places/$placeId/update'
       preLoaderRoute: typeof AdminPlacesPlaceIdUpdateRouteImport
-      parentRoute: typeof AdminPlacesRoute
+      parentRoute: typeof AdminRouteRoute
     }
   }
 }
@@ -445,37 +428,25 @@ const LayoutRouteRouteWithChildren = LayoutRouteRoute._addFileChildren(
   LayoutRouteRouteChildren,
 )
 
-interface AdminPlacesRouteChildren {
-  AdminPlacesAddRoute: typeof AdminPlacesAddRoute
-  AdminPlacesIndexRoute: typeof AdminPlacesIndexRoute
-  AdminPlacesPlaceIdUpdateRoute: typeof AdminPlacesPlaceIdUpdateRoute
-}
-
-const AdminPlacesRouteChildren: AdminPlacesRouteChildren = {
-  AdminPlacesAddRoute: AdminPlacesAddRoute,
-  AdminPlacesIndexRoute: AdminPlacesIndexRoute,
-  AdminPlacesPlaceIdUpdateRoute: AdminPlacesPlaceIdUpdateRoute,
-}
-
-const AdminPlacesRouteWithChildren = AdminPlacesRoute._addFileChildren(
-  AdminPlacesRouteChildren,
-)
-
 interface AdminRouteRouteChildren {
   AdminGalleryRoute: typeof AdminGalleryRoute
-  AdminPlacesRoute: typeof AdminPlacesRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminPlacesAddRoute: typeof AdminPlacesAddRoute
   AdminUsersUserIdRoute: typeof AdminUsersUserIdRoute
+  AdminPlacesIndexRoute: typeof AdminPlacesIndexRoute
   AdminUsersIndexRoute: typeof AdminUsersIndexRoute
+  AdminPlacesPlaceIdUpdateRoute: typeof AdminPlacesPlaceIdUpdateRoute
   AdminUsersUserIdUpdateRoute: typeof AdminUsersUserIdUpdateRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminGalleryRoute: AdminGalleryRoute,
-  AdminPlacesRoute: AdminPlacesRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
+  AdminPlacesAddRoute: AdminPlacesAddRoute,
   AdminUsersUserIdRoute: AdminUsersUserIdRoute,
+  AdminPlacesIndexRoute: AdminPlacesIndexRoute,
   AdminUsersIndexRoute: AdminUsersIndexRoute,
+  AdminPlacesPlaceIdUpdateRoute: AdminPlacesPlaceIdUpdateRoute,
   AdminUsersUserIdUpdateRoute: AdminUsersUserIdUpdateRoute,
 }
 
