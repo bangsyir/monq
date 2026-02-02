@@ -38,9 +38,9 @@ export function NavUser({
             render={<SidebarMenuButton size="lg" />}
             className="border"
           >
-            <Avatar className="h-8 w-8 rounded-lg grayscale">
+            <Avatar className="h-8 w-8 rounded-full">
               <AvatarImage src={user.image!} alt={user.name} />
-              <AvatarFallback className="rounded-lg">
+              <AvatarFallback className="rounded-full">
                 {user.name.slice(0, 2)}
               </AvatarFallback>
             </Avatar>

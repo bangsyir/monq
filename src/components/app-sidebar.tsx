@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router"
 import {
   GalleryVerticalEnd,
+  Image,
   LayoutDashboard,
   MapPin,
   Users,
@@ -42,6 +43,11 @@ const data = {
           title: "Users",
           url: "/admin/users",
           icon: <Users className="h-4 w-4" />,
+        },
+        {
+          title: "Gallery",
+          url: "/admin/gallery",
+          icon: <Image className="h-4 w-4" />,
         },
       ],
     },
