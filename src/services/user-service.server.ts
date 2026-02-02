@@ -5,6 +5,7 @@ type UserUpdateType = {
   userId: string
   name: string
   username: string
+  image: string | undefined
 }
 export async function updateUserService(data: UserUpdateType) {
   const [updateUser, updateUserErr] = await safeDbQuery(updateUserProfile(data))

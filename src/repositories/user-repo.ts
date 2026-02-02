@@ -6,15 +6,17 @@ type UpdateUserType = {
   userId: string
   name: string
   username: string
+  image: string | undefined
 }
 
 export async function updateUserProfile(data: UpdateUserType) {
-  const { userId, name, username } = data
+  const { userId, name, username, image } = data
   const updatedUser = await db
     .update(users)
     .set({
       name,
       username,
+      image,
     })
     .where(eq(users.id, userId))
     .returning({

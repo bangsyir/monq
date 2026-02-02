@@ -11,9 +11,14 @@ export const updateUserProfile = createServerFn({ method: "POST" })
   .inputValidator(updateUserSchema)
   .handler(async ({ context, data }) => {
     const userId = context.user.id
-    const { name, username } = data
+    const { name, username, image } = data
 
-    const updatedUser = await updateUserService({ userId, name, username })
+    const updatedUser = await updateUserService({
+      userId,
+      name,
+      username,
+      image,
+    })
     if (updatedUser.error) {
       throw new Error(updatedUser.message, { cause: updatedUser.error.cause })
     }
