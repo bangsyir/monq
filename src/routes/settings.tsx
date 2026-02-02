@@ -7,6 +7,7 @@ import {
   useRouter,
 } from "@tanstack/react-router"
 import { Camera, ChevronsLeft, LogOut, User } from "lucide-react"
+import { useState } from "react"
 import { toast } from "sonner"
 import { useForm } from "@tanstack/react-form"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -18,6 +19,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
@@ -25,16 +33,18 @@ import { Separator } from "@/components/ui/separator"
 import { updateUserProfile } from "@/serverFunction/user.function"
 import { updateUserSchema } from "@/schema/user-schema"
 import { authClient } from "@/lib/auth-client"
+import { getAvatarOptions } from "@/serverFunction/gallery.function"
+import { FieldError } from "@/components/ui/field"
 
 export const Route = createFileRoute("/settings")({
-  ssr: false,
   component: RouteComponent,
-  loader: ({ context }) => {
+  loader: async ({ context }) => {
     if (!context.user) {
       toast.error("Opss please login first")
       throw redirect({ to: "/" })
     }
     const user = context.user
+    const avatarOptions = await getAvatarOptions()
     return {
       user: {
         name: user.name,
@@ -42,12 +52,16 @@ export const Route = createFileRoute("/settings")({
         email: user.email,
         image: user.image,
       },
+      avatarOptions,
     }
   },
+  ssr: false,
 })
 
 function RouteComponent() {
-  const { user: userData } = Route.useLoaderData()
+  const { user: userData, avatarOptions } = Route.useLoaderData()
+  const [selectedImage, setSelectedImage] = useState(userData?.image || "")
+  const [isAvatarDialogOpen, setIsAvatarDialogOpen] = useState(false)
 
   const navigate = useNavigate()
   const handleLogout = async () => {
@@ -61,19 +75,30 @@ function RouteComponent() {
     })
   }
 
+  const handleSelectAvatar = (path: string) => {
+    setSelectedImage(path)
+    setIsAvatarDialogOpen(false)
+    toast.success("Avatar selected. Click Save Changes to update.")
+  }
+  // profile form update
   const form = useForm({
     defaultValues: {
       name: userData?.name || "",
       username: userData?.username || "",
       email: userData?.email || "",
+      image: selectedImage || userData.image || "",
     },
     validators: {
       onSubmit: updateUserSchema,
     },
     onSubmit: async ({ value }) => {
       try {
+        const data = {
+          ...value,
+          image: selectedImage,
+        }
         await updateUserProfile({
-          data: value,
+          data,
         })
         toast.success("Profile updated successfully!")
       } catch (error) {
@@ -139,12 +164,16 @@ function RouteComponent() {
               {/* Avatar */}
               <div className="flex items-center gap-4">
                 <Avatar className="h-20 w-20">
-                  <AvatarImage src={userData?.image || ""} />
+                  <AvatarImage src={selectedImage || userData?.image || ""} />
                   <AvatarFallback>
                     {userData?.name?.charAt(0) || "U"}
                   </AvatarFallback>
                 </Avatar>
-                <Button variant="outline" className="gap-2">
+                <Button
+                  variant="outline"
+                  className="gap-2"
+                  onClick={() => setIsAvatarDialogOpen(true)}
+                >
                   <Camera className="h-4 w-4" />
                   Change Photo
                 </Button>
@@ -152,45 +181,66 @@ function RouteComponent() {
 
               <div className="grid gap-4 md:grid-cols-2">
                 <form.Field name="name">
-                  {(field) => (
-                    <div className="space-y-2">
-                      <Label htmlFor={field.name}>Full Name</Label>
-                      <Input
-                        id={field.name}
-                        name={field.name}
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                      />
-                    </div>
-                  )}
+                  {(field) => {
+                    const isInvalid =
+                      field.state.meta.isTouched && !field.state.meta.isValid
+                    return (
+                      <div className="space-y-2">
+                        <Label htmlFor={field.name}>Full Name</Label>
+                        <Input
+                          id={field.name}
+                          name={field.name}
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                        />
+                        {isInvalid && (
+                          <FieldError errors={field.state.meta.errors} />
+                        )}
+                      </div>
+                    )
+                  }}
                 </form.Field>
                 <form.Field name="username">
-                  {(field) => (
-                    <div className="space-y-2">
-                      <Label htmlFor={field.name}>Username</Label>
-                      <Input
-                        id={field.name}
-                        name={field.name}
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                      />
-                    </div>
-                  )}
+                  {(field) => {
+                    const isInvalid =
+                      field.state.meta.isTouched && !field.state.meta.isValid
+                    return (
+                      <div className="space-y-2">
+                        <Label htmlFor={field.name}>Username</Label>
+                        <Input
+                          id={field.name}
+                          name={field.name}
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                        />
+                        {isInvalid && (
+                          <FieldError errors={field.state.meta.errors} />
+                        )}
+                      </div>
+                    )
+                  }}
                 </form.Field>
                 <form.Field name="email">
-                  {(field) => (
-                    <div className="space-y-2">
-                      <Label htmlFor={field.name}>Email</Label>
-                      <Input
-                        id={field.name}
-                        name={field.name}
-                        type="email"
-                        value={field.state.value}
-                        disabled
-                        onChange={(e) => field.handleChange(e.target.value)}
-                      />
-                    </div>
-                  )}
+                  {(field) => {
+                    const isInvalid =
+                      field.state.meta.isTouched && !field.state.meta.isValid
+                    return (
+                      <div className="space-y-2">
+                        <Label htmlFor={field.name}>Email</Label>
+                        <Input
+                          id={field.name}
+                          name={field.name}
+                          type="email"
+                          value={field.state.value}
+                          disabled
+                          onChange={(e) => field.handleChange(e.target.value)}
+                        />
+                        {isInvalid && (
+                          <FieldError errors={field.state.meta.errors} />
+                        )}
+                      </div>
+                    )
+                  }}
                 </form.Field>
               </div>
 
@@ -202,6 +252,7 @@ function RouteComponent() {
                     type="submit"
                     disabled={!canSubmit || isSubmitting}
                     onClick={handleSaveProfile}
+                    className="w-48"
                   >
                     {isSubmitting ? "Saving..." : "Save Changes"}
                   </Button>
@@ -251,6 +302,67 @@ function RouteComponent() {
           </Card>
         </div>
       </div>
+
+      {/* Avatar Selection Dialog */}
+      <Dialog open={isAvatarDialogOpen} onOpenChange={setIsAvatarDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Choose an Avatar</DialogTitle>
+            <DialogDescription>
+              Select a new avatar for your profile
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid max-h-[60vh] grid-cols-4 gap-3 overflow-y-auto p-2">
+            {avatarOptions && avatarOptions.length > 0 ? (
+              avatarOptions.map((avatar: { name: string; path: string }) => (
+                <button
+                  key={avatar.path}
+                  onClick={() => handleSelectAvatar(avatar.path)}
+                  className={`group relative aspect-square overflow-hidden rounded-lg border-2 transition-all hover:scale-105 ${
+                    selectedImage === avatar.path
+                      ? "border-primary ring-primary/20 ring-2"
+                      : "hover:border-muted border-transparent"
+                  }`}
+                >
+                  <img
+                    src={avatar.path}
+                    alt={avatar.name}
+                    className="h-full w-full object-cover"
+                  />
+                  {selectedImage === avatar.path && (
+                    <div className="bg-primary/20 absolute inset-0 flex items-center justify-center">
+                      <div className="bg-primary rounded-full p-1 text-white">
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  )}
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-1">
+                    <p className="text-center text-xs text-white">
+                      {avatar.name}
+                    </p>
+                  </div>
+                </button>
+              ))
+            ) : (
+              <p className="text-muted-foreground col-span-4 py-8 text-center">
+                No avatars available
+              </p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </main>
   )
 }
