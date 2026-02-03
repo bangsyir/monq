@@ -21,6 +21,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as PlacesPlaceIdRouteImport } from './routes/places.$placeId'
 import { Route as ApiUploadRouteImport } from './routes/api/upload'
 import { Route as AdminGalleryRouteImport } from './routes/admin/gallery'
+import { Route as AdminCategoriesRouteImport } from './routes/admin/categories'
 import { Route as LayoutDashboardRouteImport } from './routes/_layout/dashboard'
 import { Route as AdminUsersIndexRouteImport } from './routes/admin/users.index'
 import { Route as AdminPlacesIndexRouteImport } from './routes/admin/places.index'
@@ -89,6 +90,11 @@ const AdminGalleryRoute = AdminGalleryRouteImport.update({
   path: '/gallery',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const LayoutDashboardRoute = LayoutDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -139,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/places': typeof PlacesRouteWithChildren
   '/settings': typeof SettingsRoute
   '/dashboard': typeof LayoutDashboardRoute
+  '/admin/categories': typeof AdminCategoriesRoute
   '/admin/gallery': typeof AdminGalleryRoute
   '/api/upload': typeof ApiUploadRoute
   '/places/$placeId': typeof PlacesPlaceIdRoute
@@ -158,6 +165,7 @@ export interface FileRoutesByTo {
   '/map': typeof MapRoute
   '/settings': typeof SettingsRoute
   '/dashboard': typeof LayoutDashboardRoute
+  '/admin/categories': typeof AdminCategoriesRoute
   '/admin/gallery': typeof AdminGalleryRoute
   '/api/upload': typeof ApiUploadRoute
   '/places/$placeId': typeof PlacesPlaceIdRoute
@@ -181,6 +189,7 @@ export interface FileRoutesById {
   '/places': typeof PlacesRouteWithChildren
   '/settings': typeof SettingsRoute
   '/_layout/dashboard': typeof LayoutDashboardRoute
+  '/admin/categories': typeof AdminCategoriesRoute
   '/admin/gallery': typeof AdminGalleryRoute
   '/api/upload': typeof ApiUploadRoute
   '/places/$placeId': typeof PlacesPlaceIdRoute
@@ -204,6 +213,7 @@ export interface FileRouteTypes {
     | '/places'
     | '/settings'
     | '/dashboard'
+    | '/admin/categories'
     | '/admin/gallery'
     | '/api/upload'
     | '/places/$placeId'
@@ -223,6 +233,7 @@ export interface FileRouteTypes {
     | '/map'
     | '/settings'
     | '/dashboard'
+    | '/admin/categories'
     | '/admin/gallery'
     | '/api/upload'
     | '/places/$placeId'
@@ -245,6 +256,7 @@ export interface FileRouteTypes {
     | '/places'
     | '/settings'
     | '/_layout/dashboard'
+    | '/admin/categories'
     | '/admin/gallery'
     | '/api/upload'
     | '/places/$placeId'
@@ -357,6 +369,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGalleryRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/categories': {
+      id: '/admin/categories'
+      path: '/categories'
+      fullPath: '/admin/categories'
+      preLoaderRoute: typeof AdminCategoriesRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/_layout/dashboard': {
       id: '/_layout/dashboard'
       path: '/dashboard'
@@ -429,6 +448,7 @@ const LayoutRouteRouteWithChildren = LayoutRouteRoute._addFileChildren(
 )
 
 interface AdminRouteRouteChildren {
+  AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminGalleryRoute: typeof AdminGalleryRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminPlacesAddRoute: typeof AdminPlacesAddRoute
@@ -440,6 +460,7 @@ interface AdminRouteRouteChildren {
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminCategoriesRoute: AdminCategoriesRoute,
   AdminGalleryRoute: AdminGalleryRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminPlacesAddRoute: AdminPlacesAddRoute,
