@@ -110,6 +110,7 @@ export const categories = pgTable("categories", {
     .primaryKey(), // e.g., "waterfall", "trail"
   name: text("name").notNull(),
   icon: text("icon").notNull(),
+  image: text("image"),
 })
 
 /**

@@ -1,16 +1,25 @@
 import { createServerFn } from "@tanstack/react-start"
+import { z } from "zod"
+import type { Category } from "@/services/category.service"
 import { authMiddleware } from "@/lib/auth-middleware"
-import { db } from "@/db"
-import { categories } from "@/db/schema"
+import { getAllCategories, updateCategory } from "@/services/category.service"
+
+const UpdateCategorySchema = z.object({
+  id: z.string(),
+  name: z.string().optional(),
+  icon: z.string().optional(),
+  image: z.string().nullable().optional(),
+})
 
 export const getCategories = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
-  .handler(async () => {
-    const allCategories = await db.select().from(categories)
-    return allCategories.map((cat) => ({
-      id: cat.id,
-      name: cat.name,
-      icon: cat.icon,
-      value: cat.name.toLowerCase(), // For backward compatibility with form
-    }))
+  .handler(async (): Promise<Array<Category>> => {
+    return await getAllCategories()
+  })
+
+export const updateCategoryFn = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .inputValidator(UpdateCategorySchema)
+  .handler(async ({ data }): Promise<Category> => {
+    return await updateCategory(data)
   })
