@@ -56,7 +56,7 @@ function RouteComponent() {
     defaultImages,
   } = Route.useLoaderData()
   const params = Route.useParams()
-  const navigate = useNavigate({ from: "/admin/places" })
+  const navigate = useNavigate()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm({
@@ -264,7 +264,7 @@ function RouteComponent() {
                                   )
                                   .map((cat) => (
                                     <Button
-                                      key={cat.value}
+                                      key={cat.name}
                                       type="button"
                                       variant="outline"
                                       size="sm"
