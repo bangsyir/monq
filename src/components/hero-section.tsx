@@ -19,10 +19,10 @@ const HeroSection = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
-            className="border-border bg-secondary mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-2"
+            className="border-border bg-success/60 mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-2"
           >
-            <Compass className="text-primary h-5 w-5" />
-            <span className="text-foreground text-sm font-medium">
+            <Compass className="h-5 w-5 text-white" />
+            <span className="text-sm font-medium text-white">
               Discover Nature's Best Kept Secrets
             </span>
           </motion.div>
@@ -34,7 +34,7 @@ const HeroSection = () => {
 
           <p className="text-muted-foreground mx-auto mb-10 max-w-2xl text-lg leading-relaxed md:text-xl">
             Explore breathtaking waterfalls, serene campsites, challenging
-            trails, and secret spots.
+            trails, and secret places.
           </p>
 
           {/* Search Box */}
@@ -57,7 +57,7 @@ const HeroSection = () => {
                 <Link to="/places" search={{ cat: "all" }}>
                   <Button
                     className={cn(
-                      "w-full gap-2 rounded-xl px-4 py-5 sm:w-auto",
+                      "bg-success w-full gap-2 rounded-xl px-4 py-5 text-white sm:w-auto",
                     )}
                   >
                     <Search className="h-5 w-5" />
@@ -66,29 +66,6 @@ const HeroSection = () => {
                 </Link>
               </div>
             </div>
-          </motion.div>
-
-          {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className="mt-12 flex flex-wrap justify-center gap-8 md:gap-16"
-          >
-            {[
-              { value: "500+", label: "Hidden Gems" },
-              { value: "50K+", label: "Explorers" },
-              { value: "4.9", label: "Avg Rating" },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div className="text-foreground text-3xl font-bold md:text-4xl">
-                  {stat.value}
-                </div>
-                <div className="text-muted-foreground mt-1 text-sm">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
           </motion.div>
         </motion.div>
       </div>
