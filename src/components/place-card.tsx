@@ -8,14 +8,7 @@ interface PlaceCardProps {
   place: Place
   index?: number
 }
-const categoryLabels: Record<string, string> = {
-  waterfall: "Waterfall",
-  campsite: "Campsite",
-  hiking: "Hiking",
-  trail: "Trail",
-  lake: "Lake",
-  mountain: "Mountain",
-}
+
 const difficultyColors: Record<string, string> = {
   easy: "bg-success border-success/20",
   moderate: "bg-warning border-warning/20",
@@ -108,7 +101,7 @@ const PlaceCard = ({ place, index = 0 }: PlaceCardProps) => {
                 variant="secondary"
                 className="px-1.5 py-0 text-xs"
               >
-                {categoryLabels[cat]}
+                {cat}
               </Badge>
             ))}
             {place.categories.length > 3 && (

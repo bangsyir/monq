@@ -45,7 +45,7 @@ const HeroSection = () => {
             className="mx-auto max-w-xl"
           >
             <div className="border-border bg-card rounded-2xl border p-2 shadow-lg">
-              <div className="flex flex-col items-center gap-2 sm:flex-row">
+              <div className="flex items-center gap-2">
                 <div className="bg-secondary flex flex-1 items-center gap-3 rounded-xl px-4 py-3">
                   <MapPin className="text-muted-foreground h-5 w-5 shrink-0" />
                   <input
