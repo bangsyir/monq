@@ -12,3 +12,5 @@ count.txt
 .vinxi
 todos.json
 public/uploads
+
+src/db/seed-places.ts
