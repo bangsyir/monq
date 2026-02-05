@@ -1,4 +1,4 @@
-import { Link, createFileRoute, useParams } from "@tanstack/react-router"
+import { Link, createFileRoute } from "@tanstack/react-router"
 import { motion } from "framer-motion"
 import {
   Bike,
@@ -26,7 +26,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
-import { mockComments, mockPlaces } from "@/data/mock-places"
+import { getPlaceByIdNoAuth } from "@/serverFunction/place.function"
 import ImageGallery from "@/components/image-gallery"
 
 const amenityIcons: Record<string, React.ReactNode> = {
@@ -65,16 +65,16 @@ const difficultyColors: Record<string, string> = {
 
 export const Route = createFileRoute("/places/$placeId")({
   component: RouteComponent,
+  loader: async ({ params: { placeId } }) => {
+    const place = await getPlaceByIdNoAuth({ data: placeId })
+    return { place }
+  },
 })
 
 function RouteComponent() {
-  const { placeId } = useParams({ from: "/places/$placeId" })
-  const place = mockPlaces.find((p) => p.id === placeId)
-  const [comments, setComments] = useState<Array<PlaceComment>>(
-    mockComments[placeId] ?? [],
-  )
+  const { place } = Route.useLoaderData()
+  const [comments, setComments] = useState<Array<PlaceComment>>([])
   const [newComment, setNewComment] = useState("")
-
   // TODO: Implement actual authentication state
   const isLoggedIn = false
 
@@ -183,7 +183,7 @@ function RouteComponent() {
                       <div className="flex items-center gap-1">
                         <MapPin className="h-4 w-4" />
                         <span>
-                          {place.location.city}, {place.location.state}
+                          {place.city}, {place.stateProvince}
                         </span>
                       </div>
                     </div>
@@ -207,6 +207,22 @@ function RouteComponent() {
                     Difficulty
                   </Badge>
                 )}
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {place.placeCategories.slice(0, 3).map((cat) => (
+                    <Badge
+                      key={cat.categoryId}
+                      variant="secondary"
+                      className="px-1.5 py-0 text-xs"
+                    >
+                      {cat.category.name}
+                    </Badge>
+                  ))}
+                  {place.placeCategories.length > 3 && (
+                    <Badge variant="secondary" className="px-1.5 py-0 text-xs">
+                      +{place.placeCategories.length - 3}
+                    </Badge>
+                  )}
+                </div>
               </motion.div>
 
               <Separator />
@@ -245,12 +261,12 @@ function RouteComponent() {
                     </p>
                   </div>
                 )}
-                {place.bestSeason && (
+                {place.bestSeason?.length !== 0 && (
                   <div className="bg-secondary rounded-xl p-4">
                     <Calendar className="text-primary mb-2 h-6 w-6" />
                     <p className="text-muted-foreground text-sm">Best Season</p>
                     <p className="text-foreground font-semibold">
-                      {place.bestSeason.join(", ")}
+                      {place.bestSeason?.join(", ")}
                     </p>
                   </div>
                 )}
@@ -284,17 +300,15 @@ function RouteComponent() {
                   What this place offers
                 </h2>
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-                  {place.amenities.map((amenity) => (
+                  {place?.amenities?.map((amenity) => (
                     <div
-                      key={amenity.id}
+                      key={amenity}
                       className="bg-secondary flex items-center gap-3 rounded-lg p-3"
                     >
                       <div className="text-primary">
-                        {amenityIcons[amenity.icon] || (
-                          <div className="h-5 w-5" />
-                        )}
+                        {amenityIcons[amenity] || <div className="h-5 w-5" />}
                       </div>
-                      <span className="text-foreground">{amenity.name}</span>
+                      <span className="text-foreground">{amenity}</span>
                     </div>
                   ))}
                 </div>
@@ -379,11 +393,9 @@ function RouteComponent() {
                 transition={{ delay: 0.3 }}
                 className="sticky top-28 space-y-6"
               >
-                {/* Location Card */}
+                {/* Card */}
                 <div className="border-border bg-card shadow-card rounded-xl border p-6">
-                  <h3 className="text-foreground mb-4 font-semibold">
-                    Location
-                  </h3>
+                  <h3 className="text-foreground mb-4 font-semibold"></h3>
 
                   {/* Map Placeholder */}
                   <div className="bg-muted mb-4 flex aspect-video items-center justify-center rounded-lg">
@@ -397,12 +409,9 @@ function RouteComponent() {
                     <div className="flex items-start gap-2">
                       <MapPin className="text-muted-foreground mt-0.5 h-4 w-4" />
                       <div>
-                        <p className="text-foreground">
-                          {place.location.address}
-                        </p>
+                        <p className="text-foreground">{place.streetAddress}</p>
                         <p className="text-muted-foreground">
-                          {place.location.city}, {place.location.state},{" "}
-                          {place.location.country}
+                          {place.city}, {place.stateProvince}, {place.country}
                         </p>
                       </div>
                     </div>
@@ -413,13 +422,13 @@ function RouteComponent() {
                       <div>
                         <p className="text-muted-foreground">Latitude</p>
                         <p className="text-foreground font-mono">
-                          {place.location.latitude.toFixed(4)}
+                          {place.latitude?.toFixed(4)}
                         </p>
                       </div>
                       <div>
                         <p className="text-muted-foreground">Longitude</p>
                         <p className="text-foreground font-mono">
-                          {place.location.longitude.toFixed(4)}
+                          {place.longitude?.toFixed(4)}
                         </p>
                       </div>
                     </div>
@@ -427,7 +436,7 @@ function RouteComponent() {
 
                   <div className="mt-4 space-y-2">
                     <a
-                      href={`https://www.google.com/maps/search/?api=1&query=${place.location.latitude},${place.location.longitude}`}
+                      href={`https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block"
@@ -437,19 +446,19 @@ function RouteComponent() {
                         Google Maps
                       </Button>
                     </a>
-                    {place.categories.includes("hiking") && (
-                      <a
-                        href={`https://www.alltrails.com/search?q=${encodeURIComponent(place.name + " " + place.location.city + " " + place.location.state)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block"
-                      >
-                        <Button variant="outline" className="w-full">
-                          <ExternalLink className="mr-2 h-4 w-4" />
-                          AllTrails
-                        </Button>
-                      </a>
-                    )}
+                    {/* {place.categories.includes("hiking") && ( */}
+                    {/*   <a */}
+                    {/*     href={`https://www.alltrails.com/search?q=${encodeURIComponent(place.name + " " + place.city + " " + place.stateProvince)}`} */}
+                    {/*     target="_blank" */}
+                    {/*     rel="noopener noreferrer" */}
+                    {/*     className="block" */}
+                    {/*   > */}
+                    {/*     <Button variant="outline" className="w-full"> */}
+                    {/*       <ExternalLink className="mr-2 h-4 w-4" /> */}
+                    {/*       AllTrails */}
+                    {/*     </Button> */}
+                    {/*   </a> */}
+                    {/* )} */}
                   </div>
                 </div>
 

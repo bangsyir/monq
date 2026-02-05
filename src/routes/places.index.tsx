@@ -2,12 +2,11 @@ import { createFileRoute } from "@tanstack/react-router"
 import { motion } from "framer-motion"
 import { Grid2x2, MapPin, SlidersHorizontal } from "lucide-react"
 import React from "react"
-import type { PlaceCategory } from "@/types/place"
 import CategoryFilter from "@/components/category-filter"
 import PlaceCard from "@/components/place-card"
 import { PlaceExample } from "@/components/place-map"
 import { Button } from "@/components/ui/button"
-import { mockPlaces } from "@/data/mock-places"
+import { getPlacesForIndexFn } from "@/serverFunction/place.function"
 
 type CategoryFilterType = {
   cat: string
@@ -16,18 +15,12 @@ export const Route = createFileRoute("/places/")({
   component: RouteComponent,
   validateSearch: () => ({}) as CategoryFilterType,
   loaderDeps: ({ search: { cat } }) => ({ cat }),
-  loader: ({ deps: { cat } }) => {
-    if (cat === undefined || cat === "all") {
-      return {
-        selectedCategory: "all",
-        places: mockPlaces,
-      }
-    }
+  loader: async ({ deps: { cat } }) => {
+    const category = cat === undefined || cat === "all" ? undefined : cat
+    const places = await getPlacesForIndexFn({ data: { category } })
     return {
-      selectedCategory: cat,
-      places: mockPlaces.filter((places) =>
-        places.categories.includes(cat as PlaceCategory),
-      ),
+      selectedCategory: cat || "all",
+      places,
     }
   },
 })

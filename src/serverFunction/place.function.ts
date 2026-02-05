@@ -9,8 +9,9 @@ import {
 } from "@/schema/place-schema"
 import {
   createPlace,
-  getPlace,
+  getPlaceService,
   getPlaces,
+  getPlacesForIndex,
   getTotalPlaces,
   updatePlaceImagesService,
   updatePlaceService,
@@ -34,7 +35,17 @@ export const getPlaceById = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.string())
   .handler(async ({ data: placeId }) => {
-    const result = await getPlace(placeId)
+    const result = await getPlaceService(placeId)
+    if (result.error) {
+      throw new Error(result.error.message)
+    }
+    return result.data
+  })
+
+export const getPlaceByIdNoAuth = createServerFn({ method: "GET" })
+  .inputValidator(z.string())
+  .handler(async ({ data: placeId }) => {
+    const result = await getPlaceService(placeId)
     if (result.error) {
       throw new Error(result.error.message)
     }
@@ -118,4 +129,14 @@ export const getPlacesFn = createServerFn({ method: "GET" })
       hasLeft: currentPage > 1,
       hasMore: currentPage < totalPage,
     }
+  })
+
+export const getPlacesForIndexFn = createServerFn({ method: "GET" })
+  .inputValidator(z.object({ category: z.string().optional() }))
+  .handler(async ({ data }) => {
+    const result = await getPlacesForIndex(data.category)
+    if (result.error) {
+      throw new Error(result.error.message)
+    }
+    return result.data
   })

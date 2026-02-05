@@ -29,7 +29,7 @@ function CategoriesSection() {
     return (
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+          <div className="flex-cols flex gap-4">
             {[...Array(6)].map((_, i) => (
               <div
                 key={i}
@@ -68,7 +68,7 @@ function CategoriesSection() {
           </div>
         </motion.div>
 
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <div className="flex-cols flex w-full gap-4 overflow-x-auto">
           {categories?.map((category, index) => (
             <CategoryCard key={category.id} category={category} index={index} />
           ))}
@@ -97,7 +97,7 @@ function CategoryCard({
         search={{ cat: category.name.toLowerCase() }}
         className="group relative block overflow-hidden rounded-xl"
       >
-        <div className="aspect-[4/3] w-full">
+        <div className="aspect-[4/3] w-40 lg:w-64">
           {category.image ? (
             <img
               src={category.image}

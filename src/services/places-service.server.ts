@@ -4,6 +4,7 @@ import type { AddPlaceServer, UpdatePlaceServer } from "@/schema/place-schema"
 import {
   deletePlaceCategories,
   getPlaceById,
+  getPlacesWithDetails,
   insertCategories,
   insertImage,
   insertPlace,
@@ -76,7 +77,7 @@ export async function createPlace(data: AddPlaceServer, userId: string) {
   return { message: "Successful update place", error: null }
 }
 
-export async function getPlace(placeId: string) {
+export async function getPlaceService(placeId: string) {
   const [place, error] = await safeDbQuery(getPlaceById(placeId))
   if (error) {
     return { data: null, error }
@@ -248,4 +249,14 @@ export async function getPlaces({
     return { message: resultErr.message, error: resultErr.error }
   }
   return { message: "Success", data: result }
+}
+
+export async function getPlacesForIndex(categoryFilter?: string) {
+  const [result, error] = await safeDbQuery(
+    getPlacesWithDetails(undefined, categoryFilter),
+  )
+  if (error) {
+    return { data: null, error }
+  }
+  return { data: result, error: null }
 }

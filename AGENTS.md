@@ -128,5 +128,5 @@ function PostList() {
 ## Follow the project rules path
 
 - `src/serverFunction/` for store "createServerFn"
-- `src/services/` for store app logic
+- `src/services/` for store app logic and please use safeDbQuery function at `utils/safe-db-query` for handle db r
 - `src/repositories/` for handle access to the table

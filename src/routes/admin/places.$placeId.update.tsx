@@ -58,7 +58,6 @@ function RouteComponent() {
   const params = Route.useParams()
   const navigate = useNavigate()
   const [isSubmitting, setIsSubmitting] = useState(false)
-
   const form = useForm({
     defaultValues: {
       name: "",
