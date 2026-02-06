@@ -65,18 +65,18 @@ const difficultyColors: Record<string, string> = {
 
 export const Route = createFileRoute("/places/$placeId")({
   component: RouteComponent,
-  loader: async ({ params: { placeId } }) => {
+  loader: async ({ params: { placeId }, context }) => {
+    const isLoggedIn = context.user !== null
     const place = await getPlaceByIdNoAuth({ data: placeId })
-    return { place }
+    return { place, isLoggedIn }
   },
 })
 
 function RouteComponent() {
-  const { place } = Route.useLoaderData()
+  const { place, isLoggedIn } = Route.useLoaderData()
   const [comments, setComments] = useState<Array<PlaceComment>>([])
   const [newComment, setNewComment] = useState("")
   // TODO: Implement actual authentication state
-  const isLoggedIn = false
 
   const handleAddComment = () => {
     if (newComment.trim()) {
