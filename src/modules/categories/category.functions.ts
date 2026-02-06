@@ -4,7 +4,7 @@ import {
   getAllCategoriesService,
   updateCategoryService,
 } from "./category-service.server"
-import type { Category } from "@/services/category.service"
+import type { Category } from "./category-types.ts"
 import { authMiddleware } from "@/lib/auth-middleware"
 
 const UpdateCategorySchema = z.object({
@@ -14,11 +14,11 @@ const UpdateCategorySchema = z.object({
   image: z.string().nullable().optional(),
 })
 
-export const getCategories = createServerFn({ method: "GET" })
-  .middleware([authMiddleware])
-  .handler(async (): Promise<Array<Category>> => {
+export const getCategories = createServerFn({ method: "GET" }).handler(
+  async (): Promise<Array<Category>> => {
     return await getAllCategoriesService()
-  })
+  },
+)
 
 export const updateCategory = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
