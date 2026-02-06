@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router"
 import { useQuery } from "@tanstack/react-query"
 import { useServerFn } from "@tanstack/react-start"
 import { Grid2x2 } from "lucide-react"
-import { getCategories } from "@/serverFunction/category.function"
 import { CategoryUpdateDialog } from "@/components/category-update-dialog"
 import {
   Table,
@@ -14,9 +13,9 @@ import {
 } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+import { getCategories } from "@/modules/categories"
 
 export const Route = createFileRoute("/admin/categories")({
-  ssr: false,
   component: RouteComponent,
 })
 

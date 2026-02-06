@@ -30,11 +30,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 
-import { updateUserProfile } from "@/serverFunction/user.function"
-import { updateUserSchema } from "@/schema/user-schema"
+import { updateUserProfile, updateUserSchema } from "@/modules/users"
 import { authClient } from "@/lib/auth-client"
-import { getAvatarOptions } from "@/serverFunction/gallery.function"
 import { FieldError } from "@/components/ui/field"
+import { getAvatarOptions } from "@/modules/galleries"
 
 export const Route = createFileRoute("/settings")({
   component: RouteComponent,

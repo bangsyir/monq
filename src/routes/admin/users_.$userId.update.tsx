@@ -161,7 +161,7 @@ function RouteComponent() {
               <Avatar className="border-border h-16 w-16 border-2">
                 <AvatarImage src={user.image!} />
                 <AvatarFallback className="bg-secondary text-secondary-foreground text-lg">
-                  {user.username?.slice(0, 2) || "U"}
+                  {user.username ? user?.username.slice(0, 2) : "U"}
                 </AvatarFallback>
               </Avatar>
               <div>

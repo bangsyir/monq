@@ -2,7 +2,7 @@ import { Link, createFileRoute, useNavigate } from "@tanstack/react-router"
 import { Edit, MapPin, MoreHorizontal, Star } from "lucide-react"
 import { useState } from "react"
 import type { RegisteredRouter, RouteById } from "@tanstack/react-router"
-import type { PlaceFilter } from "@/schema/place-schema"
+import type { PlaceFilter } from "@/modules/places"
 import { Button, buttonVariants } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -21,11 +21,10 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
-import { getPlacesFn } from "@/serverFunction/place.function"
+import { getPlaces } from "@/modules/places"
 import { PlacesLoadingSkeleton } from "@/components/places-loading-skeleton"
 
 export const Route = createFileRoute("/admin/places/")({
-  ssr: false,
   validateSearch: () => ({}) as PlaceFilter,
   loaderDeps: ({ search: { search, page, sortBy, sortOrder } }) => ({
     search,
@@ -34,7 +33,7 @@ export const Route = createFileRoute("/admin/places/")({
     sortOrder,
   }),
   loader: async ({ deps }) => {
-    const placesDataPromise = await getPlacesFn({ data: deps })
+    const placesDataPromise = await getPlaces({ data: deps })
     return {
       placesData: placesDataPromise,
     }

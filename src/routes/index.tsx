@@ -3,11 +3,11 @@ import { useQuery } from "@tanstack/react-query"
 import { useServerFn } from "@tanstack/react-start"
 import { motion } from "framer-motion"
 import { ArrowRight, Sparkles } from "lucide-react"
-import type { Category } from "@/services/category.service"
+import type { Category } from "@/modules/categories"
 import FeaturedPlaces from "@/components/featured-places"
 import HeroSection from "@/components/hero-section"
 import { Navbar } from "@/components/navbar"
-import { getCategories } from "@/serverFunction/category.function"
+import { getCategories } from "@/modules/categories"
 
 export const Route = createFileRoute("/")({
   component: App,

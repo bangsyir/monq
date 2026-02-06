@@ -8,9 +8,11 @@ import { Button } from "@/components/ui/button"
 
 import {
   Field,
+  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
+  FieldTitle,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -23,12 +25,12 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 
-import { addPlaceClientSchema } from "@/schema/place-schema"
-import { addPlace } from "@/serverFunction/place.function"
-import { getCategories } from "@/serverFunction/category.function"
-import { getDefaultImages } from "@/serverFunction/gallery.function"
+import { addPlace, addPlaceClientSchema } from "@/modules/places"
+import { getCategories } from "@/modules/categories"
+import { getDefaultImages } from "@/modules/galleries"
 import { Separator } from "@/components/ui/separator"
 import { amenitiesData } from "@/data/amenities"
+import { Switch } from "@/components/ui/switch"
 
 const difficulties = [
   { value: "easy", label: "Easy" },
@@ -37,8 +39,11 @@ const difficulties = [
   { value: "expert", label: "Expert" },
 ]
 
+function PendingComponent() {
+  return <div>Loading...</div>
+}
+
 export const Route = createFileRoute("/admin/places/add")({
-  ssr: false,
   component: RouteComponent,
   loader: async () => {
     const categories = await getCategories()
@@ -48,6 +53,7 @@ export const Route = createFileRoute("/admin/places/add")({
       defaultImages,
     }
   },
+  pendingComponent: PendingComponent,
 })
 
 type ImageUploadMode = "file" | "url" | "gallery"
@@ -56,7 +62,7 @@ const STORAGE_KEY = "place-add-image-urls"
 
 function RouteComponent() {
   const { categories: categoryOptions, defaultImages } = Route.useLoaderData()
-  const navigate = useNavigate({ from: "/admin/places" })
+  const navigate = useNavigate()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [uploadMode, setUploadMode] = useState<ImageUploadMode>("file")
   const [imageUrls, setImageUrls] = useState<Array<string>>([])
@@ -158,6 +164,7 @@ function RouteComponent() {
       difficulty: "",
       duration: "",
       distance: "",
+      isFeatured: false,
       images: [] as Array<File> | null,
       amenities: [] as Array<string>,
     },
@@ -287,11 +294,11 @@ function RouteComponent() {
                                   className="bg-secondary text-secondary-foreground inline-flex items-center gap-1 rounded-full px-3 py-1"
                                 >
                                   {
-                                    categoryOptions.find((c) => c.value === cat)
+                                    categoryOptions.find((c) => c.name === cat)
                                       ?.icon
                                   }{" "}
                                   {
-                                    categoryOptions.find((c) => c.value === cat)
+                                    categoryOptions.find((c) => c.name === cat)
                                       ?.name
                                   }
                                   <button
@@ -316,18 +323,18 @@ function RouteComponent() {
                           <div className="flex flex-wrap gap-2">
                             {categoryOptions
                               .filter(
-                                (cat) => !field.state.value.includes(cat.value),
+                                (cat) => !field.state.value.includes(cat.name),
                               )
                               .map((cat) => (
                                 <Button
-                                  key={cat.value}
+                                  key={cat.name}
                                   type="button"
                                   variant="outline"
                                   size="sm"
                                   onClick={() => {
                                     field.handleChange([
                                       ...field.state.value,
-                                      cat.value,
+                                      cat.name,
                                     ])
                                   }}
                                   className="text-xs"
@@ -623,6 +630,39 @@ function RouteComponent() {
                           onChange={(e) => field.handleChange(e.target.value)}
                           aria-invalid={isInvalid}
                           placeholder="e.g., 5 miles"
+                        />
+                        {isInvalid && (
+                          <FieldError errors={field.state.meta.errors} />
+                        )}
+                      </Field>
+                    )
+                  }}
+                />
+                <form.Field
+                  name="isFeatured"
+                  defaultValue={false}
+                  children={(field) => {
+                    const isInvalid =
+                      field.state.meta.isTouched && !field.state.meta.isValid
+
+                    return (
+                      <Field
+                        orientation={"vertical"}
+                        className="bg-muted rounded-lg p-2"
+                      >
+                        <FieldTitle>Is Featured</FieldTitle>
+                        <FieldDescription>
+                          set true for display in homepage
+                        </FieldDescription>
+                        <Switch
+                          id={field.name}
+                          name={field.name}
+                          onBlur={field.handleBlur}
+                          onClick={(e) => {
+                            e.preventDefault
+                            field.handleChange(!field.state.value)
+                          }}
+                          defaultChecked={field.state.value}
                         />
                         {isInvalid && (
                           <FieldError errors={field.state.meta.errors} />

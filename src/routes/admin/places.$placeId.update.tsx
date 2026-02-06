@@ -6,9 +6,11 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import {
   Field,
+  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
+  FieldTitle,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -20,17 +22,14 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import {
-  getPlaceById,
-  updatePlace,
-  updatePlaceImages,
-} from "@/serverFunction/place.function"
-import { getCategories } from "@/serverFunction/category.function"
-import { getDefaultImages } from "@/serverFunction/gallery.function"
+import { getPlaceById, updatePlace, updatePlaceImages } from "@/modules/places"
+import { getCategories } from "@/modules/categories"
+import { getDefaultImages } from "@/modules/galleries"
 import { amenitiesData } from "@/data/amenities"
 import { StandaloneImageUploader } from "@/components/standalone-image-uploader"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Switch } from "@/components/ui/switch"
 
 const difficulties = [
   { value: "easy", label: "Easy" },
@@ -73,6 +72,7 @@ function RouteComponent() {
       difficulty: "",
       duration: "",
       distance: "",
+      isFeatured: false,
       amenities: [] as Array<string>,
     },
 
@@ -622,6 +622,40 @@ function RouteComponent() {
                               aria-invalid={isInvalid}
                               placeholder="e.g., 5 miles"
                               defaultValue={field.state.value}
+                            />
+                            {isInvalid && (
+                              <FieldError errors={field.state.meta.errors} />
+                            )}
+                          </Field>
+                        )
+                      }}
+                    />
+                    <form.Field
+                      name="isFeatured"
+                      defaultValue={place?.isFeatured || false}
+                      children={(field) => {
+                        const isInvalid =
+                          field.state.meta.isTouched &&
+                          !field.state.meta.isValid
+
+                        return (
+                          <Field
+                            orientation={"vertical"}
+                            className="bg-muted rounded-lg p-2"
+                          >
+                            <FieldTitle>Is Featured</FieldTitle>
+                            <FieldDescription>
+                              set true for display in homepage
+                            </FieldDescription>
+                            <Switch
+                              id={field.name}
+                              name={field.name}
+                              onBlur={field.handleBlur}
+                              onClick={(e) => {
+                                e.preventDefault()
+                                field.handleChange(!field.state.value)
+                              }}
+                              checked={field.state.value}
                             />
                             {isInvalid && (
                               <FieldError errors={field.state.meta.errors} />

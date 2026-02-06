@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useServerFn } from "@tanstack/react-start"
 import { Images, PencilIcon } from "lucide-react"
 import { toast } from "sonner"
-import type { Category } from "@/services/category.service"
+import type { Category } from "@/modules/categories"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -16,8 +16,8 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { updateCategoryFn } from "@/serverFunction/category.function"
-import { getDefaultImages } from "@/serverFunction/gallery.function"
+import { updateCategory } from "@/modules/categories"
+import { getDefaultImages } from "@/modules/galleries"
 
 interface CategoryUpdateDialogProps {
   category: Category
@@ -30,7 +30,7 @@ export function CategoryUpdateDialog({ category }: CategoryUpdateDialogProps) {
   const [image, setImage] = useState(category.image || "")
 
   const queryClient = useQueryClient()
-  const updateCategory = useServerFn(updateCategoryFn)
+  const updateCategoryFn = useServerFn(updateCategory)
   const getDefaultImagesFn = useServerFn(getDefaultImages)
 
   const { data: defaultImages, isLoading: imagesLoading } = useQuery({
@@ -41,7 +41,7 @@ export function CategoryUpdateDialog({ category }: CategoryUpdateDialogProps) {
 
   const updateMutation = useMutation({
     mutationFn: async () => {
-      return await updateCategory({
+      return await updateCategoryFn({
         data: {
           id: category.id,
           name,

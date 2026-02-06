@@ -1,10 +1,11 @@
+import { useState } from "react"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { Edit, Eye, MoreHorizontal } from "lucide-react"
-import { useState } from "react"
 import type { RegisteredRouter, RouteById } from "@tanstack/react-router"
-import type { UserFilter } from "@/schema/user-schema"
-import { Input } from "@/components/ui/input"
+import type { UserFilter } from "@/modules/users"
+import { getUsers } from "@/modules/users"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,7 +21,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { getUsersFn } from "@/serverFunction/user.function"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { UsersLoadingSkeleton } from "@/components/users-loading-skeleton"
 
@@ -30,7 +30,6 @@ type UsersDataType = RouteById<
 >["types"]["loaderData"]["usersData"]
 
 export const Route = createFileRoute("/admin/users/")({
-  ssr: false,
   validateSearch: () => ({}) as UserFilter,
   loaderDeps: ({ search: { search, page, sortBy, sortOrder } }) => ({
     search,
@@ -39,7 +38,7 @@ export const Route = createFileRoute("/admin/users/")({
     sortOrder,
   }),
   loader: async ({ deps }) => {
-    const usersDataPromise = await getUsersFn({ data: deps })
+    const usersDataPromise = await getUsers({ data: deps })
     return {
       usersData: usersDataPromise,
     }

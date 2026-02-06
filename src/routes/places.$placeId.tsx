@@ -26,8 +26,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
-import { getPlaceByIdNoAuth } from "@/serverFunction/place.function"
 import ImageGallery from "@/components/image-gallery"
+import { getPlaceByIdNoAuth } from "@/modules/places"
 
 const amenityIcons: Record<string, React.ReactNode> = {
   car: <Car className="h-5 w-5" />,

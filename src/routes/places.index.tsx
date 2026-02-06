@@ -6,7 +6,7 @@ import CategoryFilter from "@/components/category-filter"
 import PlaceCard from "@/components/place-card"
 import { PlaceExample } from "@/components/place-map"
 import { Button } from "@/components/ui/button"
-import { getPlacesForIndexFn } from "@/serverFunction/place.function"
+import { getPlacesForIndex } from "@/modules/places"
 
 type CategoryFilterType = {
   cat: string
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/places/")({
   loaderDeps: ({ search: { cat } }) => ({ cat }),
   loader: async ({ deps: { cat } }) => {
     const category = cat === undefined || cat === "all" ? undefined : cat
-    const places = await getPlacesForIndexFn({ data: { category } })
+    const places = await getPlacesForIndex({ data: { category } })
     return {
       selectedCategory: cat || "all",
       places,

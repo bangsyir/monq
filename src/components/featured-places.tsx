@@ -1,14 +1,25 @@
 import { Link } from "@tanstack/react-router"
+import { useQuery } from "@tanstack/react-query"
+import { useServerFn } from "@tanstack/react-start"
 import { motion } from "framer-motion"
 import { ArrowRight } from "lucide-react"
 import PlaceCard from "./place-card"
+import type { Place } from "@/types/place"
 import { Button } from "@/components/ui/button"
-import { mockPlaces } from "@/data/mock-places"
+import { getFeaturedPlaces } from "@/modules/places"
 
 const FeaturedPlaces = () => {
-  const featuredPlaces = mockPlaces
-    .filter((place) => place.isFeatured)
-    .slice(0, 4)
+  const getFeaturedPlacesFn = useServerFn(getFeaturedPlaces)
+
+  const { data: featuredPlaces, isLoading } = useQuery({
+    queryKey: ["featured-places"],
+    queryFn: () => getFeaturedPlacesFn({ data: 8 }),
+  })
+
+  // Don't show component if no featured places
+  if (!isLoading && (!featuredPlaces || featuredPlaces.length === 0)) {
+    return null
+  }
 
   return (
     <section className="py-20">
@@ -36,11 +47,22 @@ const FeaturedPlaces = () => {
           </Link>
         </motion.div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {featuredPlaces.map((place, index) => (
-            <PlaceCard key={place.id} place={place} index={index} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {[...Array(4)].map((_, i) => (
+              <div
+                key={i}
+                className="bg-muted aspect-[4/3] animate-pulse rounded-xl"
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {featuredPlaces?.map((place: Place, index: number) => (
+              <PlaceCard key={place.id} place={place} index={index} />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   )

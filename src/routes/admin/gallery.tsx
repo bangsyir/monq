@@ -21,7 +21,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Skeleton } from "@/components/ui/skeleton"
-import { getGalleryImages } from "@/serverFunction/gallery.function"
+import { getGalleryImages } from "@/modules/galleries"
 
 type FolderType = "avatar" | "default"
 
@@ -81,7 +81,6 @@ function GallerySkeleton() {
 }
 
 export const Route = createFileRoute("/admin/gallery")({
-  ssr: false,
   component: RouteComponent,
   loader: () => {
     const galleryDataPromise = getGalleryImages()
