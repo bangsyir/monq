@@ -1,5 +1,5 @@
 import { getFriendlyDbMessage } from "./errors"
-import { tryCatch } from "./try-catch"
+import { tryTo } from "./promise"
 import type { TDatabaseError } from "@/types/database"
 
 export type TAppError = {
@@ -8,14 +8,14 @@ export type TAppError = {
 }
 
 // The generic result type for your DB queries
-export type TDbResult<TData> = [TData, null] | [null, TAppError]
+export type TResult<TData> = [TData, null] | [null, TAppError]
 
-export async function safeDbQuery<TData>(
+export const safeDbQuery = <TData>(
   promise: Promise<TData>,
-): Promise<TDbResult<TData>> {
-  const [data, error] = await tryCatch<TData, TDatabaseError>(promise)
-  if (error) {
-    return [null, { message: getFriendlyDbMessage(error), error: error }]
-  }
-  return [data, null]
-}
+): Promise<TResult<TData>> =>
+  tryTo<TData, TDatabaseError>(promise).then(([data, error]) => {
+    if (error) {
+      return [null, { message: getFriendlyDbMessage(error), error: error }]
+    }
+    return [data, null]
+  })
