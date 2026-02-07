@@ -98,7 +98,7 @@ const ImageGallery = ({ images, placeName }: ImageGalleryProps) => {
           <motion.div
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="group relative col-span-2 row-span-2 aspect-square cursor-pointer"
+            className="group relative col-span-2 row-span-2 aspect-square cursor-pointer overflow-hidden"
             onClick={() => openModal(0)}
           >
             <img
