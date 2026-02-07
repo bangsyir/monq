@@ -230,12 +230,12 @@ import { db } from "@/db"
 import { places } from "@/db/schema"
 import { eq, and } from "drizzle-orm"
 
-export async function insertPlaceRepo(data: InsertPlace) {
-  return await db.insert(places).values(data).returning({ id: places.id })
+export function insertPlaceRepo(data: InsertPlace) {
+  return db.insert(places).values(data).returning({ id: places.id })
 }
 
 export async function getPlaceByIdRepo(placeId: string) {
-  return await db.query.places.findFirst({
+  return db.query.places.findFirst({
     where: eq(places.id, placeId),
     with: {
       images: true,
@@ -248,11 +248,7 @@ export async function updatePlaceRepo(
   placeId: string,
   data: Partial<InsertPlace>,
 ) {
-  return await db
-    .update(places)
-    .set(data)
-    .where(eq(places.id, placeId))
-    .returning()
+  return db.update(places).set(data).where(eq(places.id, placeId)).returning()
 }
 ```
 
