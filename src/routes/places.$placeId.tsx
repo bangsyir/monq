@@ -28,6 +28,7 @@ import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import ImageGallery from "@/components/image-gallery"
 import { getPlaceByIdNoAuth } from "@/modules/places"
+import LoginDialog from "@/components/login-dialog"
 
 const amenityIcons: Record<string, React.ReactNode> = {
   car: <Car className="h-5 w-5" />,
@@ -350,17 +351,13 @@ function RouteComponent() {
                       <Button onClick={handleAddComment}>Post Comment</Button>
                     </>
                   ) : (
-                    <div className="bg-muted rounded-lg p-6 text-center">
+                    <div className="bg-muted flex flex-col items-center rounded-lg p-6 text-center">
                       <p className="text-muted-foreground mb-3">
                         Please log in to post a comment.
                       </p>
-                      <button
-                        type="button"
-                        className="text-primary font-medium hover:underline"
-                        onClick={() => alert("Future: Open login dialog")}
-                      >
-                        Log in to comment
-                      </button>
+                      <div>
+                        <LoginDialog />
+                      </div>
                     </div>
                   )}
                 </div>
