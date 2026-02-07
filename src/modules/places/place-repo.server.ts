@@ -1,5 +1,5 @@
-import { and, eq, sql } from "drizzle-orm"
-import type { InferInsertModel } from "drizzle-orm"
+import { and, asc, count, desc, eq, ilike, or, sql } from "drizzle-orm"
+import type { InferInsertModel, SQL } from "drizzle-orm"
 import { db } from "@/db"
 import { categories, placeCategories, placeImages, places } from "@/db/schema"
 
@@ -7,11 +7,11 @@ type InsertPlace = InferInsertModel<typeof places>
 type InsertCategories = InferInsertModel<typeof placeCategories>
 type InserImage = InferInsertModel<typeof placeImages>
 
-export async function insertPlaceRepo(
+export function insertPlaceRepo(
   data: Omit<InsertPlace, "userId">,
   userId: string,
 ) {
-  return await db
+  return db
     .insert(places)
     .values({
       userId: userId,
@@ -42,8 +42,8 @@ export function insertImageRepo(data: Array<InserImage>) {
   return db.insert(placeImages).values(data)
 }
 
-export async function getPlaceByIdRepo(placeId: string) {
-  const place = await db.query.places.findFirst({
+export function getPlaceByIdRepo(placeId: string) {
+  const place = db.query.places.findFirst({
     where: eq(places.id, placeId),
     with: {
       placeCategories: {
@@ -58,12 +58,12 @@ export async function getPlaceByIdRepo(placeId: string) {
   return place
 }
 
-export async function updatePlaceRepo(
+export function updatePlaceRepo(
   placeId: string,
   userId: string,
   data: Omit<InsertPlace, "userId" | "rating">,
 ) {
-  return await db
+  return db
     .update(places)
     .set({
       userId: userId,
@@ -183,19 +183,7 @@ export async function getFeaturedPlacesRepo(limit: number = 8) {
   return placesWithDetails
 }
 
-export async function getPlacesWithDetailsRepo(
-  placeIds?: Array<string>,
-  categoryFilter?: string,
-) {
-  // Build WHERE conditions for place IDs
-  let placeIdCondition = sql`TRUE`
-  if (placeIds && placeIds.length > 0) {
-    placeIdCondition = sql`${places.id} IN (${sql.join(
-      placeIds.map((id) => sql`${id}`),
-      sql`, `,
-    )})`
-  }
-
+export async function getPlacesWithDetailsRepo(categoryFilter?: string) {
   // Build category filter using EXISTS subquery for database-level filtering
   let categoryCondition = sql`TRUE`
   if (categoryFilter && categoryFilter !== "all") {
@@ -247,7 +235,7 @@ export async function getPlacesWithDetailsRepo(
     FROM ${places}
     LEFT JOIN ${placeCategories} ON ${places.id} = ${placeCategories.placeId}
     LEFT JOIN ${categories} ON ${placeCategories.categoryId} = ${categories.id}
-    WHERE ${placeIdCondition} AND ${categoryCondition}
+    WHERE ${categoryCondition}
     GROUP BY ${places.id}
   `)
 
@@ -285,4 +273,75 @@ export async function getPlacesWithDetailsRepo(
   }))
 
   return placesWithDetails
+}
+
+export function placeConditionFilterRepo(search: string | undefined) {
+  const whereConditions = search
+    ? or(
+        ilike(places.name, `%${search}%`),
+        ilike(places.description, `%${search}%`),
+        ilike(places.city, `%${search}%`),
+        ilike(places.stateProvince, `%${search}%`),
+        ilike(places.country, `%${search}%`),
+      )
+    : undefined
+  return whereConditions
+}
+export function getPlacesRepo({
+  sortBy,
+  sortOrder,
+  filter,
+  limit,
+  offset,
+}: {
+  sortBy: string | undefined
+  sortOrder: string | undefined
+  filter: SQL<unknown> | undefined
+  limit: number
+  offset: number
+}) {
+  // Determine sort column
+  const sortColumn =
+    sortBy === "name"
+      ? places.name
+      : sortBy === "rating"
+        ? places.rating
+        : sortBy === "city"
+          ? places.city
+          : places.createdAt
+
+  return db
+    .select({
+      // Place fields
+      id: places.id,
+      name: places.name,
+      description: places.description,
+      latitude: places.latitude,
+      longitude: places.longitude,
+      address: places.streetAddress,
+      city: places.city,
+      state: places.stateProvince,
+      country: places.country,
+      rating: places.rating,
+      reviewCount: places.reviewCount,
+      difficulty: places.difficulty,
+      duration: places.duration,
+      distance: places.distance,
+      elevation: places.elevation,
+      bestSeason: places.bestSeason,
+      isFeatured: places.isFeatured,
+      createdAt: places.createdAt,
+      updatedAt: places.updatedAt,
+      userId: places.userId,
+      // Total count using window function
+    })
+    .from(places)
+    .where(filter)
+    .orderBy(sortOrder === "desc" ? desc(sortColumn) : asc(sortColumn))
+    .limit(limit)
+    .offset(offset)
+}
+
+export function getTotalPlaceRepo(filter: SQL<unknown> | undefined) {
+  return db.select({ count: count() }).from(places).where(filter)
 }

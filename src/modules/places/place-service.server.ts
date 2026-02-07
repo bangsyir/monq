@@ -1,10 +1,11 @@
-import { asc, count, desc } from "drizzle-orm"
 import {
   deletePlaceCategoriesRepo,
   deletePlaceImagesRepo,
   getFeaturedPlacesRepo,
   getPlaceByIdRepo,
+  getPlacesRepo,
   getPlacesWithDetailsRepo,
+  getTotalPlaceRepo,
   insertCategoriesRepo,
   insertImageRepo,
   insertPlaceRepo,
@@ -14,7 +15,7 @@ import type { SQL } from "drizzle-orm"
 import type { AddPlaceServer, UpdatePlaceServer } from "@/modules/places"
 import { safeDbQuery } from "@/utils/safe-db-query"
 import { db } from "@/db"
-import { categories, places } from "@/db/schema"
+import { categories } from "@/db/schema"
 
 // Helper function to get category IDs by names
 async function getCategoryIdsByName(
@@ -182,9 +183,7 @@ export async function getTotalPlacesService({
 }: {
   filter: SQL<unknown> | undefined
 }) {
-  const [total, totalErr] = await safeDbQuery(
-    db.select({ count: count() }).from(places).where(filter),
-  )
+  const [total, totalErr] = await safeDbQuery(getTotalPlaceRepo(filter))
   if (totalErr) {
     return { message: totalErr.message, error: totalErr.error.cause }
   }
@@ -204,49 +203,11 @@ export async function getPlacesService({
   limit: number
   offset: number
 }) {
-  // Determine sort column
-  const sortColumn =
-    sortBy === "name"
-      ? places.name
-      : sortBy === "rating"
-        ? places.rating
-        : sortBy === "city"
-          ? places.city
-          : places.createdAt
-
   // Optimize: Use a single query with subquery for better performance
   const [result, resultErr] = await safeDbQuery(
-    db
-      .select({
-        // Place fields
-        id: places.id,
-        name: places.name,
-        description: places.description,
-        latitude: places.latitude,
-        longitude: places.longitude,
-        address: places.streetAddress,
-        city: places.city,
-        state: places.stateProvince,
-        country: places.country,
-        rating: places.rating,
-        reviewCount: places.reviewCount,
-        difficulty: places.difficulty,
-        duration: places.duration,
-        distance: places.distance,
-        elevation: places.elevation,
-        bestSeason: places.bestSeason,
-        isFeatured: places.isFeatured,
-        createdAt: places.createdAt,
-        updatedAt: places.updatedAt,
-        userId: places.userId,
-        // Total count using window function
-      })
-      .from(places)
-      .where(filter)
-      .orderBy(sortOrder === "desc" ? desc(sortColumn) : asc(sortColumn))
-      .limit(limit)
-      .offset(offset),
+    getPlacesRepo({ sortBy, filter, limit, offset, sortOrder }),
   )
+
   if (resultErr) {
     return { message: resultErr.message, error: resultErr.error }
   }
@@ -255,8 +216,9 @@ export async function getPlacesService({
 
 export async function getPlacesForIndexService(categoryFilter?: string) {
   const [result, error] = await safeDbQuery(
-    getPlacesWithDetailsRepo(undefined, categoryFilter),
+    getPlacesWithDetailsRepo(categoryFilter),
   )
+
   if (error) {
     return { data: null, error }
   }

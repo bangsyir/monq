@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start"
 import { z } from "zod"
-import { count, ilike, or } from "drizzle-orm"
+import { count } from "drizzle-orm"
 import {
   createPlaceService,
   getFeaturedPlacesService,
@@ -16,6 +16,7 @@ import {
   addPlaceServerSchema,
   updatePlaceServerSchema,
 } from "./place-schema"
+import { placeConditionFilterRepo } from "./place-repo.server"
 import { authMiddleware } from "@/lib/auth-middleware"
 import { db } from "@/db"
 import { places } from "@/db/schema"
@@ -98,15 +99,7 @@ export const getPlaces = createServerFn({ method: "GET" })
     const limit = 100
     const offset = (currentPage - 1) * limit
     // Build where conditions
-    const whereConditions = search
-      ? or(
-          ilike(places.name, `%${search}%`),
-          ilike(places.description, `%${search}%`),
-          ilike(places.city, `%${search}%`),
-          ilike(places.stateProvince, `%${search}%`),
-          ilike(places.country, `%${search}%`),
-        )
-      : undefined
+    const whereConditions = placeConditionFilterRepo(search)
     const totalPlaces = await getTotalPlacesService({ filter: whereConditions })
     if (totalPlaces.error) {
       throw new Error(totalPlaces.message, { cause: totalPlaces.error })
