@@ -218,11 +218,42 @@ export async function getPlacesForIndexService(categoryFilter?: string) {
   const [result, error] = await safeDbQuery(
     getPlacesWithDetailsRepo(categoryFilter),
   )
-
   if (error) {
     return { data: null, error }
   }
-  return { data: result, error: null }
+  // Transform the result to match the expected format
+  const placesWithDetails = (result as Array<any>).map((row: any) => ({
+    id: row.id,
+    name: row.name,
+    description: row.description,
+    location: {
+      latitude: row.latitude || 0,
+      longitude: row.longitude || 0,
+      address: row.streetAddress || "",
+      city: row.city || "",
+      state: row.stateProvince || "",
+      country: row.country || "",
+    },
+    categories: row.categories || [],
+    images: row.first_image && row.first_image.id ? [row.first_image] : [],
+    rating: row.rating,
+    reviewCount: row.reviewCount,
+    amenities: (row.amenities || []).map((amenity: string, index: number) => ({
+      id: index.toString(),
+      name: amenity,
+      icon: amenity.toLowerCase().replace(/\s+/g, "-"),
+    })),
+    difficulty: row.difficulty,
+    duration: row.duration,
+    distance: row.distance,
+    elevation: row.elevation,
+    bestSeason: row.bestSeason,
+    isFeatured: row.isFeatured,
+    createdAt: row.createdAt
+      ? new Date(row.createdAt).toISOString()
+      : new Date().toISOString(),
+  }))
+  return { data: placesWithDetails, error: null }
 }
 
 export async function getFeaturedPlacesService(limit: number = 8) {
@@ -230,5 +261,38 @@ export async function getFeaturedPlacesService(limit: number = 8) {
   if (error) {
     return { data: null, error }
   }
-  return { data: result, error: null }
+  // Transform the result to match the expected format
+  const placesWithDetails = (result as Array<any>).map((row: any) => ({
+    id: row.id,
+    name: row.name,
+    description: row.description,
+    location: {
+      latitude: row.latitude || 0,
+      longitude: row.longitude || 0,
+      address: row.streetAddress || "",
+      city: row.city || "",
+      state: row.stateProvince || "",
+      country: row.country || "",
+    },
+    categories: row.categories || [],
+    images: row.first_image && row.first_image.id ? [row.first_image] : [],
+    rating: row.rating,
+    reviewCount: row.reviewCount,
+    amenities: (row.amenities || []).map((amenity: string, index: number) => ({
+      id: index.toString(),
+      name: amenity,
+      icon: amenity.toLowerCase().replace(/\s+/g, "-"),
+    })),
+    difficulty: row.difficulty,
+    duration: row.duration,
+    distance: row.distance,
+    elevation: row.elevation,
+    bestSeason: row.bestSeason,
+    isFeatured: row.isFeatured,
+    createdAt: row.createdAt
+      ? new Date(row.createdAt).toISOString()
+      : new Date().toISOString(),
+  }))
+
+  return { data: placesWithDetails, error: null }
 }
