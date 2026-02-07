@@ -9,9 +9,9 @@ type UpdateUserType = {
   image: string | undefined
 }
 
-export async function updateUserProfileRepo(data: UpdateUserType) {
+export function updateUserProfileRepo(data: UpdateUserType) {
   const { userId, name, username, image } = data
-  const updatedUser = await db
+  const updatedUser = db
     .update(users)
     .set({
       name,
