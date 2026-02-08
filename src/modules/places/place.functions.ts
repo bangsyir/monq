@@ -10,13 +10,14 @@ import {
   getTotalPlacesService,
   updatePlaceImagesService,
   updatePlaceService,
-} from "./place-service.server"
+} from "@/modules/places/place-service.server"
 import {
+  MainPlaceFilterSchema,
   PlaceQuerySchema,
   addPlaceServerSchema,
   updatePlaceServerSchema,
-} from "./place-schema"
-import { placeConditionFilterRepo } from "./place-repo.server"
+} from "@/modules/places/place-schema"
+import { placeConditionFilterRepo } from "@/modules/places/place-repo.server"
 import { authMiddleware } from "@/lib/auth-middleware"
 import { db } from "@/db"
 import { places } from "@/db/schema"
@@ -126,13 +127,28 @@ export const getPlaces = createServerFn({ method: "GET" })
   })
 
 export const getPlacesForIndex = createServerFn({ method: "GET" })
-  .inputValidator(z.object({ category: z.string().optional() }))
+  .inputValidator(MainPlaceFilterSchema)
   .handler(async ({ data }) => {
-    const result = await getPlacesForIndexService(data.category)
+    const currentPage = data.page || 1
+    const limit = 12
+
+    const result = await getPlacesForIndexService(
+      data.category,
+      data.search,
+      currentPage,
+      limit,
+    )
     if (result.error) {
       throw new Error(result.error.message)
     }
-    return result.data
+    return {
+      places: result.places,
+      totalCount: result.totalCount,
+      currentPage: result.currentPage,
+      totalPage: result.totalPage,
+      hasLeft: result.hasLeft,
+      hasMore: result.hasMore,
+    }
   })
 
 export const getFeaturedPlaces = createServerFn({ method: "GET" })

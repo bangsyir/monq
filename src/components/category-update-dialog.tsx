@@ -64,10 +64,8 @@ export function CategoryUpdateDialog({ category }: CategoryUpdateDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger>
-        <Button variant="ghost" size="icon">
-          <PencilIcon className="h-4 w-4" />
-        </Button>
+      <DialogTrigger render={<Button variant="ghost" size="icon" />}>
+        <PencilIcon className="h-4 w-4" />
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <form onSubmit={handleSubmit}>

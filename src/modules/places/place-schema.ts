@@ -129,3 +129,10 @@ export const PlaceQuerySchema = z.object({
 })
 
 export type PlaceFilter = z.infer<typeof PlaceQuerySchema>
+
+export const MainPlaceFilterSchema = z.object({
+  category: z.string().optional(),
+  search: z.string().optional(),
+  page: z.coerce.number().optional(),
+})
+export type MainPlaceFilter = z.infer<typeof MainPlaceFilterSchema>

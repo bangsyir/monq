@@ -148,7 +148,12 @@ export function getFeaturedPlacesRepo(limit: number = 8) {
   return result
 }
 
-export function getPlacesWithDetailsRepo(categoryFilter?: string) {
+export function getPlacesWithDetailsRepo(
+  categoryFilter?: string,
+  searchQuery?: string,
+  limit?: number,
+  offset?: number,
+) {
   // Build category filter using EXISTS subquery for database-level filtering
   let categoryCondition = sql`TRUE`
   if (categoryFilter && categoryFilter !== "all") {
@@ -159,6 +164,23 @@ export function getPlacesWithDetailsRepo(categoryFilter?: string) {
       AND LOWER(${categories.name}) = LOWER(${categoryFilter})
     )`
   }
+
+  // Build search filter using ILIKE for database-level text search
+  let searchCondition = sql`TRUE`
+  if (searchQuery && searchQuery.trim() !== "") {
+    const searchTerm = searchQuery.trim()
+    searchCondition = sql`(
+      ${places.name} ILIKE ${`%${searchTerm}%`} OR
+      ${places.description} ILIKE ${`%${searchTerm}%`} OR
+      ${places.city} ILIKE ${`%${searchTerm}%`} OR
+      ${places.stateProvince} ILIKE ${`%${searchTerm}%`} OR
+      ${places.country} ILIKE ${`%${searchTerm}%`} OR
+      ${places.streetAddress} ILIKE ${`%${searchTerm}%`}
+    )`
+  }
+
+  // Combine conditions
+  const whereCondition = sql`${categoryCondition} AND ${searchCondition}`
 
   // PostgreSQL JSON aggregation query - single query, no duplicates
   return db.execute(sql<PlaceWithDetailsRaw>`
@@ -200,8 +222,10 @@ export function getPlacesWithDetailsRepo(categoryFilter?: string) {
     FROM ${places}
     LEFT JOIN ${placeCategories} ON ${places.id} = ${placeCategories.placeId}
     LEFT JOIN ${categories} ON ${placeCategories.categoryId} = ${categories.id}
-    WHERE ${categoryCondition}
+    WHERE ${whereCondition}
     GROUP BY ${places.id}
+    LIMIT ${limit}
+    offset ${offset}
   `)
 }
 
@@ -274,4 +298,39 @@ export function getPlacesRepo({
 
 export function getTotalPlaceRepo(filter: SQL<unknown> | undefined) {
   return db.select({ count: count() }).from(places).where(filter)
+}
+
+export function getPlacesCountWithFiltersRepo(
+  categoryFilter?: string,
+  searchQuery?: string,
+) {
+  // Build category filter using EXISTS subquery
+  let categoryCondition = sql`TRUE`
+  if (categoryFilter && categoryFilter !== "all") {
+    categoryCondition = sql`EXISTS (
+      SELECT 1 FROM ${placeCategories}
+      INNER JOIN ${categories} ON ${placeCategories.categoryId} = ${categories.id}
+      WHERE ${placeCategories.placeId} = ${places.id}
+      AND LOWER(${categories.name}) = LOWER(${categoryFilter})
+    )`
+  }
+
+  // Build search filter using ILIKE
+  let searchCondition = sql`TRUE`
+  if (searchQuery && searchQuery.trim() !== "") {
+    const searchTerm = searchQuery.trim()
+    searchCondition = sql`(
+      ${places.name} ILIKE ${`%${searchTerm}%`} OR
+      ${places.description} ILIKE ${`%${searchTerm}%`} OR
+      ${places.city} ILIKE ${`%${searchTerm}%`} OR
+      ${places.stateProvince} ILIKE ${`%${searchTerm}%`} OR
+      ${places.country} ILIKE ${`%${searchTerm}%`} OR
+      ${places.streetAddress} ILIKE ${`%${searchTerm}%`}
+    )`
+  }
+
+  // Combine conditions
+  const whereCondition = sql`${categoryCondition} AND ${searchCondition}`
+
+  return db.select({ count: count() }).from(places).where(whereCondition)
 }

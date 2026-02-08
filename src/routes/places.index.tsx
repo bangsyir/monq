@@ -1,33 +1,77 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { motion } from "framer-motion"
-import { Grid2x2, MapPin, SlidersHorizontal } from "lucide-react"
+import {
+  ChevronLeft,
+  ChevronRight,
+  Grid2x2,
+  MapPin,
+  Search,
+  X,
+} from "lucide-react"
 import React from "react"
 import CategoryFilter from "@/components/category-filter"
 import PlaceCard from "@/components/place-card"
 import { PlaceExample } from "@/components/place-map"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { getPlacesForIndex } from "@/modules/places"
 
-type CategoryFilterType = {
-  cat: string
+type PlacesSearchFilter = {
+  cat?: string
+  search?: string
+  page?: number
 }
+
 export const Route = createFileRoute("/places/")({
   component: RouteComponent,
-  validateSearch: () => ({}) as CategoryFilterType,
-  loaderDeps: ({ search: { cat } }) => ({ cat }),
-  loader: async ({ deps: { cat } }) => {
+  validateSearch: () => ({}) as PlacesSearchFilter,
+  loaderDeps: ({ search: { cat, search, page } }) => ({ cat, search, page }),
+  loader: async ({ deps: { cat, search, page } }) => {
     const category = cat === undefined || cat === "all" ? undefined : cat
-    const places = await getPlacesForIndex({ data: { category } })
+    const searchQuery = search?.trim() || undefined
+    const placesData = await getPlacesForIndex({
+      data: { category, search: searchQuery, page: page || 1 },
+    })
     return {
       selectedCategory: cat || "all",
-      places,
+      searchQuery: search || "",
+      placesData,
     }
   },
 })
 
 function RouteComponent() {
-  const { selectedCategory, places } = Route.useLoaderData()
+  const { selectedCategory, placesData, searchQuery } = Route.useLoaderData()
+  const navigate = useNavigate({ from: "/places" })
+  const search = Route.useSearch()
   const [view, setView] = React.useState<"grid" | "map">("grid")
+  const [searchInput, setSearchInput] = React.useState(searchQuery)
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    navigate({
+      search: { ...search, search: searchInput || undefined, page: 1 },
+    })
+  }
+
+  const clearSearch = () => {
+    setSearchInput("")
+    navigate({
+      search: { ...search, search: undefined, page: 1 },
+    })
+  }
+
+  const handleNext = () => {
+    navigate({
+      search: { ...search, page: placesData.currentPage + 1 },
+    })
+  }
+
+  const handlePrev = () => {
+    navigate({
+      search: { ...search, page: placesData.currentPage - 1 },
+    })
+  }
 
   return (
     <>
@@ -54,15 +98,36 @@ function RouteComponent() {
                   : `${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)}s`}
               </h1>
               <p className="text-muted-foreground mt-1">
-                {places.length} places to explore
+                {placesData.totalCount} places to explore
               </p>
             </div>
 
             <div className="flex gap-3">
-              <Button variant="outline" className="gap-2">
-                <SlidersHorizontal className="h-4 w-4" />
-                Filters
-              </Button>
+              <form onSubmit={handleSearch} className="flex gap-2">
+                <div className="relative">
+                  <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                  <Input
+                    type="text"
+                    placeholder="Search places..."
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    className="w-[200px] pr-9 pl-9"
+                  />
+                  {searchInput && (
+                    <button
+                      type="button"
+                      onClick={clearSearch}
+                      className="absolute top-1/2 right-3 -translate-y-1/2"
+                    >
+                      <X className="text-muted-foreground h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+                <Button type="submit" variant="outline" className="gap-2">
+                  <Search className="h-4 w-4" />
+                  Search
+                </Button>
+              </form>
               <Button
                 variant="outline"
                 className="gap-2"
@@ -82,13 +147,13 @@ function RouteComponent() {
                   </>
                 )}
               </Button>
-              {/* <AddPlaceDialog /> */}
             </div>
           </motion.div>
+
           {/* Places Grid */}
           {view === "grid" ? (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {places.map((place, index) => (
+              {placesData.places.map((place, index) => (
                 <PlaceCard key={place.id} place={place} index={index} />
               ))}
             </div>
@@ -96,8 +161,39 @@ function RouteComponent() {
             <PlaceExample />
           )}
 
+          {/* Pagination Controls */}
+          {placesData.totalPage > 1 && (
+            <div className="mt-8 flex items-center justify-between">
+              <div className="text-muted-foreground text-sm">
+                Page {placesData.currentPage} of {placesData.totalPage}
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handlePrev}
+                  disabled={!placesData.hasLeft}
+                  className="gap-1"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleNext}
+                  disabled={!placesData.hasMore}
+                  className="gap-1"
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+
           {/* Empty State */}
-          {places.length === 0 && (
+          {placesData.places.length === 0 && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -108,7 +204,7 @@ function RouteComponent() {
                 No places found
               </h2>
               <p className="text-muted-foreground">
-                Try selecting a different category to discover more hidden gems.
+                Try selecting a different category or adjusting your search.
               </p>
             </motion.div>
           )}

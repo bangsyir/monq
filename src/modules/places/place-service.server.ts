@@ -3,6 +3,7 @@ import {
   deletePlaceImagesRepo,
   getFeaturedPlacesRepo,
   getPlaceByIdRepo,
+  getPlacesCountWithFiltersRepo,
   getPlacesRepo,
   getPlacesWithDetailsRepo,
   getTotalPlaceRepo,
@@ -214,13 +215,46 @@ export async function getPlacesService({
   return { message: "Success", data: result }
 }
 
-export async function getPlacesForIndexService(categoryFilter?: string) {
+export async function getPlacesForIndexService(
+  categoryFilter?: string,
+  searchQuery?: string,
+  page: number = 1,
+  limit: number = 1,
+) {
+  const offset = (page - 1) * limit
+
+  // Get total count with filters
+  const [countResult, countError] = await safeDbQuery(
+    getPlacesCountWithFiltersRepo(categoryFilter, searchQuery),
+  )
+  if (countError) {
+    return {
+      places: [],
+      totalCount: 0,
+      currentPage: page,
+      totalPage: 0,
+      hasLeft: false,
+      hasMore: false,
+      error: countError,
+    }
+  }
+
+  // Get paginated places
   const [result, error] = await safeDbQuery(
-    getPlacesWithDetailsRepo(categoryFilter),
+    getPlacesWithDetailsRepo(categoryFilter, searchQuery, limit, offset),
   )
   if (error) {
-    return { data: null, error }
+    return {
+      places: [],
+      totalCount: 0,
+      currentPage: page,
+      totalPage: 0,
+      hasLeft: false,
+      hasMore: false,
+      error,
+    }
   }
+
   // Transform the result to match the expected format
   const placesWithDetails = (result as Array<any>).map((row: any) => ({
     id: row.id,
@@ -253,7 +287,19 @@ export async function getPlacesForIndexService(categoryFilter?: string) {
       ? new Date(row.createdAt).toISOString()
       : new Date().toISOString(),
   }))
-  return { data: placesWithDetails, error: null }
+
+  const totalCount = Number(countResult[0].count)
+  const totalPage = Math.ceil(totalCount / limit)
+
+  return {
+    places: placesWithDetails,
+    totalCount,
+    currentPage: page,
+    totalPage,
+    hasLeft: page > 1,
+    hasMore: page < totalPage,
+    error: null,
+  }
 }
 
 export async function getFeaturedPlacesService(limit: number = 8) {
