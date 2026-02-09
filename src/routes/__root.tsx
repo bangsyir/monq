@@ -18,19 +18,13 @@ interface MyRouterContext {
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
-  beforeLoad: async () => {
-    const { user } = await getSessionUser()
-    if (!user) {
-      return { user: null }
-    }
+  beforeLoad: async ({ context }) => {
+    const user = await context.queryClient.ensureQueryData({
+      queryKey: ["get-user-session"],
+      queryFn: () => getSessionUser(),
+    })
     return {
-      user: {
-        name: user.name,
-        username: user.username,
-        email: user.email,
-        image: user.image,
-        role: user.role,
-      },
+      user,
     }
   },
   head: () => ({

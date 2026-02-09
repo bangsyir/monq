@@ -14,18 +14,16 @@ export const getSessionUser = createServerFn({ method: "GET" }).handler(
     const headers = getRequestHeaders()
     const session = await auth.api.getSession({ headers })
     if (!session) {
-      return { user: null }
+      return null
     }
     const { user } = session
     return {
-      user: {
-        id: user.id,
-        name: user.name,
-        username: user.username,
-        email: user.email,
-        image: user.image,
-        role: user.role,
-      },
+      id: user.id,
+      name: user.name,
+      username: user.username,
+      email: user.email,
+      image: user.image,
+      role: user.role,
     }
   },
 )

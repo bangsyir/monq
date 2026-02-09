@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router"
 import { Loader } from "lucide-react"
 import { toast } from "sonner"
+import { useQueryClient } from "@tanstack/react-query"
 import LoginDialog from "./login-dialog"
 import { ThemeToggle } from "./theme-toggle"
 import { AuthUserDropdown } from "./user-dropdown"
@@ -14,11 +15,13 @@ export function Navbar({
   role: string
 }) {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const handleLogout = async () => {
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
           toast.success("Logged out successfully")
+          queryClient.removeQueries({ queryKey: ["get-user-session"] })
           navigate({ to: "/" })
         },
       },

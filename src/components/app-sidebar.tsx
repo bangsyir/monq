@@ -79,7 +79,7 @@ export function AppSidebar({
   }
 
   return (
-    <Sidebar {...props}>
+    <Sidebar {...props} className="z-100">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
