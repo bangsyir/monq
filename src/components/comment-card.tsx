@@ -1,5 +1,5 @@
 import { motion } from "framer-motion"
-import { ChevronDown, Reply } from "lucide-react"
+import { ChevronDown, Loader2, Reply } from "lucide-react"
 import { useState } from "react"
 import type { PlaceComment } from "@/types/place"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -10,8 +10,10 @@ interface CommentCardProps {
   comment: PlaceComment
   index?: number
   onReply: (commentId: string, replyText: string) => void
-  onLoadReplies?: (commentId: string) => void // Future: For server action to load replies
-  isLoggedIn?: boolean // Add login state
+  onLoadReplies?: (commentId: string) => void
+  isLoggedIn?: boolean
+  replyCount?: number
+  isLoadingReplies?: boolean
 }
 
 const CommentCard = ({
@@ -20,6 +22,8 @@ const CommentCard = ({
   onReply,
   onLoadReplies,
   isLoggedIn = false,
+  replyCount = 0,
+  isLoadingReplies = false,
 }: CommentCardProps) => {
   const [isReplying, setIsReplying] = useState(false)
   const [replyText, setReplyText] = useState("")
@@ -93,26 +97,41 @@ const CommentCard = ({
             </Button>
 
             {/* Show/Hide Replies Button */}
-            {comment.replies && comment.replies.length > 0 && (
+            {(comment.replies && comment.replies.length > 0) ||
+            replyCount > 0 ? (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => {
-                  setShowReplies(!showReplies)
-                  // Future: Trigger server action to load replies if not already loaded
-                  if (!showReplies && onLoadReplies) {
+                  const newShowReplies = !showReplies
+                  setShowReplies(newShowReplies)
+                  if (
+                    newShowReplies &&
+                    onLoadReplies &&
+                    (!comment.replies || comment.replies.length === 0)
+                  ) {
                     onLoadReplies(comment.id)
                   }
                 }}
+                disabled={isLoadingReplies}
                 className="text-muted-foreground hover:text-foreground h-8"
               >
-                <ChevronDown
-                  className={`mr-1 h-4 w-4 transition-transform ${showReplies ? "rotate-180" : ""}`}
-                />
-                {showReplies ? "Hide" : "Show"} {comment.replies.length}{" "}
-                {comment.replies.length === 1 ? "Reply" : "Replies"}
+                {isLoadingReplies ? (
+                  <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                ) : (
+                  <ChevronDown
+                    className={`mr-1 h-4 w-4 transition-transform ${showReplies ? "rotate-180" : ""}`}
+                  />
+                )}
+                {showReplies ? "Hide" : "Show"}{" "}
+                {replyCount > 0 ? replyCount : comment.replies?.length || 0}{" "}
+                {(replyCount > 0
+                  ? replyCount
+                  : comment.replies?.length || 0) === 1
+                  ? "Reply"
+                  : "Replies"}
               </Button>
-            )}
+            ) : null}
           </div>
 
           {isReplying && isLoggedIn && (
@@ -148,7 +167,6 @@ const CommentCard = ({
                 <button
                   type="button"
                   className="text-primary font-medium hover:underline"
-                  onClick={() => alert("Future: Open login dialog")}
                 >
                   log in
                 </button>{" "}

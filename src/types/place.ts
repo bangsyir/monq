@@ -45,6 +45,7 @@ export interface PlaceComment {
   comment: string
   createdAt: string
   replies?: Array<PlaceComment>
+  replyCount?: number
 }
 
 export interface Place {
