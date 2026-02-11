@@ -1,6 +1,8 @@
 import {
-  getCommentsWithUserRepo,
-  getRepliesWithUserRepo,
+  getCommentsReplyCountRepo,
+  getCommentsRepo,
+  getCommentsTotalRepo,
+  getRepliesRepo,
   insertCommentRepo,
   insertReplyRepo,
 } from "./comment-repo.server"
@@ -47,17 +49,50 @@ export async function getCommentsService(
   page: number,
   limit: number,
 ): Promise<{ error: { message: string } | null; data?: PaginatedComments }> {
-  const [result, error] = await safeDbQuery(
-    getCommentsWithUserRepo(placeId, page, limit),
-  )
+  const offset = (page - 1) * limit
 
-  if (error) {
-    return { error: { message: error.message } }
+  const [[commentsData, commentsDataErr], [commentsTotal, commentsTotalErr]] =
+    await Promise.all([
+      safeDbQuery(getCommentsRepo(placeId, limit, offset)),
+      safeDbQuery(getCommentsTotalRepo(placeId)),
+    ])
+
+  if (commentsDataErr || commentsTotalErr) {
+    throw new Error(commentsDataErr?.message || commentsTotalErr?.message)
+  }
+  const commentIds = commentsData.slice(0, limit).map((c) => c.id)
+
+  let replyCountMap = new Map<string, number>()
+  if (commentIds.length > 0) {
+    const [replyCounts, replyCountsErr] = await safeDbQuery(
+      getCommentsReplyCountRepo(commentIds),
+    )
+    if (replyCountsErr) {
+      throw new Error(replyCountsErr.message)
+    }
+    replyCountMap = new Map(replyCounts.map((rc) => [rc.parentId!, rc.count]))
+  }
+  const hasMore = commentsData.length > limit
+  const result = commentsData.slice(0, limit).map((comment) => ({
+    ...comment,
+    replyCount: replyCountMap.get(comment.id) || 0,
+  }))
+  // const [result, error] = await safeDbQuery(
+  //   getCommentsWithUserRepo(placeId, page, limit),
+  // )
+  //
+  // if (error) {
+  //   return { error: { message: error.message } }
+  // }
+  const data = {
+    comments: result,
+    hasMore,
+    totalCount: commentsTotal[0].count || 0,
   }
 
   return {
     error: null,
-    data: result,
+    data: data,
   }
 }
 
@@ -66,16 +101,30 @@ export async function getRepliesService(
   page: number,
   limit: number,
 ): Promise<{ error: { message: string } | null; data?: PaginatedReplies }> {
-  const [result, error] = await safeDbQuery(
-    getRepliesWithUserRepo(parentId, page, limit),
+  const offset = (page - 1) * limit
+  const [replies, repliesErr] = await safeDbQuery(
+    getRepliesRepo(parentId, limit, offset),
   )
-
-  if (error) {
-    return { error: { message: error.message } }
+  if (repliesErr) {
+    throw Error(repliesErr.message)
   }
+  const hasMore = replies?.[0].length > limit
+
+  const data = {
+    replies: replies?.[0].slice(0, limit),
+    hasMore,
+    totalCount: replies[1][0].count || 0,
+  }
+  // const [result, error] = await safeDbQuery(
+  //   getRepliesWithUserRepo(parentId, page, limit),
+  // )
+  //
+  // if (error) {
+  //   return { error: { message: error.message } }
+  // }
 
   return {
     error: null,
-    data: result,
+    data: data,
   }
 }
