@@ -77,13 +77,7 @@ export async function getCommentsService(
     ...comment,
     replyCount: replyCountMap.get(comment.id) || 0,
   }))
-  // const [result, error] = await safeDbQuery(
-  //   getCommentsWithUserRepo(placeId, page, limit),
-  // )
-  //
-  // if (error) {
-  //   return { error: { message: error.message } }
-  // }
+
   const data = {
     comments: result,
     hasMore,
@@ -115,14 +109,6 @@ export async function getRepliesService(
     hasMore,
     totalCount: replies[1][0].count || 0,
   }
-  // const [result, error] = await safeDbQuery(
-  //   getRepliesWithUserRepo(parentId, page, limit),
-  // )
-  //
-  // if (error) {
-  //   return { error: { message: error.message } }
-  // }
-
   return {
     error: null,
     data: data,
