@@ -22,8 +22,9 @@ import {
 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useServerFn } from "@tanstack/react-start"
+import { toast } from "sonner"
 import type { PlaceComment } from "@/types/place"
-import type { Comment, Reply } from "@/modules/comments"
+import type { Comment } from "@/modules/comments"
 import CommentCard from "@/components/comment-card"
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -31,12 +32,7 @@ import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import ImageGallery from "@/components/image-gallery"
 import { getPlaceByIdNoAuth } from "@/modules/places"
-import {
-  addComment,
-  addReply,
-  getComments,
-  getReplies,
-} from "@/modules/comments"
+import { addComment, getComments } from "@/modules/comments"
 import LoginDialog from "@/components/login-dialog"
 
 const amenityIcons: Record<string, React.ReactNode> = {
@@ -83,7 +79,6 @@ export const Route = createFileRoute("/places/$placeId")({
 })
 
 const COMMENTS_LIMIT = 5
-const REPLIES_LIMIT = 3
 
 function formatComment(comment: Comment): PlaceComment {
   return {
@@ -98,17 +93,6 @@ function formatComment(comment: Comment): PlaceComment {
   }
 }
 
-function formatReply(reply: Reply): PlaceComment {
-  return {
-    id: reply.id,
-    userId: reply.userId,
-    userName: reply.user.name,
-    userAvatar: reply.user.image || "",
-    comment: reply.comment,
-    createdAt: reply.createdAt.toISOString(),
-  }
-}
-
 function RouteComponent() {
   const { place, isLoggedIn } = Route.useLoaderData()
   const [comments, setComments] = useState<
@@ -119,18 +103,8 @@ function RouteComponent() {
   const [hasMoreComments, setHasMoreComments] = useState(true)
   const [isLoadingComments, setIsLoadingComments] = useState(false)
   const [isAddingComment, setIsAddingComment] = useState(false)
-  const [repliesMap, setRepliesMap] = useState<
-    Map<
-      string,
-      { replies: Array<PlaceComment>; page: number; hasMore: boolean }
-    >
-  >(new Map())
-  const [loadingReplies, setLoadingReplies] = useState<Set<string>>(new Set())
-
   const addCommentFn = useServerFn(addComment)
-  const addReplyFn = useServerFn(addReply)
   const getCommentsFn = useServerFn(getComments)
-  const getRepliesFn = useServerFn(getReplies)
 
   // Load initial comments
   const loadComments = async (page: number) => {
@@ -161,44 +135,6 @@ function RouteComponent() {
     }
   }
 
-  // Load replies for a specific comment
-  const loadReplies = async (commentId: string, page: number) => {
-    setLoadingReplies((prev) => new Set(prev).add(commentId))
-    try {
-      const result = await getRepliesFn({
-        data: {
-          commentId,
-          page,
-          limit: REPLIES_LIMIT,
-        },
-      })
-
-      if (result) {
-        const formattedReplies = result.replies.map(formatReply)
-        setRepliesMap((prev) => {
-          const existing = prev.get(commentId)
-          const newReplies =
-            page === 1
-              ? formattedReplies
-              : [...(existing?.replies || []), ...formattedReplies]
-          return new Map(prev).set(commentId, {
-            replies: newReplies,
-            page,
-            hasMore: result.hasMore,
-          })
-        })
-      }
-    } catch (error) {
-      console.error("Failed to load replies:", error)
-    } finally {
-      setLoadingReplies((prev) => {
-        const newSet = new Set(prev)
-        newSet.delete(commentId)
-        return newSet
-      })
-    }
-  }
-
   // Handle adding a new comment
   const handleAddComment = async () => {
     if (!newComment.trim() || !isLoggedIn || !place) return
@@ -222,46 +158,11 @@ function RouteComponent() {
     }
   }
 
-  // Handle adding a reply
-  const handleReply = async (commentId: string, replyText: string) => {
-    if (!replyText.trim() || !isLoggedIn || !place) return
-
-    try {
-      await addReplyFn({
-        data: {
-          placeId: place.id,
-          parentId: commentId,
-          comment: replyText,
-        },
-      })
-      // Reload replies for this comment
-      await loadReplies(commentId, 1)
-    } catch (error) {
-      console.error("Failed to add reply:", error)
-    }
-  }
-
   // Handle load more comments
   const handleLoadMoreComments = async () => {
     const nextPage = commentPage + 1
     await loadComments(nextPage)
     setCommentPage(nextPage)
-  }
-
-  // Handle showing replies for a comment
-  const handleShowReplies = (commentId: string) => {
-    const existing = repliesMap.get(commentId)
-    if (!existing) {
-      loadReplies(commentId, 1)
-    }
-  }
-
-  // Handle loading more replies for a comment
-  const handleLoadMoreReplies = (commentId: string) => {
-    const existing = repliesMap.get(commentId)
-    if (existing) {
-      loadReplies(commentId, existing.page + 1)
-    }
   }
 
   // Load initial comments on mount
@@ -530,41 +431,24 @@ function RouteComponent() {
                     </div>
                   ) : (
                     <>
-                      {comments.map((comment, index) => {
-                        const repliesData = repliesMap.get(comment.id)
-                        const isLoadingReplies = loadingReplies.has(comment.id)
+                      {comments.map((comment) => {
                         return (
                           <div key={comment.id}>
-                            <CommentCard
-                              comment={{
-                                ...comment,
-                                replies: repliesData?.replies,
+                            <Link
+                              to="/comments/$commentId"
+                              params={{ commentId: comment.id }}
+                              className="block"
+                              onClick={() => {
+                                !isLoggedIn && toast.error("Please login first")
                               }}
-                              index={index}
-                              onReply={handleReply}
-                              onLoadReplies={handleShowReplies}
-                              isLoggedIn={isLoggedIn}
-                              replyCount={comment.replyCount || 0}
-                              isLoadingReplies={isLoadingReplies}
-                            />
-                            {/* Load More Replies Button */}
-                            {repliesData?.hasMore && (
-                              <div className="mt-2 ml-16">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() =>
-                                    handleLoadMoreReplies(comment.id)
-                                  }
-                                  disabled={isLoadingReplies}
-                                >
-                                  {isLoadingReplies ? (
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                  ) : null}
-                                  Load more replies
-                                </Button>
-                              </div>
-                            )}
+                              disabled={!isLoggedIn}
+                            >
+                              <CommentCard
+                                comment={comment}
+                                replyCount={comment.replyCount || 0}
+                              />
+                            </Link>
+                            <Separator />
                           </div>
                         )
                       })}
