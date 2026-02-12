@@ -19,6 +19,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlacesIndexRouteImport } from './routes/places.index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as PlacesPlaceIdRouteImport } from './routes/places.$placeId'
+import { Route as CommentsCommentIdRouteImport } from './routes/comments.$commentId'
 import { Route as ApiUploadRouteImport } from './routes/api/upload'
 import { Route as AdminGalleryRouteImport } from './routes/admin/gallery'
 import { Route as AdminCategoriesRouteImport } from './routes/admin/categories'
@@ -79,6 +80,11 @@ const PlacesPlaceIdRoute = PlacesPlaceIdRouteImport.update({
   id: '/$placeId',
   path: '/$placeId',
   getParentRoute: () => PlacesRoute,
+} as any)
+const CommentsCommentIdRoute = CommentsCommentIdRouteImport.update({
+  id: '/comments/$commentId',
+  path: '/comments/$commentId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiUploadRoute = ApiUploadRouteImport.update({
   id: '/api/upload',
@@ -148,6 +154,7 @@ export interface FileRoutesByFullPath {
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/gallery': typeof AdminGalleryRoute
   '/api/upload': typeof ApiUploadRoute
+  '/comments/$commentId': typeof CommentsCommentIdRoute
   '/places/$placeId': typeof PlacesPlaceIdRoute
   '/admin/': typeof AdminIndexRoute
   '/places/': typeof PlacesIndexRoute
@@ -168,6 +175,7 @@ export interface FileRoutesByTo {
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/gallery': typeof AdminGalleryRoute
   '/api/upload': typeof ApiUploadRoute
+  '/comments/$commentId': typeof CommentsCommentIdRoute
   '/places/$placeId': typeof PlacesPlaceIdRoute
   '/admin': typeof AdminIndexRoute
   '/places': typeof PlacesIndexRoute
@@ -192,6 +200,7 @@ export interface FileRoutesById {
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/gallery': typeof AdminGalleryRoute
   '/api/upload': typeof ApiUploadRoute
+  '/comments/$commentId': typeof CommentsCommentIdRoute
   '/places/$placeId': typeof PlacesPlaceIdRoute
   '/admin/': typeof AdminIndexRoute
   '/places/': typeof PlacesIndexRoute
@@ -216,6 +225,7 @@ export interface FileRouteTypes {
     | '/admin/categories'
     | '/admin/gallery'
     | '/api/upload'
+    | '/comments/$commentId'
     | '/places/$placeId'
     | '/admin/'
     | '/places/'
@@ -236,6 +246,7 @@ export interface FileRouteTypes {
     | '/admin/categories'
     | '/admin/gallery'
     | '/api/upload'
+    | '/comments/$commentId'
     | '/places/$placeId'
     | '/admin'
     | '/places'
@@ -259,6 +270,7 @@ export interface FileRouteTypes {
     | '/admin/categories'
     | '/admin/gallery'
     | '/api/upload'
+    | '/comments/$commentId'
     | '/places/$placeId'
     | '/admin/'
     | '/places/'
@@ -280,6 +292,7 @@ export interface RootRouteChildren {
   PlacesRoute: typeof PlacesRouteWithChildren
   SettingsRoute: typeof SettingsRoute
   ApiUploadRoute: typeof ApiUploadRoute
+  CommentsCommentIdRoute: typeof CommentsCommentIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -354,6 +367,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/places/$placeId'
       preLoaderRoute: typeof PlacesPlaceIdRouteImport
       parentRoute: typeof PlacesRoute
+    }
+    '/comments/$commentId': {
+      id: '/comments/$commentId'
+      path: '/comments/$commentId'
+      fullPath: '/comments/$commentId'
+      preLoaderRoute: typeof CommentsCommentIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/upload': {
       id: '/api/upload'
@@ -497,6 +517,7 @@ const rootRouteChildren: RootRouteChildren = {
   PlacesRoute: PlacesRouteWithChildren,
   SettingsRoute: SettingsRoute,
   ApiUploadRoute: ApiUploadRoute,
+  CommentsCommentIdRoute: CommentsCommentIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
