@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start"
+import { z } from "zod"
 import {
   addCommentSchema,
   addReplySchema,
@@ -8,6 +9,7 @@ import {
 import {
   createCommentService,
   createReplyService,
+  getCommentByIdService,
   getCommentsService,
   getRepliesService,
 } from "./comment-service.server"
@@ -70,6 +72,19 @@ export const getReplies = createServerFn({ method: "GET" })
       data.page,
       data.limit,
     )
+
+    if (result.error) {
+      throw new Error(result.error.message)
+    }
+
+    return result.data
+  })
+
+export const getCommentById = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
+  .inputValidator(z.string())
+  .handler(async ({ data: commentId }) => {
+    const result = await getCommentByIdService(commentId)
 
     if (result.error) {
       throw new Error(result.error.message)

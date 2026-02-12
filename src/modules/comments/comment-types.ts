@@ -13,7 +13,7 @@ export interface Comment {
   createdAt: Date
   updatedAt: Date
   user: CommentUser
-  replyCount: number
+  replyCount?: number
 }
 
 export interface Reply {

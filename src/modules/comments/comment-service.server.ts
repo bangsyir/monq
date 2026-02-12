@@ -1,4 +1,5 @@
 import {
+  getCommentByIdRepo,
   getCommentsReplyCountRepo,
   getCommentsRepo,
   getCommentsTotalRepo,
@@ -9,6 +10,7 @@ import {
 import type {
   AddCommentData,
   AddReplyData,
+  Comment as CommentType,
   PaginatedComments,
   PaginatedReplies,
 } from "./comment-types"
@@ -112,5 +114,20 @@ export async function getRepliesService(
   return {
     error: null,
     data: data,
+  }
+}
+
+export async function getCommentByIdService(
+  commentId: string,
+): Promise<{ error: { message: string } | null; data?: CommentType | null }> {
+  const [comment, error] = await safeDbQuery(getCommentByIdRepo(commentId))
+
+  if (error) {
+    return { error: { message: error.message } }
+  }
+
+  return {
+    error: null,
+    data: comment,
   }
 }

@@ -109,3 +109,39 @@ export function getRepliesRepo(
       .where(eq(comments.parentId, parentId)),
   ])
 }
+
+export function getCommentByIdRepo(commentId: string) {
+  return db.query.comments.findFirst({
+    where: eq(comments.id, commentId),
+    with: {
+      user: {
+        columns: {
+          id: true,
+          name: true,
+          image: true,
+        },
+      },
+      place: {
+        columns: {
+          id: true,
+          name: true,
+          rating: true,
+          reviewCount: true,
+          streetAddress: true,
+          city: true,
+          stateProvince: true,
+          country: true,
+        },
+        with: {
+          images: {
+            columns: {
+              id: true,
+              url: true,
+            },
+            limit: 1,
+          },
+        },
+      },
+    },
+  })
+}
