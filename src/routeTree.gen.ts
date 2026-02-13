@@ -26,6 +26,7 @@ import { Route as AdminCategoriesRouteImport } from './routes/admin/categories'
 import { Route as LayoutDashboardRouteImport } from './routes/_layout/dashboard'
 import { Route as AdminUsersIndexRouteImport } from './routes/admin/users.index'
 import { Route as AdminPlacesIndexRouteImport } from './routes/admin/places.index'
+import { Route as PlacesPlaceIdCommentsRouteImport } from './routes/places_.$placeId.comments'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
 import { Route as AdminUsersUserIdRouteImport } from './routes/admin/users.$userId'
 import { Route as AdminPlacesAddRouteImport } from './routes/admin/places.add'
@@ -116,6 +117,11 @@ const AdminPlacesIndexRoute = AdminPlacesIndexRouteImport.update({
   path: '/places/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const PlacesPlaceIdCommentsRoute = PlacesPlaceIdCommentsRouteImport.update({
+  id: '/places_/$placeId/comments',
+  path: '/places/$placeId/comments',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -161,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/admin/places/add': typeof AdminPlacesAddRoute
   '/admin/users/$userId': typeof AdminUsersUserIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/places/$placeId/comments': typeof PlacesPlaceIdCommentsRoute
   '/admin/places/': typeof AdminPlacesIndexRoute
   '/admin/users/': typeof AdminUsersIndexRoute
   '/admin/places/$placeId/update': typeof AdminPlacesPlaceIdUpdateRoute
@@ -182,6 +189,7 @@ export interface FileRoutesByTo {
   '/admin/places/add': typeof AdminPlacesAddRoute
   '/admin/users/$userId': typeof AdminUsersUserIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/places/$placeId/comments': typeof PlacesPlaceIdCommentsRoute
   '/admin/places': typeof AdminPlacesIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
   '/admin/places/$placeId/update': typeof AdminPlacesPlaceIdUpdateRoute
@@ -207,6 +215,7 @@ export interface FileRoutesById {
   '/admin/places/add': typeof AdminPlacesAddRoute
   '/admin/users/$userId': typeof AdminUsersUserIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/places_/$placeId/comments': typeof PlacesPlaceIdCommentsRoute
   '/admin/places/': typeof AdminPlacesIndexRoute
   '/admin/users/': typeof AdminUsersIndexRoute
   '/admin/places/$placeId/update': typeof AdminPlacesPlaceIdUpdateRoute
@@ -232,6 +241,7 @@ export interface FileRouteTypes {
     | '/admin/places/add'
     | '/admin/users/$userId'
     | '/api/auth/$'
+    | '/places/$placeId/comments'
     | '/admin/places/'
     | '/admin/users/'
     | '/admin/places/$placeId/update'
@@ -253,6 +263,7 @@ export interface FileRouteTypes {
     | '/admin/places/add'
     | '/admin/users/$userId'
     | '/api/auth/$'
+    | '/places/$placeId/comments'
     | '/admin/places'
     | '/admin/users'
     | '/admin/places/$placeId/update'
@@ -277,6 +288,7 @@ export interface FileRouteTypes {
     | '/admin/places/add'
     | '/admin/users/$userId'
     | '/api/auth/$'
+    | '/places_/$placeId/comments'
     | '/admin/places/'
     | '/admin/users/'
     | '/admin/places/$placeId/update'
@@ -294,6 +306,7 @@ export interface RootRouteChildren {
   ApiUploadRoute: typeof ApiUploadRoute
   CommentsCommentIdRoute: typeof CommentsCommentIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  PlacesPlaceIdCommentsRoute: typeof PlacesPlaceIdCommentsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -417,6 +430,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPlacesIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/places_/$placeId/comments': {
+      id: '/places_/$placeId/comments'
+      path: '/places/$placeId/comments'
+      fullPath: '/places/$placeId/comments'
+      preLoaderRoute: typeof PlacesPlaceIdCommentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -519,6 +539,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiUploadRoute: ApiUploadRoute,
   CommentsCommentIdRoute: CommentsCommentIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  PlacesPlaceIdCommentsRoute: PlacesPlaceIdCommentsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
