@@ -78,7 +78,7 @@ export const Route = createFileRoute("/places/$placeId")({
   },
 })
 
-const COMMENTS_LIMIT = 5
+const COMMENTS_LIMIT = 3
 
 function formatComment(comment: Comment): PlaceComment {
   return {
@@ -99,8 +99,6 @@ function RouteComponent() {
     Array<PlaceComment & { replyCount?: number }>
   >([])
   const [newComment, setNewComment] = useState("")
-  const [commentPage, setCommentPage] = useState(1)
-  const [hasMoreComments, setHasMoreComments] = useState(true)
   const [isLoadingComments, setIsLoadingComments] = useState(false)
   const [isAddingComment, setIsAddingComment] = useState(false)
   const addCommentFn = useServerFn(addComment)
@@ -121,12 +119,7 @@ function RouteComponent() {
 
       if (result) {
         const formattedComments = result.comments.map(formatComment)
-        if (page === 1) {
-          setComments(formattedComments)
-        } else {
-          setComments((prev) => [...prev, ...formattedComments])
-        }
-        setHasMoreComments(result.hasMore)
+        setComments(formattedComments)
       }
     } catch (error) {
       console.error("Failed to load comments:", error)
@@ -148,21 +141,13 @@ function RouteComponent() {
         },
       })
       setNewComment("")
-      // Reload comments from page 1 to show the new comment
-      setCommentPage(1)
+      // Reload comments to show the new comment
       await loadComments(1)
     } catch (error) {
       console.error("Failed to add comment:", error)
     } finally {
       setIsAddingComment(false)
     }
-  }
-
-  // Handle load more comments
-  const handleLoadMoreComments = async () => {
-    const nextPage = commentPage + 1
-    await loadComments(nextPage)
-    setCommentPage(nextPage)
   }
 
   // Load initial comments on mount
@@ -457,21 +442,16 @@ function RouteComponent() {
                           No comments yet. Be the first to share your thoughts!
                         </p>
                       )}
-                      {/* Load More Comments Button */}
-                      {hasMoreComments && comments.length > 0 && (
-                        <div className="flex justify-center pt-4">
-                          <Button
-                            variant="outline"
-                            onClick={handleLoadMoreComments}
-                            disabled={isLoadingComments}
-                          >
-                            {isLoadingComments && (
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            )}
-                            Load more comments
-                          </Button>
-                        </div>
-                      )}
+                      {/* View All Comments Link */}
+                      <div className="flex justify-center pt-4">
+                        <Link
+                          to="/places/$placeId/comments"
+                          params={{ placeId: place.id }}
+                          className={buttonVariants({ variant: "outline" })}
+                        >
+                          View all {place.reviewCount} comments
+                        </Link>
+                      </div>
                     </>
                   )}
                 </div>

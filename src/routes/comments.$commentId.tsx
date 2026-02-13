@@ -163,7 +163,7 @@ function RouteComponent() {
           className="mb-6"
         >
           <Link
-            to="/places/$placeId"
+            to="/places/$placeId/comments"
             params={{ placeId: place.id }}
             className={buttonVariants({ variant: "ghost", size: "sm" })}
           >
@@ -296,86 +296,13 @@ function RouteComponent() {
           </div>
         </motion.div>
 
-        {/* Reply Section with Toggle - Background Color Style */}
-        {/* <motion.div */}
-        {/*   initial={{ opacity: 0, y: 20 }} */}
-        {/*   animate={{ opacity: 1, y: 0 }} */}
-        {/*   transition={{ delay: 0.25 }} */}
-        {/*   className="mb-6 rounded-xl p-6" */}
-        {/* > */}
-        {/*   {!showReplyInput ? ( */}
-        {/*     // Trigger Button (Threads style) */}
-        {/*     <button */}
-        {/*       onClick={() => setShowReplyInput(true)} */}
-        {/*       className="text-muted-foreground hover:text-foreground w-full text-left transition-colors" */}
-        {/*     > */}
-        {/*       {isLoggedIn ? ( */}
-        {/*         <span className="flex items-center gap-3"> */}
-        {/*           <Avatar className="h-8 w-8"> */}
-        {/*             <AvatarFallback className="bg-primary text-primary-foreground text-xs"> */}
-        {/*               You */}
-        {/*             </AvatarFallback> */}
-        {/*           </Avatar> */}
-        {/*           <span className="text-sm">Add a reply...</span> */}
-        {/*         </span> */}
-        {/*       ) : ( */}
-        {/*         <span className="text-sm"> */}
-        {/*           Please{" "} */}
-        {/*           <Link */}
-        {/*             to="/login" */}
-        {/*             className="text-primary font-medium hover:underline" */}
-        {/*           > */}
-        {/*             log in */}
-        {/*           </Link>{" "} */}
-        {/*           to reply */}
-        {/*         </span> */}
-        {/*       )} */}
-        {/*     </button> */}
-        {/*   ) : ( */}
-        {/*     // Reply Input Form */}
-        {/*     <div className="space-y-4"> */}
-        {/*       <Textarea */}
-        {/*         placeholder="Write your reply..." */}
-        {/*         value={replyText} */}
-        {/*         onChange={(e) => setReplyText(e.target.value)} */}
-        {/*         className="min-h-[100px]" */}
-        {/*         autoFocus */}
-        {/*       /> */}
-        {/*       <div className="flex justify-end gap-2"> */}
-        {/*         <Button */}
-        {/*           variant="ghost" */}
-        {/*           size="sm" */}
-        {/*           onClick={handleCancelReply} */}
-        {/*           disabled={isAddingReply} */}
-        {/*         > */}
-        {/*           Cancel */}
-        {/*         </Button> */}
-        {/*         <Button */}
-        {/*           size="sm" */}
-        {/*           onClick={handleAddReply} */}
-        {/*           disabled={isAddingReply || !replyText.trim()} */}
-        {/*         > */}
-        {/*           {isAddingReply && ( */}
-        {/*             <Loader2 className="mr-2 h-4 w-4 animate-spin" /> */}
-        {/*           )} */}
-        {/*           Post */}
-        {/*         </Button> */}
-        {/*       </div> */}
-        {/*     </div> */}
-        {/*   )} */}
-        {/* </motion.div> */}
-
         {/* Replies Section - Background Color Style */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="pl-12"
+          className="pt-4 pl-12"
         >
-          <h3 className="text-foreground mb-4 text-lg font-semibold">
-            Replies ({replies.length})
-          </h3>
-
           <div className="space-y-3">
             {isLoadingReplies && replies.length === 0 ? (
               <div className="flex items-center justify-center py-8">
@@ -384,9 +311,8 @@ function RouteComponent() {
             ) : (
               <>
                 {replies.map((reply, index) => (
-                  <>
+                  <div key={reply.id}>
                     <motion.div
-                      key={reply.id}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
@@ -428,7 +354,7 @@ function RouteComponent() {
                       </div>
                     </motion.div>
                     <Separator />
-                  </>
+                  </div>
                 ))}
 
                 {replies.length === 0 && (
