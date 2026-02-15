@@ -13,7 +13,7 @@ function RouteComponent() {
   const { user } = Route.useLoaderData()
   return (
     <div className="min-h-screen">
-      <Navbar username={user?.username} role={user.role!} />
+      <Navbar username={user?.username} role={user.role || undefined} />
       <Outlet />
     </div>
   )

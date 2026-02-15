@@ -11,7 +11,6 @@ import {
   Fish,
   Flame,
   Heart,
-  Loader2,
   MapPin,
   Mountain,
   Router,
@@ -20,20 +19,13 @@ import {
   Tent,
   Waves,
 } from "lucide-react"
-import { useEffect, useState } from "react"
-import { useServerFn } from "@tanstack/react-start"
-import { toast } from "sonner"
-import type { PlaceComment } from "@/types/place"
-import type { Comment } from "@/modules/comments"
-import CommentCard from "@/components/comment-card"
+import { queryOptions } from "@tanstack/react-query"
+import { CommentsComponent } from "./-components/comments"
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { Textarea } from "@/components/ui/textarea"
 import ImageGallery from "@/components/image-gallery"
 import { getPlaceByIdNoAuth } from "@/modules/places"
-import { addComment, getComments } from "@/modules/comments"
-import LoginDialog from "@/components/login-dialog"
 
 const amenityIcons: Record<string, React.ReactNode> = {
   car: <Car className="h-5 w-5" />,
@@ -69,94 +61,25 @@ const difficultyColors: Record<string, string> = {
   expert: "bg-destructive text-foreground",
 }
 
+const getPlacesOptions = (placeId: string) =>
+  queryOptions({
+    queryKey: ["get-places"],
+    queryFn: () => getPlaceByIdNoAuth({ data: placeId }),
+  })
+
 export const Route = createFileRoute("/places/$placeId")({
   component: RouteComponent,
   loader: async ({ params: { placeId }, context }) => {
     const isLoggedIn = context.user !== null
-    const place = await getPlaceByIdNoAuth({ data: placeId })
+    const place = await context.queryClient.ensureQueryData(
+      getPlacesOptions(placeId),
+    )
     return { place, isLoggedIn }
   },
 })
 
-const COMMENTS_LIMIT = 3
-
-function formatComment(comment: Comment): PlaceComment {
-  return {
-    id: comment.id,
-    userId: comment.userId,
-    userName: comment.user.name,
-    userAvatar: comment.user.image || "",
-    comment: comment.comment,
-    createdAt: comment.createdAt.toISOString(),
-    replies: [],
-    replyCount: comment.replyCount,
-  }
-}
-
 function RouteComponent() {
-  const { place, isLoggedIn } = Route.useLoaderData()
-  const [comments, setComments] = useState<
-    Array<PlaceComment & { replyCount?: number }>
-  >([])
-  const [newComment, setNewComment] = useState("")
-  const [isLoadingComments, setIsLoadingComments] = useState(false)
-  const [isAddingComment, setIsAddingComment] = useState(false)
-  const addCommentFn = useServerFn(addComment)
-  const getCommentsFn = useServerFn(getComments)
-
-  // Load initial comments
-  const loadComments = async (page: number) => {
-    if (!place) return
-    setIsLoadingComments(true)
-    try {
-      const result = await getCommentsFn({
-        data: {
-          placeId: place.id,
-          page,
-          limit: COMMENTS_LIMIT,
-        },
-      })
-
-      if (result) {
-        const formattedComments = result.comments.map(formatComment)
-        setComments(formattedComments)
-      }
-    } catch (error) {
-      console.error("Failed to load comments:", error)
-    } finally {
-      setIsLoadingComments(false)
-    }
-  }
-
-  // Handle adding a new comment
-  const handleAddComment = async () => {
-    if (!newComment.trim() || !isLoggedIn || !place) return
-
-    setIsAddingComment(true)
-    try {
-      await addCommentFn({
-        data: {
-          placeId: place.id,
-          comment: newComment,
-        },
-      })
-      setNewComment("")
-      // Reload comments to show the new comment
-      await loadComments(1)
-    } catch (error) {
-      console.error("Failed to add comment:", error)
-    } finally {
-      setIsAddingComment(false)
-    }
-  }
-
-  // Load initial comments on mount
-  useEffect(() => {
-    if (place) {
-      loadComments(1)
-    }
-  }, [place?.id])
-
+  const { place } = Route.useLoaderData()
   if (!place) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -356,106 +279,7 @@ function RouteComponent() {
               <Separator />
 
               {/* Comments */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-              >
-                <div className="mb-6 flex items-center justify-between">
-                  <h2 className="text-foreground text-xl font-semibold">
-                    Comments ({comments.length})
-                  </h2>
-                  <div className="flex items-center gap-2">
-                    <Star className="fill-accent text-accent h-5 w-5" />
-                    <span className="text-foreground font-semibold">
-                      {place.rating}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Add Comment */}
-                <div className="bg-secondary mb-6 rounded-xl p-6">
-                  <h3 className="text-foreground mb-4 font-semibold">
-                    Leave a comment
-                  </h3>
-                  {isLoggedIn ? (
-                    <>
-                      <Textarea
-                        placeholder="Share your thoughts..."
-                        className="bg-background mb-4"
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                      />
-                      <Button
-                        onClick={handleAddComment}
-                        disabled={isAddingComment}
-                      >
-                        {isAddingComment && (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        )}
-                        Post Comment
-                      </Button>
-                    </>
-                  ) : (
-                    <div className="bg-muted flex flex-col items-center rounded-lg text-center">
-                      <p className="text-muted-foreground mb-3">
-                        Please log in to post a comment.
-                      </p>
-                      <div>
-                        <LoginDialog />
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Comment List */}
-                <div className="space-y-4">
-                  {isLoadingComments && comments.length === 0 ? (
-                    <div className="flex items-center justify-center py-8">
-                      <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
-                    </div>
-                  ) : (
-                    <>
-                      {comments.map((comment) => {
-                        return (
-                          <div key={comment.id}>
-                            <Link
-                              to="/comments/$commentId"
-                              params={{ commentId: comment.id }}
-                              className="block"
-                              onClick={() => {
-                                !isLoggedIn && toast.error("Please login first")
-                              }}
-                              disabled={!isLoggedIn}
-                            >
-                              <CommentCard
-                                comment={comment}
-                                replyCount={comment.replyCount || 0}
-                              />
-                            </Link>
-                            <Separator />
-                          </div>
-                        )
-                      })}
-                      {comments.length === 0 && (
-                        <p className="text-muted-foreground py-8 text-center">
-                          No comments yet. Be the first to share your thoughts!
-                        </p>
-                      )}
-                      {/* View All Comments Link */}
-                      <div className="flex justify-center pt-4">
-                        <Link
-                          to="/places/$placeId/comments"
-                          params={{ placeId: place.id }}
-                          className={buttonVariants({ variant: "outline" })}
-                        >
-                          View all {place.reviewCount} comments
-                        </Link>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </motion.div>
+              <CommentsComponent />
             </div>
 
             {/* Sidebar */}
@@ -519,19 +343,6 @@ function RouteComponent() {
                         Google Maps
                       </Button>
                     </a>
-                    {/* {place.categories.includes("hiking") && ( */}
-                    {/*   <a */}
-                    {/*     href={`https://www.alltrails.com/search?q=${encodeURIComponent(place.name + " " + place.city + " " + place.stateProvince)}`} */}
-                    {/*     target="_blank" */}
-                    {/*     rel="noopener noreferrer" */}
-                    {/*     className="block" */}
-                    {/*   > */}
-                    {/*     <Button variant="outline" className="w-full"> */}
-                    {/*       <ExternalLink className="mr-2 h-4 w-4" /> */}
-                    {/*       AllTrails */}
-                    {/*     </Button> */}
-                    {/*   </a> */}
-                    {/* )} */}
                   </div>
                 </div>
 

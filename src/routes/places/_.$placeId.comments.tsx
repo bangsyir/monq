@@ -24,7 +24,7 @@ function formatComment(comment: Comment): PlaceComment {
   }
 }
 
-export const Route = createFileRoute("/places_/$placeId/comments")({
+export const Route = createFileRoute("/places/_/$placeId/comments")({
   component: RouteComponent,
   loader: async ({ params: { placeId } }) => {
     const place = await getPlaceByIdNoAuth({ data: placeId })
