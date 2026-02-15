@@ -12,7 +12,7 @@ export function Navbar({
   role,
 }: {
   username: string | undefined
-  role: string
+  role: string | undefined
 }) {
   const navigate = useNavigate()
   const queryClient = useQueryClient()

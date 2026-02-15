@@ -17,7 +17,7 @@ export function AuthUserDropdown({
   handleLogout,
 }: {
   name: string | undefined
-  role: string
+  role: string | undefined
   handleLogout: () => void
 }) {
   return (
