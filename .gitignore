@@ -12,5 +12,6 @@ count.txt
 .vinxi
 todos.json
 public/uploads
-
+public/gallery-manifest.json
 src/db/seed-places.ts
+scripts
