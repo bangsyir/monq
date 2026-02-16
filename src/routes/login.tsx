@@ -3,10 +3,11 @@ import { createServerFn } from "@tanstack/react-start"
 import { getRequestHeaders } from "@tanstack/react-start/server"
 import { GalleryVerticalEnd } from "lucide-react"
 import { LoginForm } from "@/components/login-form"
-import { auth } from "@/lib/auth"
+import { createAuth } from "@/lib/auth"
 
 const fetchSession = createServerFn({ method: "GET" }).handler(async () => {
   const headers = getRequestHeaders()
+  const auth = createAuth()
   const session = await auth.api.getSession({ headers })
   return session
 })

@@ -13,7 +13,7 @@ import {
 import { eq } from "drizzle-orm"
 import { Link, createFileRoute } from "@tanstack/react-router"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { db } from "@/db"
+import { createDb } from "@/db"
 import { users } from "@/db/schema"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -29,6 +29,7 @@ import { Separator } from "@/components/ui/separator"
 const getUserFn = createServerFn({ method: "GET" })
   .inputValidator((data: { userId: string }) => data)
   .handler(async ({ data }) => {
+    const db = createDb()
     const user = await db
       .select()
       .from(users)

@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
-import { db } from "@/db"
+import { createDb } from "@/db"
 
 const UpdateUserSchema = z.object({
   userId: z.string().min(1, "user id required"),
@@ -46,6 +46,7 @@ const getUserFn = createServerFn({ method: "GET" })
     }),
   )
   .handler(async ({ data }: { data: { userId: string } }) => {
+    const db = createDb()
     const user = await db
       .select()
       .from(users)
@@ -58,6 +59,7 @@ const getUserFn = createServerFn({ method: "GET" })
 const updateUserFn = createServerFn({ method: "POST" })
   .inputValidator(UpdateUserSchema)
   .handler(async ({ data }) => {
+    const db = createDb()
     const { banExpires, ...updateData } = data
 
     const updateValues = {
