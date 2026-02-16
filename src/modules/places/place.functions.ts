@@ -19,7 +19,7 @@ import {
 } from "@/modules/places/place-schema"
 import { placeConditionFilterRepo } from "@/modules/places/place-repo.server"
 import { authMiddleware } from "@/lib/auth-middleware"
-import { db } from "@/db"
+import { createDb } from "@/db"
 import { places } from "@/db/schema"
 
 export const addPlace = createServerFn({ method: "POST" })
@@ -87,6 +87,7 @@ export const updatePlaceImages = createServerFn({ method: "POST" })
 // Function to get total places count
 export const getTotalPlacesCount = createServerFn({ method: "GET" }).handler(
   async () => {
+    const db = createDb()
     const result = await db.select({ count: count() }).from(places)
     return result[0].count || 0
   },

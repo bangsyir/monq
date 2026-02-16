@@ -3,7 +3,7 @@ import { asc, count, desc, ilike, or } from "drizzle-orm"
 import { updateUserService } from "./user-service.server"
 import { UserQuerySchema, updateUserSchema } from "./user-schema"
 import { authMiddleware } from "@/lib/auth-middleware"
-import { db } from "@/db"
+import { createDb } from "@/db"
 import { users } from "@/db/schema"
 
 export const updateUserProfile = createServerFn({ method: "POST" })
@@ -29,6 +29,7 @@ export const updateUserProfile = createServerFn({ method: "POST" })
 export const getUsers = createServerFn({ method: "GET" })
   .inputValidator(UserQuerySchema)
   .handler(async ({ data }) => {
+    const db = createDb()
     const { search, page, sortBy, sortOrder } = data
     const currentPage = page || 1
     const limit = 100

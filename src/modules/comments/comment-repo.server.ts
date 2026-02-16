@@ -1,9 +1,10 @@
 import { and, count, desc, eq, inArray, isNull } from "drizzle-orm"
 import type { AddCommentData, AddReplyData } from "./comment-types"
-import { db } from "@/db"
+import { createDb } from "@/db"
 import { comments } from "@/db/schema"
 
 export async function insertCommentRepo(data: AddCommentData) {
+  const db = createDb()
   return db
     .insert(comments)
     .values({
@@ -23,6 +24,7 @@ export async function insertCommentRepo(data: AddCommentData) {
 }
 
 export async function insertReplyRepo(data: AddReplyData) {
+  const db = createDb()
   return db
     .insert(comments)
     .values({
@@ -47,6 +49,7 @@ export function getCommentsRepo(
   limit: number,
   offset: number,
 ) {
+  const db = createDb()
   return db.query.comments.findMany({
     where: and(eq(comments.placeId, placeId), isNull(comments.parentId)),
     with: {
@@ -65,6 +68,7 @@ export function getCommentsRepo(
 }
 
 export function getCommentsTotalRepo(placeId: string) {
+  const db = createDb()
   return db
     .select({ count: count() })
     .from(comments)
@@ -72,6 +76,7 @@ export function getCommentsTotalRepo(placeId: string) {
 }
 
 export function getCommentsReplyCountRepo(commentIds: Array<string>) {
+  const db = createDb()
   return db
     .select({
       parentId: comments.parentId,
@@ -87,6 +92,7 @@ export function getRepliesRepo(
   limit: number,
   offset: number,
 ) {
+  const db = createDb()
   return Promise.all([
     db.query.comments.findMany({
       where: eq(comments.parentId, parentId),
@@ -111,6 +117,7 @@ export function getRepliesRepo(
 }
 
 export function getCommentByIdRepo(commentId: string) {
+  const db = createDb()
   return db.query.comments.findFirst({
     where: eq(comments.id, commentId),
     with: {

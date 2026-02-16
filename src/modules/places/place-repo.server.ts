@@ -1,7 +1,7 @@
 import { and, asc, count, desc, eq, ilike, or, sql } from "drizzle-orm"
 import type { FeaturedPlace, PlaceWithDetailsRaw } from "./place-types"
 import type { InferInsertModel, SQL } from "drizzle-orm"
-import { db } from "@/db"
+import { createDb } from "@/db"
 import { categories, placeCategories, placeImages, places } from "@/db/schema"
 
 type InsertPlace = InferInsertModel<typeof places>
@@ -12,6 +12,7 @@ export function insertPlaceRepo(
   data: Omit<InsertPlace, "userId">,
   userId: string,
 ) {
+  const db = createDb()
   return db
     .insert(places)
     .values({
@@ -36,14 +37,17 @@ export function insertPlaceRepo(
 }
 
 export function insertCategoriesRepo(data: Array<InsertCategories>) {
+  const db = createDb()
   return db.insert(placeCategories).values(data)
 }
 
 export function insertImageRepo(data: Array<InserImage>) {
+  const db = createDb()
   return db.insert(placeImages).values(data)
 }
 
 export function getPlaceByIdRepo(placeId: string) {
+  const db = createDb()
   const place = db.query.places.findFirst({
     where: eq(places.id, placeId),
     with: {
@@ -64,6 +68,7 @@ export function updatePlaceRepo(
   userId: string,
   data: Omit<InsertPlace, "userId" | "rating">,
 ) {
+  const db = createDb()
   return db
     .update(places)
     .set({
@@ -88,18 +93,22 @@ export function updatePlaceRepo(
 }
 
 export function deletePlaceCategoriesRepo(placeId: string) {
+  const db = createDb()
   return db.delete(placeCategories).where(eq(placeCategories.placeId, placeId))
 }
 
 export function deletePlaceImagesRepo(placeId: string) {
+  const db = createDb()
   return db.delete(placeImages).where(eq(placeImages.placeId, placeId))
 }
 
 export function deletePlaceImageRepo(imageId: string) {
+  const db = createDb()
   return db.delete(placeImages).where(eq(placeImages.id, imageId))
 }
 
 export function getFeaturedPlacesRepo(limit: number = 8) {
+  const db = createDb()
   // PostgreSQL JSON aggregation query for featured places
   const result = db.execute(sql<FeaturedPlace>`
     SELECT 
@@ -154,6 +163,7 @@ export function getPlacesWithDetailsRepo(
   limit?: number,
   offset?: number,
 ) {
+  const db = createDb()
   // Build category filter using EXISTS subquery for database-level filtering
   let categoryCondition = sql`TRUE`
   if (categoryFilter && categoryFilter !== "all") {
@@ -254,6 +264,7 @@ export function getPlacesRepo({
   limit: number
   offset: number
 }) {
+  const db = createDb()
   // Determine sort column
   const sortColumn =
     sortBy === "name"
@@ -297,6 +308,7 @@ export function getPlacesRepo({
 }
 
 export function getTotalPlaceRepo(filter: SQL<unknown> | undefined) {
+  const db = createDb()
   return db.select({ count: count() }).from(places).where(filter)
 }
 
@@ -304,6 +316,7 @@ export function getPlacesCountWithFiltersRepo(
   categoryFilter?: string,
   searchQuery?: string,
 ) {
+  const db = createDb()
   // Build category filter using EXISTS subquery
   let categoryCondition = sql`TRUE`
   if (categoryFilter && categoryFilter !== "all") {

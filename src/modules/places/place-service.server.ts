@@ -15,13 +15,14 @@ import {
 import type { SQL } from "drizzle-orm"
 import type { AddPlaceServer, UpdatePlaceServer } from "@/modules/places"
 import { safeDbQuery } from "@/utils/safe-db-query"
-import { db } from "@/db"
+import { createDb } from "@/db"
 import { categories } from "@/db/schema"
 
 // Helper function to get category IDs by names
 async function getCategoryIdsByName(
   categoryNames: Array<string>,
 ): Promise<Array<string>> {
+  const db = createDb()
   const allCategories = await db.select().from(categories)
   return categoryNames
     .map((name) => {

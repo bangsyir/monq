@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm"
-import { db } from "@/db"
+import { createDb } from "@/db"
 import { users } from "@/db/schema"
 
 type UpdateUserType = {
@@ -10,6 +10,7 @@ type UpdateUserType = {
 }
 
 export function updateUserProfileRepo(data: UpdateUserType) {
+  const db = createDb()
   const { userId, name, username, image } = data
   const updatedUser = db
     .update(users)
