@@ -1,0 +1,132 @@
+[
+  {
+    "name": "boy-1",
+    "path": "/avatar/boy-1.webp",
+    "folder": "avatar"
+  },
+  {
+    "name": "boy-2",
+    "path": "/avatar/boy-2.webp",
+    "folder": "avatar"
+  },
+  {
+    "name": "boy-3",
+    "path": "/avatar/boy-3.webp",
+    "folder": "avatar"
+  },
+  {
+    "name": "boy-4",
+    "path": "/avatar/boy-4.webp",
+    "folder": "avatar"
+  },
+  {
+    "name": "boy-5",
+    "path": "/avatar/boy-5.webp",
+    "folder": "avatar"
+  },
+  {
+    "name": "girl-1",
+    "path": "/avatar/girl-1.webp",
+    "folder": "avatar"
+  },
+  {
+    "name": "hijab-1",
+    "path": "/avatar/hijab-1.webp",
+    "folder": "avatar"
+  },
+  {
+    "name": "hijab-2",
+    "path": "/avatar/hijab-2.webp",
+    "folder": "avatar"
+  },
+  {
+    "name": "hijab-3",
+    "path": "/avatar/hijab-3.webp",
+    "folder": "avatar"
+  },
+  {
+    "name": "man-1",
+    "path": "/avatar/man-1.webp",
+    "folder": "avatar"
+  },
+  {
+    "name": "man-2",
+    "path": "/avatar/man-2.webp",
+    "folder": "avatar"
+  },
+  {
+    "name": "man-3",
+    "path": "/avatar/man-3.webp",
+    "folder": "avatar"
+  },
+  {
+    "name": "man-4",
+    "path": "/avatar/man-4.webp",
+    "folder": "avatar"
+  },
+  {
+    "name": "man-5",
+    "path": "/avatar/man-5.webp",
+    "folder": "avatar"
+  },
+  {
+    "name": "women-1",
+    "path": "/avatar/women-1.webp",
+    "folder": "avatar"
+  },
+  {
+    "name": "women-2",
+    "path": "/avatar/women-2.webp",
+    "folder": "avatar"
+  },
+  {
+    "name": "women-3",
+    "path": "/avatar/women-3.webp",
+    "folder": "avatar"
+  },
+  {
+    "name": "women-4",
+    "path": "/avatar/women-4.webp",
+    "folder": "avatar"
+  },
+  {
+    "name": "women-5",
+    "path": "/avatar/women-5.webp",
+    "folder": "avatar"
+  },
+  {
+    "name": "women-6",
+    "path": "/avatar/women-6.webp",
+    "folder": "avatar"
+  },
+  {
+    "name": "campsite",
+    "path": "/default/campsite.webp",
+    "folder": "default"
+  },
+  {
+    "name": "hiking",
+    "path": "/default/hiking.webp",
+    "folder": "default"
+  },
+  {
+    "name": "lake",
+    "path": "/default/lake.webp",
+    "folder": "default"
+  },
+  {
+    "name": "mountains",
+    "path": "/default/mountains.webp",
+    "folder": "default"
+  },
+  {
+    "name": "trails",
+    "path": "/default/trails.webp",
+    "folder": "default"
+  },
+  {
+    "name": "waterfall",
+    "path": "/default/waterfall.webp",
+    "folder": "default"
+  }
+]
