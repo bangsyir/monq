@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "workers_dev": true,
+  "name": "sifokus",
+  "compatibility_date": "2025-09-15",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "enable_nodejs_process_v2",
+    "nodejs_compat_populate_process_env",
+    "no_handle_cross_request_promise_resolution",
+  ],
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+  },
+}

@@ -9,7 +9,14 @@ import viteTsConfigPaths from "vite-tsconfig-paths"
 const config = defineConfig({
   plugins: [
     devtools(),
-    nitro(),
+    nitro({
+      compatibilityDate: "2025-09-15",
+      preset: "cloudflare_module",
+      cloudflare: {
+        deployConfig: true,
+        nodeCompat: true,
+      },
+    }),
     // this is the plugin that enables path aliases
     viteTsConfigPaths({
       projects: ["./tsconfig.json"],
