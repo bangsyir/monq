@@ -1,6 +1,6 @@
-import { db } from "@/db"
-import { categories } from "@/db/schema"
 import { v7 as uuidv7 } from "uuid"
+import { createDb } from "@/db"
+import { categories } from "@/db/schema"
 
 const categoryData = [
   { name: "Waterfall", icon: "💧" },
@@ -12,6 +12,7 @@ const categoryData = [
 ]
 
 export async function seedCategories() {
+  const db = createDb()
   try {
     const existingCategories = await db.select().from(categories)
 
