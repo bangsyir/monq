@@ -1,10 +1,11 @@
 import { redirect } from "@tanstack/react-router"
 import { createMiddleware } from "@tanstack/react-start"
 import { getRequestHeaders } from "@tanstack/react-start/server"
-import { auth } from "@/lib/auth"
+import { createAuth } from "@/lib/auth"
 
 export const authMiddleware = createMiddleware().server(async ({ next }) => {
   const headers = getRequestHeaders()
+  const auth = createAuth()
   const session = await auth.api.getSession({ headers })
 
   if (!session) {
@@ -27,6 +28,7 @@ export const authMiddleware = createMiddleware().server(async ({ next }) => {
 export const authAdminMiddleware = createMiddleware().server(
   async ({ next }) => {
     const headers = getRequestHeaders()
+    const auth = createAuth()
     const session = await auth.api.getSession({ headers })
     if (!session) {
       throw redirect({ to: "/login" })
