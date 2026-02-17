@@ -11,7 +11,7 @@ const categoryData = [
   { name: "Mountain", icon: "⛰️" },
 ]
 
-export async function seedCategories() {
+const main = async () => {
   const db = createDb()
   try {
     const existingCategories = await db.select().from(categories)
@@ -31,3 +31,4 @@ export async function seedCategories() {
     console.error("Error seeding categories:", error)
   }
 }
+main()
