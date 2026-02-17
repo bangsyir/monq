@@ -1,5 +1,5 @@
 import { motion } from "framer-motion"
-import { MessageSquare } from "lucide-react"
+import { Loader2, MessageSquare, Trash2 } from "lucide-react"
 import type { PlaceComment } from "@/types/place"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -8,12 +8,18 @@ interface CommentCardProps {
   comment: PlaceComment
   index?: number
   replyCount?: number
+  currentUserId?: string
+  onDelete?: (commentId: string) => void
+  isDeleting?: boolean
 }
 
 const CommentCard = ({
   comment,
   index = 0,
   replyCount = 0,
+  currentUserId,
+  onDelete,
+  isDeleting = false,
 }: CommentCardProps) => {
   const formattedDate = new Date(comment.createdAt).toLocaleDateString(
     "en-US",
@@ -23,6 +29,17 @@ const CommentCard = ({
       day: "numeric",
     },
   )
+
+  const isOwner = currentUserId === comment.userId
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (onDelete) {
+      onDelete(comment.id)
+    }
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -49,6 +66,22 @@ const CommentCard = ({
               </h4>
               <p className="text-muted-foreground text-sm">{formattedDate}</p>
             </div>
+            {isOwner && onDelete && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="text-muted-foreground hover:text-destructive h-8"
+              >
+                {isDeleting ? (
+                  <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                ) : (
+                  <Trash2 className="mr-1 h-4 w-4" />
+                )}
+                Delete
+              </Button>
+            )}
           </div>
           <p className="text-foreground leading-relaxed">{comment.comment}</p>
 
