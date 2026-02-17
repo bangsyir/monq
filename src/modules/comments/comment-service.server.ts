@@ -1,4 +1,5 @@
 import {
+  deleteCommentRepo,
   getCommentByIdRepo,
   getCommentsReplyCountRepo,
   getCommentsRepo,
@@ -129,5 +130,31 @@ export async function getCommentByIdService(
   return {
     error: null,
     data: comment,
+  }
+}
+
+export async function deleteCommentService(
+  commentId: string,
+  userId: string,
+): Promise<{ error: { message: string } | null; data?: { id: string } }> {
+  const [result, error] = await safeDbQuery(
+    deleteCommentRepo(commentId, userId),
+  )
+
+  if (error) {
+    return { error: { message: error.message } }
+  }
+
+  if (!result || result.length === 0) {
+    return {
+      error: {
+        message: "Comment not found or you don't have permission to delete it",
+      },
+    }
+  }
+
+  return {
+    error: null,
+    data: { id: result[0].id },
   }
 }

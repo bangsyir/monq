@@ -2,18 +2,42 @@ import {
   Link,
   createFileRoute,
   redirect,
+  useNavigate,
   useParams,
 } from "@tanstack/react-router"
 import { motion } from "framer-motion"
-import { ArrowLeft, Loader2, MapPin, MessageSquare, Star } from "lucide-react"
+import {
+  ArrowLeft,
+  Loader2,
+  MapPin,
+  MessageSquare,
+  Star,
+  Trash2,
+} from "lucide-react"
 import { useEffect, useState } from "react"
 import { useServerFn } from "@tanstack/react-start"
 import type { Comment, Reply } from "@/modules/comments"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { addReply, getCommentById, getReplies } from "@/modules/comments"
+import {
+  addReply,
+  deleteComment,
+  getCommentById,
+  getReplies,
+} from "@/modules/comments"
 import { Separator } from "@/components/ui/separator"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { authClient } from "@/lib/auth-client"
 
 interface CommentWithPlace extends Comment {
   place: {
@@ -46,6 +70,7 @@ export const Route = createFileRoute("/comments/$commentId")({
 function RouteComponent() {
   const { comment, isLoggedIn } = Route.useLoaderData()
   const { commentId } = useParams({ from: "/comments/$commentId" })
+  const navigate = useNavigate()
   const [replies, setReplies] = useState<Array<Reply>>([])
   const [isLoadingReplies, setIsLoadingReplies] = useState(false)
   const [hasMoreReplies, setHasMoreReplies] = useState(false)
@@ -53,11 +78,67 @@ function RouteComponent() {
   const [replyText, setReplyText] = useState("")
   const [isAddingReply, setIsAddingReply] = useState(false)
   const [showReplyInput, setShowReplyInput] = useState(false)
+  const [currentUserId, setCurrentUserId] = useState<string | undefined>()
+  const [isDeleting, setIsDeleting] = useState<string | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [commentToDelete, setCommentToDelete] = useState<{
+    id: string
+    isMainComment: boolean
+  } | null>(null)
 
   const getRepliesFn = useServerFn(getReplies)
   const addReplyFn = useServerFn(addReply)
+  const deleteCommentFn = useServerFn(deleteComment)
 
   const commentWithPlace = comment as CommentWithPlace | null
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      const { data: session } = await authClient.getSession()
+      if (session?.user) {
+        setCurrentUserId(session.user.id)
+      }
+    }
+    fetchSession()
+  }, [])
+
+  const handleDeleteClick = (
+    targetCommentId: string,
+    isMainComment: boolean = false,
+  ) => {
+    setCommentToDelete({ id: targetCommentId, isMainComment })
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!commentToDelete) return
+    setIsDeleting(commentToDelete.id)
+    setDeleteError(null)
+    try {
+      await deleteCommentFn({ data: { commentId: commentToDelete.id } })
+      if (commentToDelete.isMainComment) {
+        // Redirect to place comments page if main comment is deleted
+        if (commentWithPlace) {
+          navigate({
+            to: "/places/$placeId/comments",
+            params: { placeId: commentWithPlace.placeId },
+          })
+        }
+      } else {
+        // Remove reply from list
+        setReplies((prev) => prev.filter((r) => r.id !== commentToDelete.id))
+      }
+      setCommentToDelete(null)
+    } catch (error) {
+      console.error("Failed to delete comment:", error)
+      setDeleteError("Failed to delete comment. Please try again.")
+    } finally {
+      setIsDeleting(null)
+    }
+  }
+
+  const handleCancelDelete = () => {
+    setCommentToDelete(null)
+  }
 
   useEffect(() => {
     if (commentId) {
@@ -156,6 +237,44 @@ function RouteComponent() {
   return (
     <div className="bg-background min-h-screen">
       <main className="container mx-auto max-w-3xl px-4 py-6">
+        {/* Error Alert Dialog */}
+        <AlertDialog
+          open={!!deleteError}
+          onOpenChange={() => setDeleteError(null)}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Error</AlertDialogTitle>
+              <AlertDialogDescription>{deleteError}</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogAction onClick={() => setDeleteError(null)}>
+                OK
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={!!commentToDelete} onOpenChange={handleCancelDelete}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Comment</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this comment? This action cannot
+                be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={handleCancelDelete}>
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction onClick={handleConfirmDelete}>
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
         {/* Back Button */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -234,13 +353,31 @@ function RouteComponent() {
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <div className="mb-2">
-                <h3 className="text-foreground font-semibold">
-                  {commentWithPlace.user.name}
-                </h3>
-                <p className="text-muted-foreground text-sm">
-                  {formattedCommentDate}
-                </p>
+              <div className="mb-2 flex items-center justify-between">
+                <div>
+                  <h3 className="text-foreground font-semibold">
+                    {commentWithPlace.user.name}
+                  </h3>
+                  <p className="text-muted-foreground text-sm">
+                    {formattedCommentDate}
+                  </p>
+                </div>
+                {currentUserId === commentWithPlace.userId && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDeleteClick(commentWithPlace.id, true)}
+                    disabled={isDeleting === commentWithPlace.id}
+                    className="text-muted-foreground hover:text-destructive h-8"
+                  >
+                    {isDeleting === commentWithPlace.id ? (
+                      <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="mr-1 h-4 w-4" />
+                    )}
+                    Delete
+                  </Button>
+                )}
               </div>
               <p className="text-foreground leading-relaxed whitespace-pre-wrap">
                 {commentWithPlace.comment}
@@ -332,20 +469,39 @@ function RouteComponent() {
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
-                          <div className="mb-1">
-                            <span className="text-foreground text-sm font-medium">
-                              {reply.user.name}
-                            </span>
-                            <span className="text-muted-foreground ml-2 text-sm">
-                              {new Date(reply.createdAt).toLocaleDateString(
-                                "en-US",
-                                {
-                                  month: "short",
-                                  day: "numeric",
-                                  year: "numeric",
-                                },
-                              )}
-                            </span>
+                          <div className="mb-1 flex items-center justify-between">
+                            <div>
+                              <span className="text-foreground text-sm font-medium">
+                                {reply.user.name}
+                              </span>
+                              <span className="text-muted-foreground ml-2 text-sm">
+                                {new Date(reply.createdAt).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  },
+                                )}
+                              </span>
+                            </div>
+                            {currentUserId === reply.userId && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  handleDeleteClick(reply.id, false)
+                                }
+                                disabled={isDeleting === reply.id}
+                                className="text-muted-foreground hover:text-destructive h-6 px-2"
+                              >
+                                {isDeleting === reply.id ? (
+                                  <Loader2 className="h-3 w-3 animate-spin" />
+                                ) : (
+                                  <Trash2 className="h-3 w-3" />
+                                )}
+                              </Button>
+                            )}
                           </div>
                           <p className="text-foreground text-sm leading-relaxed">
                             {reply.comment}

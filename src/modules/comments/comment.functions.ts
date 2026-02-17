@@ -3,12 +3,14 @@ import { z } from "zod"
 import {
   addCommentSchema,
   addReplySchema,
+  deleteCommentSchema,
   getCommentsSchema,
   getRepliesSchema,
 } from "./comment-schema"
 import {
   createCommentService,
   createReplyService,
+  deleteCommentService,
   getCommentByIdService,
   getCommentsService,
   getRepliesService,
@@ -85,6 +87,20 @@ export const getCommentById = createServerFn({ method: "GET" })
   .inputValidator(z.string())
   .handler(async ({ data: commentId }) => {
     const result = await getCommentByIdService(commentId)
+
+    if (result.error) {
+      throw new Error(result.error.message)
+    }
+
+    return result.data
+  })
+
+export const deleteComment = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .inputValidator(deleteCommentSchema)
+  .handler(async ({ data, context }) => {
+    const userId = context.user.id
+    const result = await deleteCommentService(data.commentId, userId)
 
     if (result.error) {
       throw new Error(result.error.message)

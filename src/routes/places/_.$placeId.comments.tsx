@@ -5,11 +5,22 @@ import { useEffect, useState } from "react"
 import { useServerFn } from "@tanstack/react-start"
 import type { Comment } from "@/modules/comments"
 import type { PlaceComment } from "@/types/place"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import CommentCard from "@/components/comment-card"
+import { deleteComment, getComments } from "@/modules/comments"
 import { getPlaceByIdNoAuth } from "@/modules/places"
-import { getComments } from "@/modules/comments"
+import { authClient } from "@/lib/auth-client"
 
 function formatComment(comment: Comment): PlaceComment {
   return {
@@ -40,8 +51,47 @@ function RouteComponent() {
   const [isLoadingComments, setIsLoadingComments] = useState(false)
   const [hasMoreComments, setHasMoreComments] = useState(true)
   const [commentPage, setCommentPage] = useState(1)
+  const [currentUserId, setCurrentUserId] = useState<string | undefined>()
+  const [isDeleting, setIsDeleting] = useState<string | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [commentToDelete, setCommentToDelete] = useState<string | null>(null)
 
   const getCommentsFn = useServerFn(getComments)
+  const deleteCommentFn = useServerFn(deleteComment)
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      const { data: session } = await authClient.getSession()
+      if (session?.user) {
+        setCurrentUserId(session.user.id)
+      }
+    }
+    fetchSession()
+  }, [])
+
+  const handleDeleteClick = (commentId: string) => {
+    setCommentToDelete(commentId)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!commentToDelete) return
+    setIsDeleting(commentToDelete)
+    setDeleteError(null)
+    try {
+      await deleteCommentFn({ data: { commentId: commentToDelete } })
+      setComments((prev) => prev.filter((c) => c.id !== commentToDelete))
+      setCommentToDelete(null)
+    } catch (error) {
+      console.error("Failed to delete comment:", error)
+      setDeleteError("Failed to delete comment. Please try again.")
+    } finally {
+      setIsDeleting(null)
+    }
+  }
+
+  const handleCancelDelete = () => {
+    setCommentToDelete(null)
+  }
 
   const loadComments = async (page: number) => {
     if (!place) return
@@ -162,6 +212,45 @@ function RouteComponent() {
           </Link>
         </motion.div>
 
+        {/* Error Alert Dialog */}
+        <AlertDialog
+          open={!!deleteError}
+          onOpenChange={() => setDeleteError(null)}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Error</AlertDialogTitle>
+              <AlertDialogDescription>{deleteError}</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogAction onClick={() => setDeleteError(null)}>
+                OK
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={!!commentToDelete} onOpenChange={handleCancelDelete}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Comment</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this comment? This action cannot
+                be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={handleCancelDelete}>
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction onClick={handleConfirmDelete}>
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
         {/* Comments Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -198,6 +287,9 @@ function RouteComponent() {
                         comment={comment}
                         index={index}
                         replyCount={comment.replyCount || 0}
+                        currentUserId={currentUserId}
+                        onDelete={handleDeleteClick}
+                        isDeleting={isDeleting === comment.id}
                       />
                     </Link>
                     <Separator />

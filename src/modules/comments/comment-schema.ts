@@ -29,7 +29,12 @@ export const getRepliesSchema = z.object({
   limit: z.number().int().min(1).max(50).default(5),
 })
 
+export const deleteCommentSchema = z.object({
+  commentId: z.string(),
+})
+
 export type AddCommentInput = z.infer<typeof addCommentSchema>
 export type AddReplyInput = z.infer<typeof addReplySchema>
 export type GetCommentsInput = z.infer<typeof getCommentsSchema>
 export type GetRepliesInput = z.infer<typeof getRepliesSchema>
+export type DeleteCommentInput = z.infer<typeof deleteCommentSchema>

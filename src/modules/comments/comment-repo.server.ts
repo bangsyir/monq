@@ -152,3 +152,11 @@ export function getCommentByIdRepo(commentId: string) {
     },
   })
 }
+
+export async function deleteCommentRepo(commentId: string, userId: string) {
+  const db = createDb()
+  return db
+    .delete(comments)
+    .where(and(eq(comments.id, commentId), eq(comments.userId, userId)))
+    .returning({ id: comments.id })
+}
