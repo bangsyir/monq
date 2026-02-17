@@ -257,7 +257,7 @@ export async function getPlacesForIndexService(
   }
 
   // Transform the result to match the expected format
-  const placesWithDetails = (result as Array<any>).map((row: any) => ({
+  const placesWithDetails = result.rows.map((row: any) => ({
     id: row.id,
     name: row.name,
     description: row.description,
@@ -309,7 +309,7 @@ export async function getFeaturedPlacesService(limit: number = 8) {
     return { data: null, error }
   }
   // Transform the result to match the expected format
-  const placesWithDetails = (result as Array<any>).map((row: any) => ({
+  const placesWithDetails = result.rows.map((row: any) => ({
     id: row.id,
     name: row.name,
     description: row.description,
