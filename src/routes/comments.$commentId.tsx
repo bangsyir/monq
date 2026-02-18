@@ -17,7 +17,7 @@ import {
 } from "lucide-react"
 import React, { useEffect, useState } from "react"
 import { useServerFn } from "@tanstack/react-start"
-import { useInfiniteQuery } from "@tanstack/react-query"
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query"
 import type { Comment, Reply } from "@/modules/comments"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -99,6 +99,8 @@ function RouteComponent() {
   const deleteCommentFn = useServerFn(deleteComment)
   const updateCommentFn = useServerFn(updateComment)
 
+  const queryClient = useQueryClient()
+
   const commentWithPlace = comment as CommentWithPlace | null
 
   useEffect(() => {
@@ -133,6 +135,9 @@ function RouteComponent() {
           })
         }
       } else {
+        queryClient.invalidateQueries({
+          queryKey: ["comment-replies", comment?.id],
+        })
         // Remove reply from list
         setReplies((prev) => prev.filter((r) => r.id !== commentToDelete.id))
       }
@@ -230,6 +235,9 @@ function RouteComponent() {
         },
       })
       setReplyText("")
+      queryClient.invalidateQueries({
+        queryKey: ["comment-replies", comment?.id],
+      })
       setShowReplyInput(false)
       // Reload replies to show the new one
     } catch (error) {

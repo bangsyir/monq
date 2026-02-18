@@ -57,8 +57,6 @@ export const Route = createFileRoute("/places/_/$placeId/comments")({
 
 function RouteComponent() {
   const { place } = Route.useLoaderData()
-  // const [comments, setComments] = useState<Array<Place>>()
-  // const [commentPage, setCommentPage] = useState(1)
   const [currentUserId, setCurrentUserId] = useState<string | undefined>()
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
   const [deleteError, setDeleteError] = useState<string | null>(null)
