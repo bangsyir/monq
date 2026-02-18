@@ -48,3 +48,26 @@ export const authAdminMiddleware = createMiddleware().server(
     })
   },
 )
+
+export const optionalAuthMiddleware = createMiddleware().server(
+  async ({ next }) => {
+    const headers = getRequestHeaders()
+    const auth = createAuth()
+    const session = await auth.api.getSession({ headers })
+
+    if (session) {
+      return await next({
+        context: {
+          user: {
+            id: session.user.id,
+            name: session.user.name,
+            image: session.user.image,
+            role: session.user.role,
+          },
+        },
+      })
+    }
+
+    return await next()
+  },
+)

@@ -181,7 +181,7 @@ export function CommentsComponent() {
             <AddComment isLoggedIn={isLoggedIn} placeId={place.id} />
           </>
         ) : (
-          <div className="bg-muted flex flex-col items-center rounded-lg text-center">
+          <div className="flex flex-col items-center rounded-lg text-center">
             <p className="text-muted-foreground mb-3">
               Please log in to post a comment.
             </p>
@@ -241,6 +241,7 @@ export function CommentsComponent() {
                 to="/places/$placeId/comments"
                 params={{ placeId: place.id }}
                 className={buttonVariants({ variant: "outline" })}
+                preload={false}
               >
                 View all comments
               </Link>

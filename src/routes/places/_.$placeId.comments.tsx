@@ -1,9 +1,10 @@
 import { useServerFn } from "@tanstack/react-start"
-import { Link, createFileRoute } from "@tanstack/react-router"
+import { Link, createFileRoute, redirect } from "@tanstack/react-router"
 import { motion } from "framer-motion"
 import { ArrowLeft, Loader2, MapPin, Star } from "lucide-react"
 import { useInfiniteQuery } from "@tanstack/react-query"
 import React, { useEffect, useState } from "react"
+import { toast } from "sonner"
 import { AddComment } from "./-components/add-comments"
 import type { PlaceComment } from "@/types/place"
 import type { Comment } from "@/modules/comments"
@@ -42,6 +43,12 @@ function formatComment(comment: Comment): PlaceComment {
 
 export const Route = createFileRoute("/places/_/$placeId/comments")({
   component: RouteComponent,
+  beforeLoad: ({ context, params: { placeId } }) => {
+    if (!context.user) {
+      toast.error("Please login first")
+      throw redirect({ to: "/places/$placeId", params: { placeId } })
+    }
+  },
   loader: async ({ params: { placeId } }) => {
     const place = await getPlaceByIdNoAuth({ data: placeId })
     return { place }
