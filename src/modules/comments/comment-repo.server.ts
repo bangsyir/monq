@@ -153,10 +153,31 @@ export function getCommentByIdRepo(commentId: string) {
   })
 }
 
-export async function deleteCommentRepo(commentId: string, userId: string) {
+export function deleteCommentRepo(commentId: string, userId: string) {
   const db = createDb()
   return db
     .delete(comments)
     .where(and(eq(comments.id, commentId), eq(comments.userId, userId)))
     .returning({ id: comments.id })
+}
+
+export function updateCommentRepo(
+  commentId: string,
+  userId: string,
+  commentText: string,
+) {
+  const db = createDb()
+  return db
+    .update(comments)
+    .set({ comment: commentText })
+    .where(and(eq(comments.id, commentId), eq(comments.userId, userId)))
+    .returning({
+      id: comments.id,
+      placeId: comments.placeId,
+      userId: comments.userId,
+      parentId: comments.parentId,
+      comment: comments.comment,
+      createdAt: comments.createdAt,
+      updatedAt: comments.updatedAt,
+    })
 }

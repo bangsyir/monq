@@ -14,6 +14,7 @@ export interface Comment {
   updatedAt: Date
   user: CommentUser
   replyCount?: number
+  isEditable?: boolean
 }
 
 export interface Reply {
@@ -25,18 +26,21 @@ export interface Reply {
   createdAt: Date
   updatedAt: Date
   user: CommentUser
+  isEditable?: boolean
 }
 
 export interface PaginatedComments {
   comments: Array<Comment>
   hasMore: boolean
   totalCount: number
+  nextPage: number
 }
 
 export interface PaginatedReplies {
   replies: Array<Reply>
   hasMore: boolean
   totalCount: number
+  nextPage: number
 }
 
 export interface AddCommentData {

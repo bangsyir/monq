@@ -7,6 +7,7 @@ import {
   getRepliesRepo,
   insertCommentRepo,
   insertReplyRepo,
+  updateCommentRepo,
 } from "./comment-repo.server"
 import type {
   AddCommentData,
@@ -51,6 +52,7 @@ export async function getCommentsService(
   placeId: string,
   page: number,
   limit: number,
+  currentUserId?: string,
 ): Promise<{ error: { message: string } | null; data?: PaginatedComments }> {
   const offset = (page - 1) * limit
 
@@ -79,12 +81,15 @@ export async function getCommentsService(
   const result = commentsData.slice(0, limit).map((comment) => ({
     ...comment,
     replyCount: replyCountMap.get(comment.id) || 0,
+    isEditable:
+      currentUserId === comment.userId && isWithinEditWindow(comment.createdAt),
   }))
 
   const data = {
     comments: result,
     hasMore,
     totalCount: commentsTotal[0].count || 0,
+    nextPage: hasMore ? page + 1 : page,
   }
 
   return {
@@ -97,6 +102,7 @@ export async function getRepliesService(
   parentId: string,
   page: number,
   limit: number,
+  currentUserId?: string,
 ): Promise<{ error: { message: string } | null; data?: PaginatedReplies }> {
   const offset = (page - 1) * limit
   const [replies, repliesErr] = await safeDbQuery(
@@ -107,10 +113,17 @@ export async function getRepliesService(
   }
   const hasMore = replies?.[0].length > limit
 
+  const result = replies?.[0].slice(0, limit).map((reply) => ({
+    ...reply,
+    isEditable:
+      currentUserId === reply.userId && isWithinEditWindow(reply.createdAt),
+  }))
+
   const data = {
-    replies: replies?.[0].slice(0, limit),
+    replies: result,
     hasMore,
     totalCount: replies[1][0].count || 0,
+    nextPage: hasMore ? page + 1 : page,
   }
   return {
     error: null,
@@ -120,11 +133,24 @@ export async function getRepliesService(
 
 export async function getCommentByIdService(
   commentId: string,
+  currentUserId?: string,
 ): Promise<{ error: { message: string } | null; data?: CommentType | null }> {
   const [comment, error] = await safeDbQuery(getCommentByIdRepo(commentId))
 
   if (error) {
     return { error: { message: error.message } }
+  }
+
+  if (comment && currentUserId) {
+    return {
+      error: null,
+      data: {
+        ...comment,
+        isEditable:
+          currentUserId === comment.userId &&
+          isWithinEditWindow(comment.createdAt),
+      },
+    }
   }
 
   return {
@@ -149,6 +175,71 @@ export async function deleteCommentService(
     return {
       error: {
         message: "Comment not found or you don't have permission to delete it",
+      },
+    }
+  }
+
+  return {
+    error: null,
+    data: { id: result[0].id },
+  }
+}
+
+const EDIT_WINDOW_MINUTES = 10
+
+function isWithinEditWindow(createdAt: Date): boolean {
+  const now = new Date()
+  const created = new Date(createdAt)
+  const diffMs = now.getTime() - created.getTime()
+  const diffMinutes = diffMs / (1000 * 60)
+  return diffMinutes <= EDIT_WINDOW_MINUTES
+}
+
+export async function updateCommentService(
+  commentId: string,
+  userId: string,
+  commentText: string,
+): Promise<{ error: { message: string } | null; data?: { id: string } }> {
+  // First, get the comment to check ownership and creation time
+  const [comment, fetchError] = await safeDbQuery(getCommentByIdRepo(commentId))
+
+  if (fetchError) {
+    return { error: { message: fetchError.message } }
+  }
+
+  if (!comment) {
+    return { error: { message: "Comment not found" } }
+  }
+
+  // Check ownership
+  if (comment.userId !== userId) {
+    return {
+      error: { message: "You don't have permission to update this comment" },
+    }
+  }
+
+  // Check if within edit window (10 minutes)
+  if (!isWithinEditWindow(comment.createdAt)) {
+    return {
+      error: {
+        message: `You can only edit comments within ${EDIT_WINDOW_MINUTES} minutes of creation`,
+      },
+    }
+  }
+
+  // Update the comment
+  const [result, error] = await safeDbQuery(
+    updateCommentRepo(commentId, userId, commentText),
+  )
+
+  if (error) {
+    return { error: { message: error.message } }
+  }
+
+  if (!result || result.length === 0) {
+    return {
+      error: {
+        message: "Comment not found or you don't have permission to update it",
       },
     }
   }
