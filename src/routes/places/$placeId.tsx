@@ -71,10 +71,11 @@ export const Route = createFileRoute("/places/$placeId")({
   component: RouteComponent,
   loader: async ({ params: { placeId }, context }) => {
     const isLoggedIn = context.user !== null
+    const currentUserId = context.user?.id
     const place = await context.queryClient.ensureQueryData(
       getPlacesOptions(placeId),
     )
-    return { place, isLoggedIn }
+    return { place, isLoggedIn, currentUserId }
   },
 })
 

@@ -44,8 +44,10 @@ export interface PlaceComment {
   userAvatar?: string
   comment: string
   createdAt: string
+  updatedAt?: string
   replies?: Array<PlaceComment>
   replyCount?: number
+  isEditable?: boolean
 }
 
 export interface Place {

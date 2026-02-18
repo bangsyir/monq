@@ -1,5 +1,5 @@
 import { motion } from "framer-motion"
-import { Loader2, MessageSquare, Trash2 } from "lucide-react"
+import { Loader2, MessageSquare, Pencil, Trash2 } from "lucide-react"
 import type { PlaceComment } from "@/types/place"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -10,7 +10,9 @@ interface CommentCardProps {
   replyCount?: number
   currentUserId?: string
   onDelete?: (commentId: string) => void
+  onEdit?: (commentId: string, newComment: string) => void
   isDeleting?: boolean
+  isEditing?: boolean
 }
 
 const CommentCard = ({
@@ -19,7 +21,9 @@ const CommentCard = ({
   replyCount = 0,
   currentUserId,
   onDelete,
+  onEdit,
   isDeleting = false,
+  isEditing = false,
 }: CommentCardProps) => {
   const formattedDate = new Date(comment.createdAt).toLocaleDateString(
     "en-US",
@@ -31,12 +35,21 @@ const CommentCard = ({
   )
 
   const isOwner = currentUserId === comment.userId
+  const canEdit = comment.isEditable && isOwner
 
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
     if (onDelete) {
       onDelete(comment.id)
+    }
+  }
+
+  const handleEdit = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (onEdit) {
+      onEdit(comment.id, comment.comment)
     }
   }
 
@@ -66,22 +79,40 @@ const CommentCard = ({
               </h4>
               <p className="text-muted-foreground text-sm">{formattedDate}</p>
             </div>
-            {isOwner && onDelete && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleDelete}
-                disabled={isDeleting}
-                className="text-muted-foreground hover:text-destructive h-8"
-              >
-                {isDeleting ? (
-                  <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-                ) : (
-                  <Trash2 className="mr-1 h-4 w-4" />
-                )}
-                Delete
-              </Button>
-            )}
+            <div className="flex items-center gap-1">
+              {canEdit && onEdit && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleEdit}
+                  disabled={isEditing}
+                  className="text-muted-foreground hover:text-foreground h-8"
+                >
+                  {isEditing ? (
+                    <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Pencil className="mr-1 h-4 w-4" />
+                  )}
+                  Edit
+                </Button>
+              )}
+              {isOwner && onDelete && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="text-muted-foreground hover:text-destructive h-8"
+                >
+                  {isDeleting ? (
+                    <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="mr-1 h-4 w-4" />
+                  )}
+                  Delete
+                </Button>
+              )}
+            </div>
           </div>
           <p className="text-foreground leading-relaxed">{comment.comment}</p>
 
