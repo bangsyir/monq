@@ -1,18 +1,10 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router"
 import { motion } from "framer-motion"
-import {
-  ChevronLeft,
-  ChevronRight,
-  Grid2x2,
-  MapPin,
-  Search,
-  X,
-} from "lucide-react"
+import { ChevronLeft, ChevronRight, MapPin, Search, X } from "lucide-react"
 import React from "react"
 import CategoryFilter from "@/components/category-filter"
 import PlaceCard from "@/components/place-card"
-import { PlaceExample } from "@/components/place-map"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { getPlacesForIndex } from "@/modules/places"
 
@@ -44,7 +36,6 @@ function RouteComponent() {
   const { selectedCategory, placesData, searchQuery } = Route.useLoaderData()
   const navigate = useNavigate({ from: "/places" })
   const search = Route.useSearch()
-  const [view, setView] = React.useState<"grid" | "map">("grid")
   const [searchInput, setSearchInput] = React.useState(searchQuery)
 
   const handleSearch = (e: React.FormEvent) => {
@@ -128,38 +119,25 @@ function RouteComponent() {
                   Search
                 </Button>
               </form>
-              <Button
-                variant="outline"
-                className="gap-2"
-                onClick={() =>
-                  setView((prev) => (prev === "grid" ? "map" : "grid"))
-                }
+              <Link
+                to="/map"
+                className={buttonVariants({
+                  variant: "outline",
+                  className: "flex items-center gap-1",
+                })}
               >
-                {view === "map" ? (
-                  <>
-                    <Grid2x2 className="h-4 w-4" />
-                    Show grid
-                  </>
-                ) : (
-                  <>
-                    <MapPin className="h-4 w-4" />
-                    Show map
-                  </>
-                )}
-              </Button>
+                <MapPin className="h-4 w-4" />
+                Show map
+              </Link>
             </div>
           </motion.div>
 
           {/* Places Grid */}
-          {view === "grid" ? (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {placesData.places.map((place, index) => (
-                <PlaceCard key={place.id} place={place} index={index} />
-              ))}
-            </div>
-          ) : (
-            <PlaceExample />
-          )}
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {placesData.places.map((place, index) => (
+              <PlaceCard key={place.id} place={place} index={index} />
+            ))}
+          </div>
 
           {/* Pagination Controls */}
           {placesData.totalPage > 1 && (
