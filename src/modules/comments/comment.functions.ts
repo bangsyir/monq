@@ -17,10 +17,14 @@ import {
   getRepliesService,
   updateCommentService,
 } from "./comment-service.server"
-import { authMiddleware, optionalAuthMiddleware } from "@/lib/auth-middleware"
+import {
+  authMiddleware,
+  commentRateLimitMiddleware,
+  optionalAuthMiddleware,
+} from "@/lib/auth-middleware"
 
 export const addComment = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([authMiddleware, commentRateLimitMiddleware])
   .inputValidator(addCommentSchema)
   .handler(async ({ data, context }) => {
     const userId = context.user.id
@@ -38,7 +42,7 @@ export const addComment = createServerFn({ method: "POST" })
   })
 
 export const addReply = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([authMiddleware, commentRateLimitMiddleware])
   .inputValidator(addReplySchema)
   .handler(async ({ data, context }) => {
     const userId = context.user.id

@@ -18,7 +18,7 @@ import {
   updatePlaceServerSchema,
 } from "@/modules/places/place-schema"
 import { placeConditionFilterRepo } from "@/modules/places/place-repo.server"
-import { authMiddleware } from "@/lib/auth-middleware"
+import { authMiddleware, rateLimitMiddleware } from "@/lib/auth-middleware"
 import { createDb } from "@/db"
 import { places } from "@/db/schema"
 
@@ -94,6 +94,7 @@ export const getTotalPlacesCount = createServerFn({ method: "GET" }).handler(
 )
 
 export const getPlaces = createServerFn({ method: "GET" })
+  .middleware([rateLimitMiddleware])
   .inputValidator(PlaceQuerySchema)
   .handler(async ({ data }) => {
     const { search, page, sortBy, sortOrder } = data

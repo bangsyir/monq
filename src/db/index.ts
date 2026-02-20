@@ -9,7 +9,7 @@ dotenv.config()
 // Factory function to create a new database connection for each request
 // This is required for Cloudflare Workers where I/O objects cannot be shared across requests
 export const createDb = createServerOnlyFn(() => {
-  const sql = neon(process.env.DATABASE_URL!)
+  const sql = neon(process.env.DATABASE_URL)
   return drizzle({ client: sql, schema })
 })
 

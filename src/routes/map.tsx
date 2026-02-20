@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useCallback, useMemo } from "react"
-import { Map, MapControls } from "@/components/ui/map"
 import type { MapViewport } from "@/components/ui/map"
+import { Map, MapControls } from "@/components/ui/map"
 
 type MapSearchParams = {
   lat?: number

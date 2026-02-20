@@ -2,6 +2,43 @@ import { redirect } from "@tanstack/react-router"
 import { createMiddleware } from "@tanstack/react-start"
 import { getRequestHeaders } from "@tanstack/react-start/server"
 import { createAuth } from "@/lib/auth"
+import { commentRateLimit, searchRateLimit } from "@/lib/rate-limit"
+
+export const rateLimitMiddleware = createMiddleware().server(
+  async ({ next }) => {
+    const headers = getRequestHeaders()
+    const ip =
+      headers["x-forwarded-for"]?.split(",")[0] ??
+      headers["x-real-ip"] ??
+      "unknown"
+
+    const { success } = await searchRateLimit.limit(ip)
+
+    if (!success) {
+      throw new Error("RATE_LIMIT_EXCEEDED")
+    }
+
+    return await next()
+  },
+)
+
+export const commentRateLimitMiddleware = createMiddleware().server(
+  async ({ next }) => {
+    const headers = getRequestHeaders()
+    const ip =
+      headers["x-forwarded-for"]?.split(",")[0] ??
+      headers["x-real-ip"] ??
+      "unknown"
+
+    const { success } = await commentRateLimit.limit(ip)
+
+    if (!success) {
+      throw new Error("RATE_LIMIT_EXCEEDED")
+    }
+
+    return await next()
+  },
+)
 
 export const authMiddleware = createMiddleware().server(async ({ next }) => {
   const headers = getRequestHeaders()

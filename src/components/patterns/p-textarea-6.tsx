@@ -24,7 +24,7 @@ export function Pattern() {
         textarea.style.height = `${textarea.scrollHeight}px`
       }
     },
-    []
+    [],
   )
 
   const remaining = MAX_CHARS - value.length
