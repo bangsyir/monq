@@ -347,3 +347,42 @@ export function getPlacesCountWithFiltersRepo(
 
   return db.select({ count: count() }).from(places).where(whereCondition)
 }
+
+export function getPlacesByBoundsRepo(bounds: {
+  north: number
+  south: number
+  east: number
+  west: number
+}) {
+  const db = createDb()
+  return db.execute(sql<any>`
+    SELECT 
+      ${places.id},
+      ${places.name},
+      ${places.description},
+      ${places.latitude},
+      ${places.longitude},
+      ${places.streetAddress},
+      ${places.city},
+      ${places.stateProvince},
+      ${places.country},
+      ${places.rating},
+      ${places.reviewCount},
+      ${places.difficulty},
+      ${places.distance},
+      ${places.isFeatured},
+      (
+        SELECT JSON_BUILD_OBJECT(
+          'id', ${placeImages.id},
+          'url', ${placeImages.url},
+          'alt', ${placeImages.alt}
+        )
+        FROM ${placeImages}
+        WHERE ${placeImages.placeId} = ${places.id}
+        LIMIT 1
+      ) as first_image
+    FROM ${places}
+    WHERE ${places.latitude} BETWEEN ${bounds.south} AND ${bounds.north} 
+      AND ${places.longitude} BETWEEN ${bounds.west} AND ${bounds.east}
+  `)
+}

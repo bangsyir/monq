@@ -3,6 +3,7 @@ import {
   deletePlaceImagesRepo,
   getFeaturedPlacesRepo,
   getPlaceByIdRepo,
+  getPlacesByBoundsRepo,
   getPlacesCountWithFiltersRepo,
   getPlacesRepo,
   getPlacesWithDetailsRepo,
@@ -342,4 +343,19 @@ export async function getFeaturedPlacesService(limit: number = 8) {
   }))
 
   return { data: placesWithDetails, error: null }
+}
+
+export type PlaceByBounds = Awaited<ReturnType<typeof getPlacesByBoundsService>>
+
+export async function getPlacesByBoundsService(bounds: {
+  north: number
+  south: number
+  east: number
+  west: number
+}) {
+  const [result, error] = await safeDbQuery(getPlacesByBoundsRepo(bounds))
+  if (error) {
+    return { data: null, error }
+  }
+  return { data: result.rows, error: null }
 }

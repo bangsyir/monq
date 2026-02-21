@@ -5,6 +5,7 @@ import {
   createPlaceService,
   getFeaturedPlacesService,
   getPlaceService,
+  getPlacesByBoundsService,
   getPlacesForIndexService,
   getPlacesService,
   getTotalPlacesService,
@@ -158,6 +159,23 @@ export const getFeaturedPlaces = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const limit = data || 8
     const result = await getFeaturedPlacesService(limit)
+    if (result.error) {
+      throw new Error(result.error.message)
+    }
+    return result.data
+  })
+
+const MapBoundsSchema = z.object({
+  north: z.number(),
+  south: z.number(),
+  east: z.number(),
+  west: z.number(),
+})
+
+export const getPlacesByBounds = createServerFn({ method: "GET" })
+  .inputValidator(MapBoundsSchema)
+  .handler(async ({ data }) => {
+    const result = await getPlacesByBoundsService(data)
     if (result.error) {
       throw new Error(result.error.message)
     }
