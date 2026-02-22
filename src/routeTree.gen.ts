@@ -10,9 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as MapRouteImport } from './routes/map'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as PlacesRouteRouteImport } from './routes/places/route'
+import { Route as MapRouteRouteImport } from './routes/map/route'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as LayoutRouteRouteImport } from './routes/_layout/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -38,11 +38,6 @@ const SettingsRoute = SettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MapRoute = MapRouteImport.update({
-  id: '/map',
-  path: '/map',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -51,6 +46,11 @@ const LoginRoute = LoginRouteImport.update({
 const PlacesRouteRoute = PlacesRouteRouteImport.update({
   id: '/places',
   path: '/places',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MapRouteRoute = MapRouteRouteImport.update({
+  id: '/map',
+  path: '/map',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRouteRoute = AdminRouteRouteImport.update({
@@ -152,9 +152,9 @@ const AdminPlacesPlaceIdUpdateRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/map': typeof MapRouteRoute
   '/places': typeof PlacesRouteRouteWithChildren
   '/login': typeof LoginRoute
-  '/map': typeof MapRoute
   '/settings': typeof SettingsRoute
   '/dashboard': typeof LayoutDashboardRoute
   '/admin/categories': typeof AdminCategoriesRoute
@@ -175,8 +175,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/map': typeof MapRouteRoute
   '/login': typeof LoginRoute
-  '/map': typeof MapRoute
   '/settings': typeof SettingsRoute
   '/dashboard': typeof LayoutDashboardRoute
   '/admin/categories': typeof AdminCategoriesRoute
@@ -200,9 +200,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_layout': typeof LayoutRouteRouteWithChildren
   '/admin': typeof AdminRouteRouteWithChildren
+  '/map': typeof MapRouteRoute
   '/places': typeof PlacesRouteRouteWithChildren
   '/login': typeof LoginRoute
-  '/map': typeof MapRoute
   '/settings': typeof SettingsRoute
   '/_layout/dashboard': typeof LayoutDashboardRoute
   '/admin/categories': typeof AdminCategoriesRoute
@@ -226,9 +226,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/map'
     | '/places'
     | '/login'
-    | '/map'
     | '/settings'
     | '/dashboard'
     | '/admin/categories'
@@ -249,8 +249,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/login'
     | '/map'
+    | '/login'
     | '/settings'
     | '/dashboard'
     | '/admin/categories'
@@ -273,9 +273,9 @@ export interface FileRouteTypes {
     | '/'
     | '/_layout'
     | '/admin'
+    | '/map'
     | '/places'
     | '/login'
-    | '/map'
     | '/settings'
     | '/_layout/dashboard'
     | '/admin/categories'
@@ -299,9 +299,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LayoutRouteRoute: typeof LayoutRouteRouteWithChildren
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  MapRouteRoute: typeof MapRouteRoute
   PlacesRouteRoute: typeof PlacesRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
-  MapRoute: typeof MapRoute
   SettingsRoute: typeof SettingsRoute
   ApiUploadRoute: typeof ApiUploadRoute
   CommentsCommentIdRoute: typeof CommentsCommentIdRoute
@@ -317,13 +317,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/map': {
-      id: '/map'
-      path: '/map'
-      fullPath: '/map'
-      preLoaderRoute: typeof MapRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -336,6 +329,13 @@ declare module '@tanstack/react-router' {
       path: '/places'
       fullPath: '/places'
       preLoaderRoute: typeof PlacesRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/map': {
+      id: '/map'
+      path: '/map'
+      fullPath: '/map'
+      preLoaderRoute: typeof MapRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -534,9 +534,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LayoutRouteRoute: LayoutRouteRouteWithChildren,
   AdminRouteRoute: AdminRouteRouteWithChildren,
+  MapRouteRoute: MapRouteRoute,
   PlacesRouteRoute: PlacesRouteRouteWithChildren,
   LoginRoute: LoginRoute,
-  MapRoute: MapRoute,
   SettingsRoute: SettingsRoute,
   ApiUploadRoute: ApiUploadRoute,
   CommentsCommentIdRoute: CommentsCommentIdRoute,
