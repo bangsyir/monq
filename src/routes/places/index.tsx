@@ -121,6 +121,7 @@ function RouteComponent() {
               </form>
               <Link
                 to="/map"
+                preload={false}
                 className={buttonVariants({
                   variant: "outline",
                   className: "flex items-center gap-1",

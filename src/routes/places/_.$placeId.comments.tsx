@@ -45,7 +45,7 @@ export const Route = createFileRoute("/places/_/$placeId/comments")({
   component: RouteComponent,
   beforeLoad: ({ context, params: { placeId } }) => {
     if (!context.user) {
-      toast.error("Please login first")
+      toast.error("You need to login")
       throw redirect({ to: "/places/$placeId", params: { placeId } })
     }
   },
