@@ -58,7 +58,7 @@ export function MapContent({
                     <h3 className="mb-1 font-semibold">{place.name}</h3>
                     <div className="flex-cols flex items-center">
                       <p className="text-muted-foreground mb-2 text-xs">
-                        {place.streetaddress}, {place.city}
+                        {place.streetAddress}, {place.city}
                       </p>
                     </div>
 
