@@ -345,6 +345,28 @@ export async function getFeaturedPlacesService(limit: number = 8) {
   return { data: placesWithDetails, error: null }
 }
 
+export type PlaceByBoundsData = {
+  id: string
+  name: string | null
+  description: string | null
+  latitude: number | null
+  longitude: number | null
+  streetAddress: string | null
+  city: string | null
+  stateProvince: string | null
+  country: string | null
+  rating: number | null
+  reviewCount: number | null
+  difficulty: string | null
+  distance: string | null
+  isFeatured: boolean | null
+  first_image: {
+    id: string
+    url: string
+    alt: string | null
+  } | null
+}
+
 export type PlaceByBounds = Awaited<ReturnType<typeof getPlacesByBoundsService>>
 
 export async function getPlacesByBoundsService(bounds: {
@@ -357,5 +379,8 @@ export async function getPlacesByBoundsService(bounds: {
   if (error) {
     return { data: null, error }
   }
-  return { data: result.rows, error: null }
+  return {
+    data: result.rows as unknown as Array<PlaceByBoundsData>,
+    error: null,
+  }
 }
