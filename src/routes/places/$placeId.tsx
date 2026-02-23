@@ -63,7 +63,7 @@ const difficultyColors: Record<string, string> = {
 
 const getPlacesOptions = (placeId: string) =>
   queryOptions({
-    queryKey: ["get-places"],
+    queryKey: ["get-places", placeId],
     queryFn: () => getPlaceByIdNoAuth({ data: placeId }),
   })
 

@@ -1,6 +1,13 @@
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router"
 import { motion } from "framer-motion"
-import { ChevronLeft, ChevronRight, MapPin, Search, X } from "lucide-react"
+import {
+  ChevronLeft,
+  ChevronRight,
+  Lock,
+  MapPin,
+  Search,
+  X,
+} from "lucide-react"
 import React from "react"
 import CategoryFilter from "@/components/category-filter"
 import PlaceCard from "@/components/place-card"
@@ -16,24 +23,31 @@ type PlacesSearchFilter = {
 
 export const Route = createFileRoute("/places/")({
   component: RouteComponent,
+
   validateSearch: () => ({}) as PlacesSearchFilter,
   loaderDeps: ({ search: { cat, search, page } }) => ({ cat, search, page }),
-  loader: async ({ deps: { cat, search, page } }) => {
+  loader: async ({ context, deps: { cat, search, page } }) => {
     const category = cat === undefined || cat === "all" ? undefined : cat
     const searchQuery = search?.trim() || undefined
     const placesData = await getPlacesForIndex({
       data: { category, search: searchQuery, page: page || 1 },
     })
+    const isLoggedIn = context.user !== null
     return {
       selectedCategory: cat || "all",
       searchQuery: search || "",
       placesData,
+      isLoggedIn,
     }
+  },
+  errorComponent: ({ error }) => {
+    return <div className="pt-20">{JSON.stringify(error.message)}</div>
   },
 })
 
 function RouteComponent() {
-  const { selectedCategory, placesData, searchQuery } = Route.useLoaderData()
+  const { selectedCategory, placesData, searchQuery, isLoggedIn } =
+    Route.useLoaderData()
   const navigate = useNavigate({ from: "/places" })
   const search = Route.useSearch()
   const [searchInput, setSearchInput] = React.useState(searchQuery)
@@ -124,11 +138,12 @@ function RouteComponent() {
                 preload={false}
                 className={buttonVariants({
                   variant: "outline",
-                  className: "flex items-center gap-1",
+                  className: `flex items-center gap-1 ${!isLoggedIn && "text-muted-foreground hover:text-muted-foreground"}`,
                 })}
               >
                 <MapPin className="h-4 w-4" />
                 Show map
+                {!isLoggedIn && <Lock className="h-4 w-4" />}
               </Link>
             </div>
           </motion.div>

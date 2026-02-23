@@ -1,6 +1,6 @@
 import { Link, getRouteApi } from "@tanstack/react-router"
 import { motion } from "framer-motion"
-import { Loader2, Star } from "lucide-react"
+import { Loader2, Lock, Star } from "lucide-react"
 import { useState } from "react"
 import { useServerFn } from "@tanstack/react-start"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
@@ -240,10 +240,16 @@ export function CommentsComponent() {
               <Link
                 to="/places/$placeId/comments"
                 params={{ placeId: place.id }}
-                className={buttonVariants({ variant: "outline" })}
+                className={buttonVariants({
+                  variant: "outline",
+                  className:
+                    !isLoggedIn &&
+                    "text-muted-foreground hover:text-muted-foreground",
+                })}
                 preload={false}
               >
                 View all comments
+                {!isLoggedIn && <Lock />}
               </Link>
             </div>
           </>
