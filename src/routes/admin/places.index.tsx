@@ -95,6 +95,7 @@ function PlacesContent({
       search: {
         page: currentPage + 1,
       },
+      resetScroll: true,
     })
   }
 
@@ -103,6 +104,7 @@ function PlacesContent({
       search: {
         page: currentPage - 1,
       },
+      resetScroll: true,
     })
   }
 

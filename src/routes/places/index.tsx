@@ -69,12 +69,14 @@ function RouteComponent() {
   const handleNext = () => {
     navigate({
       search: { ...search, page: placesData.currentPage + 1 },
+      resetScroll: true,
     })
   }
 
   const handlePrev = () => {
     navigate({
       search: { ...search, page: placesData.currentPage - 1 },
+      resetScroll: true,
     })
   }
 
