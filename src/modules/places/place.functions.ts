@@ -100,7 +100,7 @@ export const getPlaces = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const { search, page, sortBy, sortOrder } = data
     const currentPage = page || 1
-    const limit = 100
+    const limit = 25
     const offset = (currentPage - 1) * limit
     // Build where conditions
     const whereConditions = placeConditionFilterRepo(search)

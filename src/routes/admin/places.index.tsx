@@ -1,6 +1,7 @@
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router"
 import { Edit, ImageIcon, MapPin, MoreHorizontal, Star } from "lucide-react"
 import { useState } from "react"
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query"
 import type { RegisteredRouter, RouteById } from "@tanstack/react-router"
 import type { PlaceFilter } from "@/modules/places"
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -24,6 +25,12 @@ import { cn } from "@/lib/utils"
 import { getPlaces } from "@/modules/places"
 import { PlacesLoadingSkeleton } from "@/components/places-loading-skeleton"
 
+const placesQueryOptions = (data: PlaceFilter) =>
+  queryOptions({
+    queryKey: ["admin-places", data.page],
+    queryFn: () => getPlaces({ data: data }),
+  })
+
 export const Route = createFileRoute("/admin/places/")({
   validateSearch: () => ({}) as PlaceFilter,
   loaderDeps: ({ search: { search, page, sortBy, sortOrder } }) => ({
@@ -32,10 +39,12 @@ export const Route = createFileRoute("/admin/places/")({
     sortBy,
     sortOrder,
   }),
-  loader: async ({ deps }) => {
-    const placesDataPromise = await getPlaces({ data: deps })
+  loader: async ({ context, deps }) => {
+    const placesData = await context.queryClient.ensureQueryData(
+      placesQueryOptions(deps),
+    )
     return {
-      placesData: placesDataPromise,
+      placesData,
     }
   },
   component: RouteComponent,
@@ -291,10 +300,17 @@ function PlacesContent({
 }
 
 function RouteComponent() {
-  const { placesData } = Route.useLoaderData()
+  const { search, page, sortBy, sortOrder } = Route.useSearch()
+  const { data: placesData, isLoading } = useSuspenseQuery(
+    placesQueryOptions({ search, page, sortBy, sortOrder }),
+  )
   return (
     <div className="container mx-auto py-6">
-      <PlacesContent placesData={placesData} />
+      {isLoading ? (
+        <PlacesLoadingSkeleton />
+      ) : (
+        <PlacesContent placesData={placesData} />
+      )}
     </div>
   )
 }
