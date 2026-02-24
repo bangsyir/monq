@@ -1,5 +1,5 @@
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router"
-import { Edit, MapPin, MoreHorizontal, Star } from "lucide-react"
+import { Edit, ImageIcon, MapPin, MoreHorizontal, Star } from "lucide-react"
 import { useState } from "react"
 import type { RegisteredRouter, RouteById } from "@tanstack/react-router"
 import type { PlaceFilter } from "@/modules/places"
@@ -139,6 +139,7 @@ function PlacesContent({
         <TableCaption>A list of all places in the system.</TableCaption>
         <TableHeader>
           <TableRow>
+            <TableHead>Image</TableHead>
             <TableHead
               className="cursor-pointer"
               onClick={() => handleSort("name")}
@@ -179,6 +180,19 @@ function PlacesContent({
         <TableBody>
           {placesData.places.map((place) => (
             <TableRow key={place.id}>
+              <TableCell>
+                {place.firstImage ? (
+                  <img
+                    src={place.firstImage.url}
+                    alt={place.firstImage.alt || place.name}
+                    className="h-16 w-24 rounded-md object-cover"
+                  />
+                ) : (
+                  <div className="flex h-16 w-24 items-center justify-center rounded-md bg-gray-100">
+                    <ImageIcon className="h-8 w-8 text-gray-400" />
+                  </div>
+                )}
+              </TableCell>
               <TableCell>
                 <div className="font-medium">{place.name}</div>
                 {place.description && (

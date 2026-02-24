@@ -298,9 +298,16 @@ export function getPlacesRepo({
       createdAt: places.createdAt,
       updatedAt: places.updatedAt,
       userId: places.userId,
+      // Images
+      firstImage: {
+        id: placeImages.id,
+        url: placeImages.url,
+        alt: placeImages.alt,
+      },
       // Total count using window function
     })
     .from(places)
+    .leftJoin(placeImages, eq(placeImages.placeId, places.id))
     .where(filter)
     .orderBy(sortOrder === "desc" ? desc(sortColumn) : asc(sortColumn))
     .limit(limit)

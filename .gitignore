@@ -14,5 +14,9 @@ todos.json
 public/uploads
 public/gallery-manifest.json
 src/db/seed-places.ts
+src/db/seed-selangor.ts
 scripts
 wrangler.jsonc
+
+src/data/kuala-lumpur.json
+src/data/selangor.json

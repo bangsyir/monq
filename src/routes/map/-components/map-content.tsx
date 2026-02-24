@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router"
-import { ExternalLink } from "lucide-react"
+import { ExternalLink, ImageIcon } from "lucide-react"
 import type { MapRef, MapViewport } from "@/components/ui/map"
 import { buttonVariants } from "@/components/ui/button"
 import {
@@ -45,13 +45,17 @@ export function MapContent({
                   </div>
                 </MarkerContent>
                 <MarkerPopup className="w-62 p-0">
-                  {place.first_image?.url && (
+                  {place.first_image?.url ? (
                     <div className="relative h-32 overflow-hidden rounded-t-md">
                       <img
                         src={place.first_image.url}
                         alt={place.name}
                         className="mb-2 h-32 w-full rounded-md object-cover"
                       />
+                    </div>
+                  ) : (
+                    <div className="bg-muted flex h-32 items-center justify-center rounded-t-md">
+                      <ImageIcon className="text-muted-foreground h-10 w-10" />
                     </div>
                   )}
                   <div className="space-y-2 p-3">

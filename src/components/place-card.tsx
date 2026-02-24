@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router"
 import { motion } from "framer-motion"
-import { MapPin, Star } from "lucide-react"
+import { ImageIcon, MapPin, Star } from "lucide-react"
 import type { Place } from "@/types/place"
 import { Badge } from "@/components/ui/badge"
 
@@ -30,13 +30,19 @@ const PlaceCard = ({ place, index = 0 }: PlaceCardProps) => {
       >
         <div className="relative overflow-hidden rounded-xl">
           {/* Image Container */}
-          <div className="aspect-[4/3] overflow-hidden rounded-xl">
-            <motion.img
-              src={place.images[0]?.url}
-              alt={place.name}
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-              whileHover={{ scale: 1.05 }}
-            />
+          <div className="bg-muted aspect-[4/3] overflow-hidden rounded-xl">
+            {place.images && place.images.length > 0 ? (
+              <motion.img
+                src={place.images[0]?.url}
+                alt={place.name}
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                whileHover={{ scale: 1.05 }}
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center">
+                <ImageIcon className="text-muted-foreground h-16 w-16" />
+              </div>
+            )}
           </div>
 
           {/* Favorite Button */}
