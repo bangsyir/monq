@@ -27,7 +27,7 @@ import { PlacesLoadingSkeleton } from "@/components/places-loading-skeleton"
 
 const placesQueryOptions = (data: PlaceFilter) =>
   queryOptions({
-    queryKey: ["admin-places", data.page],
+    queryKey: ["admin-places", data.page, data.search],
     queryFn: () => getPlaces({ data: data }),
   })
 
