@@ -1,7 +1,5 @@
-import { config } from "dotenv"
+import * as process from "node:process"
 import { defineConfig } from "drizzle-kit"
-
-config({ path: [".env.local", ".env"] })
 
 export default defineConfig({
   schema: "./src/db/schema.ts",
