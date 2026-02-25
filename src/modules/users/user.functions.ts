@@ -1,10 +1,50 @@
 import { createServerFn } from "@tanstack/react-start"
 import { asc, count, desc, ilike, or } from "drizzle-orm"
-import { updateUserService } from "./user-service.server"
+import { z } from "zod"
+import {
+  getUserByIdService,
+  updateUserByIdService,
+  updateUserService,
+} from "./user-service.server"
 import { UserQuerySchema, updateUserSchema } from "./user-schema"
 import { authMiddleware } from "@/lib/auth-middleware"
 import { createDb } from "@/db"
 import { users } from "@/db/schema"
+
+export const getUserById = createServerFn({ method: "GET" })
+  .inputValidator(z.object({ userId: z.string() }))
+  .handler(async ({ data }) => {
+    const result = await getUserByIdService(data.userId)
+    if (result.error) {
+      throw new Error(result.message, { cause: result.error.cause })
+    }
+    return result.data
+  })
+
+const adminUpdateUserSchema = z.object({
+  userId: z.string().min(1, "user id required"),
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email address"),
+  role: z.enum(["user", "admin"]).default("user"),
+  emailVerified: z.boolean().default(false),
+  banned: z.boolean().default(false),
+  banReason: z.string().optional(),
+  banExpires: z.string().optional(),
+})
+
+export const updateUserById = createServerFn({ method: "POST" })
+  .inputValidator(adminUpdateUserSchema)
+  .handler(async ({ data }) => {
+    const { banExpires, ...updateData } = data
+    const result = await updateUserByIdService({
+      ...updateData,
+      banExpires: banExpires ? new Date(banExpires) : null,
+    })
+    if (result.error) {
+      throw new Error(result.message, { cause: result.error.cause })
+    }
+    return result.data
+  })
 
 export const updateUserProfile = createServerFn({ method: "POST" })
   .middleware([authMiddleware])

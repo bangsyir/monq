@@ -1,11 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { eq } from "drizzle-orm"
 import { ChevronsLeft, Save } from "lucide-react"
-import { createServerFn, useServerFn } from "@tanstack/react-start"
+import { useServerFn } from "@tanstack/react-start"
 import { useState } from "react"
-import { z } from "zod"
 import { toast } from "sonner"
-import { users } from "@/db/schema"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -26,60 +23,11 @@ import {
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
-import { createDb } from "@/db"
-
-const UpdateUserSchema = z.object({
-  userId: z.string().min(1, "user id required"),
-  name: z.string().min(1, "Name is required"),
-  email: z.email("Invalid email address"),
-  role: z.enum(["user", "admin"]).default("user"),
-  emailVerified: z.boolean().default(false),
-  banned: z.boolean().default(false),
-  banReason: z.string().optional(),
-  banExpires: z.string().optional(),
-})
-
-const getUserFn = createServerFn({ method: "GET" })
-  .inputValidator(
-    z.object({
-      userId: z.string(),
-    }),
-  )
-  .handler(async ({ data }: { data: { userId: string } }) => {
-    const db = createDb()
-    const user = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, data.userId))
-      .limit(1)
-
-    return user[0] || null
-  })
-
-const updateUserFn = createServerFn({ method: "POST" })
-  .inputValidator(UpdateUserSchema)
-  .handler(async ({ data }) => {
-    const db = createDb()
-    const { banExpires, ...updateData } = data
-
-    const updateValues = {
-      ...updateData,
-      updatedAt: new Date(),
-      banExpires: banExpires ? new Date(banExpires) : null,
-    }
-
-    const result = await db
-      .update(users)
-      .set(updateValues)
-      .where(eq(users.id, data.userId))
-      .returning()
-
-    return result[0] || null
-  })
+import { getUserById, updateUserById } from "@/modules/users"
 
 export const Route = createFileRoute("/admin/users_/$userId/update")({
   loader: async ({ params }) => {
-    const user = await getUserFn({ data: { userId: params.userId } })
+    const user = await getUserById({ data: { userId: params.userId } })
     return { user }
   },
   component: RouteComponent,
@@ -88,7 +36,7 @@ export const Route = createFileRoute("/admin/users_/$userId/update")({
 function RouteComponent() {
   const { user } = Route.useLoaderData()
   const navigate = useNavigate({ from: "/admin/users/" })
-  const updateUserMutation = useServerFn(updateUserFn)
+  const updateUserMutation = useServerFn(updateUserById)
 
   const [formData, setFormData] = useState({
     name: user?.name || "",

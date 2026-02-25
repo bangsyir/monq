@@ -1,4 +1,3 @@
-import { createServerFn } from "@tanstack/react-start"
 import {
   Ban,
   Calendar,
@@ -10,11 +9,8 @@ import {
   User,
   XCircle,
 } from "lucide-react"
-import { eq } from "drizzle-orm"
 import { Link, createFileRoute } from "@tanstack/react-router"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { createDb } from "@/db"
-import { users } from "@/db/schema"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -25,19 +21,9 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { getUserById } from "@/modules/users"
 
-const getUserFn = createServerFn({ method: "GET" })
-  .inputValidator((data: { userId: string }) => data)
-  .handler(async ({ data }) => {
-    const db = createDb()
-    const user = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, data.userId))
-      .limit(1)
-
-    return user[0] || null
-  })
+const getUserFn = getUserById
 
 export const Route = createFileRoute("/admin/users/$userId")({
   loader: async ({ params }) => {
