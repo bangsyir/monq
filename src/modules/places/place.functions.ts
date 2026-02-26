@@ -130,6 +130,7 @@ export const getPlaces = createServerFn({ method: "GET" })
   })
 
 export const getPlacesForIndex = createServerFn({ method: "GET" })
+  .middleware([rateLimitMiddleware])
   .inputValidator(MainPlaceFilterSchema)
   .handler(async ({ data }) => {
     const currentPage = data.page || 1
