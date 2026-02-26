@@ -10,6 +10,7 @@ export const rateLimitMiddleware = createMiddleware().server(
     const ip =
       headers["x-forwarded-for"]?.split(",")[0] ??
       headers["x-real-ip"] ??
+      headers["cf-connecting-ip"] ??
       "unknown"
 
     const { success } = await searchRateLimit.limit(ip)
@@ -28,8 +29,8 @@ export const commentRateLimitMiddleware = createMiddleware().server(
     const ip =
       headers["x-forwarded-for"]?.split(",")[0] ??
       headers["x-real-ip"] ??
+      headers["cf-connecting-ip"] ??
       "unknown"
-
     const { success } = await commentRateLimit.limit(ip)
 
     if (!success) {
