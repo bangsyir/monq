@@ -31,7 +31,11 @@ export function createAuth() {
       },
       ipAddress: {
         // Use Cloudflare's IP header for Cloudflare Workers
-        ipAddressHeaders: ["cf-connecting-ip", "x-forwarded-for"],
+        ipAddressHeaders: [
+          "cf-connecting-ip",
+          "x-forwarded-for",
+          "CF-Connecting-IP",
+        ],
         // Or disable IP tracking entirely if you prefer:
         // disableIpTracking: true,
       },

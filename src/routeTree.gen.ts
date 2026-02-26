@@ -8,291 +8,291 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as PlacesRouteRouteImport } from './routes/places/route'
-import { Route as MapRouteRouteImport } from './routes/map/route'
-import { Route as AdminRouteRouteImport } from './routes/admin/route'
-import { Route as LayoutRouteRouteImport } from './routes/_layout/route'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as PlacesIndexRouteImport } from './routes/places/index'
-import { Route as AdminIndexRouteImport } from './routes/admin/index'
-import { Route as PlacesPlaceIdRouteImport } from './routes/places/$placeId'
-import { Route as CommentsCommentIdRouteImport } from './routes/comments.$commentId'
-import { Route as ApiUploadRouteImport } from './routes/api/upload'
-import { Route as AdminGalleryRouteImport } from './routes/admin/gallery'
-import { Route as AdminCategoriesRouteImport } from './routes/admin/categories'
-import { Route as LayoutDashboardRouteImport } from './routes/_layout/dashboard'
-import { Route as AdminUsersIndexRouteImport } from './routes/admin/users.index'
-import { Route as AdminPlacesIndexRouteImport } from './routes/admin/places.index'
-import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
-import { Route as AdminUsersUserIdRouteImport } from './routes/admin/users.$userId'
-import { Route as AdminPlacesAddRouteImport } from './routes/admin/places.add'
-import { Route as PlacesPlaceIdCommentsRouteImport } from './routes/places/_.$placeId.comments'
-import { Route as AdminUsersUserIdUpdateRouteImport } from './routes/admin/users_.$userId.update'
-import { Route as AdminPlacesPlaceIdUpdateRouteImport } from './routes/admin/places.$placeId.update'
+import { Route as rootRouteImport } from "./routes/__root"
+import { Route as SettingsRouteImport } from "./routes/settings"
+import { Route as LoginRouteImport } from "./routes/login"
+import { Route as PlacesRouteRouteImport } from "./routes/places/route"
+import { Route as MapRouteRouteImport } from "./routes/map/route"
+import { Route as AdminRouteRouteImport } from "./routes/admin/route"
+import { Route as LayoutRouteRouteImport } from "./routes/_layout/route"
+import { Route as IndexRouteImport } from "./routes/index"
+import { Route as PlacesIndexRouteImport } from "./routes/places/index"
+import { Route as AdminIndexRouteImport } from "./routes/admin/index"
+import { Route as PlacesPlaceIdRouteImport } from "./routes/places/$placeId"
+import { Route as CommentsCommentIdRouteImport } from "./routes/comments.$commentId"
+import { Route as ApiUploadRouteImport } from "./routes/api/upload"
+import { Route as AdminGalleryRouteImport } from "./routes/admin/gallery"
+import { Route as AdminCategoriesRouteImport } from "./routes/admin/categories"
+import { Route as LayoutDashboardRouteImport } from "./routes/_layout/dashboard"
+import { Route as AdminUsersIndexRouteImport } from "./routes/admin/users.index"
+import { Route as AdminPlacesIndexRouteImport } from "./routes/admin/places.index"
+import { Route as ApiAuthSplatRouteImport } from "./routes/api/auth.$"
+import { Route as AdminUsersUserIdRouteImport } from "./routes/admin/users.$userId"
+import { Route as AdminPlacesAddRouteImport } from "./routes/admin/places.add"
+import { Route as PlacesPlaceIdCommentsRouteImport } from "./routes/places/_.$placeId.comments"
+import { Route as AdminUsersUserIdUpdateRouteImport } from "./routes/admin/users_.$userId.update"
+import { Route as AdminPlacesPlaceIdUpdateRouteImport } from "./routes/admin/places.$placeId.update"
 
 const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
+  id: "/settings",
+  path: "/settings",
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+  id: "/login",
+  path: "/login",
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlacesRouteRoute = PlacesRouteRouteImport.update({
-  id: '/places',
-  path: '/places',
+  id: "/places",
+  path: "/places",
   getParentRoute: () => rootRouteImport,
 } as any)
 const MapRouteRoute = MapRouteRouteImport.update({
-  id: '/map',
-  path: '/map',
+  id: "/map",
+  path: "/map",
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRouteRoute = AdminRouteRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+  id: "/admin",
+  path: "/admin",
   getParentRoute: () => rootRouteImport,
 } as any)
 const LayoutRouteRoute = LayoutRouteRouteImport.update({
-  id: '/_layout',
+  id: "/_layout",
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlacesIndexRoute = PlacesIndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => PlacesRouteRoute,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const PlacesPlaceIdRoute = PlacesPlaceIdRouteImport.update({
-  id: '/$placeId',
-  path: '/$placeId',
+  id: "/$placeId",
+  path: "/$placeId",
   getParentRoute: () => PlacesRouteRoute,
 } as any)
 const CommentsCommentIdRoute = CommentsCommentIdRouteImport.update({
-  id: '/comments/$commentId',
-  path: '/comments/$commentId',
+  id: "/comments/$commentId",
+  path: "/comments/$commentId",
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiUploadRoute = ApiUploadRouteImport.update({
-  id: '/api/upload',
-  path: '/api/upload',
+  id: "/api/upload",
+  path: "/api/upload",
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminGalleryRoute = AdminGalleryRouteImport.update({
-  id: '/gallery',
-  path: '/gallery',
+  id: "/gallery",
+  path: "/gallery",
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
-  id: '/categories',
-  path: '/categories',
+  id: "/categories",
+  path: "/categories",
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const LayoutDashboardRoute = LayoutDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+  id: "/dashboard",
+  path: "/dashboard",
   getParentRoute: () => LayoutRouteRoute,
 } as any)
 const AdminUsersIndexRoute = AdminUsersIndexRouteImport.update({
-  id: '/users/',
-  path: '/users/',
+  id: "/users/",
+  path: "/users/",
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminPlacesIndexRoute = AdminPlacesIndexRouteImport.update({
-  id: '/places/',
-  path: '/places/',
+  id: "/places/",
+  path: "/places/",
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
+  id: "/api/auth/$",
+  path: "/api/auth/$",
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminUsersUserIdRoute = AdminUsersUserIdRouteImport.update({
-  id: '/users/$userId',
-  path: '/users/$userId',
+  id: "/users/$userId",
+  path: "/users/$userId",
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminPlacesAddRoute = AdminPlacesAddRouteImport.update({
-  id: '/places/add',
-  path: '/places/add',
+  id: "/places/add",
+  path: "/places/add",
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const PlacesPlaceIdCommentsRoute = PlacesPlaceIdCommentsRouteImport.update({
-  id: '/_/$placeId/comments',
-  path: '/$placeId/comments',
+  id: "/_/$placeId/comments",
+  path: "/$placeId/comments",
   getParentRoute: () => PlacesRouteRoute,
 } as any)
 const AdminUsersUserIdUpdateRoute = AdminUsersUserIdUpdateRouteImport.update({
-  id: '/users_/$userId/update',
-  path: '/users/$userId/update',
+  id: "/users_/$userId/update",
+  path: "/users/$userId/update",
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminPlacesPlaceIdUpdateRoute =
   AdminPlacesPlaceIdUpdateRouteImport.update({
-    id: '/places/$placeId/update',
-    path: '/places/$placeId/update',
+    id: "/places/$placeId/update",
+    path: "/places/$placeId/update",
     getParentRoute: () => AdminRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/admin': typeof AdminRouteRouteWithChildren
-  '/map': typeof MapRouteRoute
-  '/places': typeof PlacesRouteRouteWithChildren
-  '/login': typeof LoginRoute
-  '/settings': typeof SettingsRoute
-  '/dashboard': typeof LayoutDashboardRoute
-  '/admin/categories': typeof AdminCategoriesRoute
-  '/admin/gallery': typeof AdminGalleryRoute
-  '/api/upload': typeof ApiUploadRoute
-  '/comments/$commentId': typeof CommentsCommentIdRoute
-  '/places/$placeId': typeof PlacesPlaceIdRoute
-  '/admin/': typeof AdminIndexRoute
-  '/places/': typeof PlacesIndexRoute
-  '/admin/places/add': typeof AdminPlacesAddRoute
-  '/admin/users/$userId': typeof AdminUsersUserIdRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
-  '/admin/places/': typeof AdminPlacesIndexRoute
-  '/admin/users/': typeof AdminUsersIndexRoute
-  '/admin/places/$placeId/update': typeof AdminPlacesPlaceIdUpdateRoute
-  '/admin/users/$userId/update': typeof AdminUsersUserIdUpdateRoute
-  '/places/$placeId/comments': typeof PlacesPlaceIdCommentsRoute
+  "/": typeof IndexRoute
+  "/admin": typeof AdminRouteRouteWithChildren
+  "/map": typeof MapRouteRoute
+  "/places": typeof PlacesRouteRouteWithChildren
+  "/login": typeof LoginRoute
+  "/settings": typeof SettingsRoute
+  "/dashboard": typeof LayoutDashboardRoute
+  "/admin/categories": typeof AdminCategoriesRoute
+  "/admin/gallery": typeof AdminGalleryRoute
+  "/api/upload": typeof ApiUploadRoute
+  "/comments/$commentId": typeof CommentsCommentIdRoute
+  "/places/$placeId": typeof PlacesPlaceIdRoute
+  "/admin/": typeof AdminIndexRoute
+  "/places/": typeof PlacesIndexRoute
+  "/admin/places/add": typeof AdminPlacesAddRoute
+  "/admin/users/$userId": typeof AdminUsersUserIdRoute
+  "/api/auth/$": typeof ApiAuthSplatRoute
+  "/admin/places/": typeof AdminPlacesIndexRoute
+  "/admin/users/": typeof AdminUsersIndexRoute
+  "/admin/places/$placeId/update": typeof AdminPlacesPlaceIdUpdateRoute
+  "/admin/users/$userId/update": typeof AdminUsersUserIdUpdateRoute
+  "/places/$placeId/comments": typeof PlacesPlaceIdCommentsRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/map': typeof MapRouteRoute
-  '/login': typeof LoginRoute
-  '/settings': typeof SettingsRoute
-  '/dashboard': typeof LayoutDashboardRoute
-  '/admin/categories': typeof AdminCategoriesRoute
-  '/admin/gallery': typeof AdminGalleryRoute
-  '/api/upload': typeof ApiUploadRoute
-  '/comments/$commentId': typeof CommentsCommentIdRoute
-  '/places/$placeId': typeof PlacesPlaceIdRoute
-  '/admin': typeof AdminIndexRoute
-  '/places': typeof PlacesIndexRoute
-  '/admin/places/add': typeof AdminPlacesAddRoute
-  '/admin/users/$userId': typeof AdminUsersUserIdRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
-  '/admin/places': typeof AdminPlacesIndexRoute
-  '/admin/users': typeof AdminUsersIndexRoute
-  '/admin/places/$placeId/update': typeof AdminPlacesPlaceIdUpdateRoute
-  '/admin/users/$userId/update': typeof AdminUsersUserIdUpdateRoute
-  '/places/$placeId/comments': typeof PlacesPlaceIdCommentsRoute
+  "/": typeof IndexRoute
+  "/map": typeof MapRouteRoute
+  "/login": typeof LoginRoute
+  "/settings": typeof SettingsRoute
+  "/dashboard": typeof LayoutDashboardRoute
+  "/admin/categories": typeof AdminCategoriesRoute
+  "/admin/gallery": typeof AdminGalleryRoute
+  "/api/upload": typeof ApiUploadRoute
+  "/comments/$commentId": typeof CommentsCommentIdRoute
+  "/places/$placeId": typeof PlacesPlaceIdRoute
+  "/admin": typeof AdminIndexRoute
+  "/places": typeof PlacesIndexRoute
+  "/admin/places/add": typeof AdminPlacesAddRoute
+  "/admin/users/$userId": typeof AdminUsersUserIdRoute
+  "/api/auth/$": typeof ApiAuthSplatRoute
+  "/admin/places": typeof AdminPlacesIndexRoute
+  "/admin/users": typeof AdminUsersIndexRoute
+  "/admin/places/$placeId/update": typeof AdminPlacesPlaceIdUpdateRoute
+  "/admin/users/$userId/update": typeof AdminUsersUserIdUpdateRoute
+  "/places/$placeId/comments": typeof PlacesPlaceIdCommentsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/_layout': typeof LayoutRouteRouteWithChildren
-  '/admin': typeof AdminRouteRouteWithChildren
-  '/map': typeof MapRouteRoute
-  '/places': typeof PlacesRouteRouteWithChildren
-  '/login': typeof LoginRoute
-  '/settings': typeof SettingsRoute
-  '/_layout/dashboard': typeof LayoutDashboardRoute
-  '/admin/categories': typeof AdminCategoriesRoute
-  '/admin/gallery': typeof AdminGalleryRoute
-  '/api/upload': typeof ApiUploadRoute
-  '/comments/$commentId': typeof CommentsCommentIdRoute
-  '/places/$placeId': typeof PlacesPlaceIdRoute
-  '/admin/': typeof AdminIndexRoute
-  '/places/': typeof PlacesIndexRoute
-  '/admin/places/add': typeof AdminPlacesAddRoute
-  '/admin/users/$userId': typeof AdminUsersUserIdRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
-  '/admin/places/': typeof AdminPlacesIndexRoute
-  '/admin/users/': typeof AdminUsersIndexRoute
-  '/admin/places/$placeId/update': typeof AdminPlacesPlaceIdUpdateRoute
-  '/admin/users_/$userId/update': typeof AdminUsersUserIdUpdateRoute
-  '/places/_/$placeId/comments': typeof PlacesPlaceIdCommentsRoute
+  "/": typeof IndexRoute
+  "/_layout": typeof LayoutRouteRouteWithChildren
+  "/admin": typeof AdminRouteRouteWithChildren
+  "/map": typeof MapRouteRoute
+  "/places": typeof PlacesRouteRouteWithChildren
+  "/login": typeof LoginRoute
+  "/settings": typeof SettingsRoute
+  "/_layout/dashboard": typeof LayoutDashboardRoute
+  "/admin/categories": typeof AdminCategoriesRoute
+  "/admin/gallery": typeof AdminGalleryRoute
+  "/api/upload": typeof ApiUploadRoute
+  "/comments/$commentId": typeof CommentsCommentIdRoute
+  "/places/$placeId": typeof PlacesPlaceIdRoute
+  "/admin/": typeof AdminIndexRoute
+  "/places/": typeof PlacesIndexRoute
+  "/admin/places/add": typeof AdminPlacesAddRoute
+  "/admin/users/$userId": typeof AdminUsersUserIdRoute
+  "/api/auth/$": typeof ApiAuthSplatRoute
+  "/admin/places/": typeof AdminPlacesIndexRoute
+  "/admin/users/": typeof AdminUsersIndexRoute
+  "/admin/places/$placeId/update": typeof AdminPlacesPlaceIdUpdateRoute
+  "/admin/users_/$userId/update": typeof AdminUsersUserIdUpdateRoute
+  "/places/_/$placeId/comments": typeof PlacesPlaceIdCommentsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
-    | '/admin'
-    | '/map'
-    | '/places'
-    | '/login'
-    | '/settings'
-    | '/dashboard'
-    | '/admin/categories'
-    | '/admin/gallery'
-    | '/api/upload'
-    | '/comments/$commentId'
-    | '/places/$placeId'
-    | '/admin/'
-    | '/places/'
-    | '/admin/places/add'
-    | '/admin/users/$userId'
-    | '/api/auth/$'
-    | '/admin/places/'
-    | '/admin/users/'
-    | '/admin/places/$placeId/update'
-    | '/admin/users/$userId/update'
-    | '/places/$placeId/comments'
+    | "/"
+    | "/admin"
+    | "/map"
+    | "/places"
+    | "/login"
+    | "/settings"
+    | "/dashboard"
+    | "/admin/categories"
+    | "/admin/gallery"
+    | "/api/upload"
+    | "/comments/$commentId"
+    | "/places/$placeId"
+    | "/admin/"
+    | "/places/"
+    | "/admin/places/add"
+    | "/admin/users/$userId"
+    | "/api/auth/$"
+    | "/admin/places/"
+    | "/admin/users/"
+    | "/admin/places/$placeId/update"
+    | "/admin/users/$userId/update"
+    | "/places/$placeId/comments"
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
-    | '/map'
-    | '/login'
-    | '/settings'
-    | '/dashboard'
-    | '/admin/categories'
-    | '/admin/gallery'
-    | '/api/upload'
-    | '/comments/$commentId'
-    | '/places/$placeId'
-    | '/admin'
-    | '/places'
-    | '/admin/places/add'
-    | '/admin/users/$userId'
-    | '/api/auth/$'
-    | '/admin/places'
-    | '/admin/users'
-    | '/admin/places/$placeId/update'
-    | '/admin/users/$userId/update'
-    | '/places/$placeId/comments'
+    | "/"
+    | "/map"
+    | "/login"
+    | "/settings"
+    | "/dashboard"
+    | "/admin/categories"
+    | "/admin/gallery"
+    | "/api/upload"
+    | "/comments/$commentId"
+    | "/places/$placeId"
+    | "/admin"
+    | "/places"
+    | "/admin/places/add"
+    | "/admin/users/$userId"
+    | "/api/auth/$"
+    | "/admin/places"
+    | "/admin/users"
+    | "/admin/places/$placeId/update"
+    | "/admin/users/$userId/update"
+    | "/places/$placeId/comments"
   id:
-    | '__root__'
-    | '/'
-    | '/_layout'
-    | '/admin'
-    | '/map'
-    | '/places'
-    | '/login'
-    | '/settings'
-    | '/_layout/dashboard'
-    | '/admin/categories'
-    | '/admin/gallery'
-    | '/api/upload'
-    | '/comments/$commentId'
-    | '/places/$placeId'
-    | '/admin/'
-    | '/places/'
-    | '/admin/places/add'
-    | '/admin/users/$userId'
-    | '/api/auth/$'
-    | '/admin/places/'
-    | '/admin/users/'
-    | '/admin/places/$placeId/update'
-    | '/admin/users_/$userId/update'
-    | '/places/_/$placeId/comments'
+    | "__root__"
+    | "/"
+    | "/_layout"
+    | "/admin"
+    | "/map"
+    | "/places"
+    | "/login"
+    | "/settings"
+    | "/_layout/dashboard"
+    | "/admin/categories"
+    | "/admin/gallery"
+    | "/api/upload"
+    | "/comments/$commentId"
+    | "/places/$placeId"
+    | "/admin/"
+    | "/places/"
+    | "/admin/places/add"
+    | "/admin/users/$userId"
+    | "/api/auth/$"
+    | "/admin/places/"
+    | "/admin/users/"
+    | "/admin/places/$placeId/update"
+    | "/admin/users_/$userId/update"
+    | "/places/_/$placeId/comments"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -308,166 +308,166 @@ export interface RootRouteChildren {
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
+    "/settings": {
+      id: "/settings"
+      path: "/settings"
+      fullPath: "/settings"
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
+    "/login": {
+      id: "/login"
+      path: "/login"
+      fullPath: "/login"
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/places': {
-      id: '/places'
-      path: '/places'
-      fullPath: '/places'
+    "/places": {
+      id: "/places"
+      path: "/places"
+      fullPath: "/places"
       preLoaderRoute: typeof PlacesRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/map': {
-      id: '/map'
-      path: '/map'
-      fullPath: '/map'
+    "/map": {
+      id: "/map"
+      path: "/map"
+      fullPath: "/map"
       preLoaderRoute: typeof MapRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
+    "/admin": {
+      id: "/admin"
+      path: "/admin"
+      fullPath: "/admin"
       preLoaderRoute: typeof AdminRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_layout': {
-      id: '/_layout'
-      path: ''
-      fullPath: '/'
+    "/_layout": {
+      id: "/_layout"
+      path: ""
+      fullPath: "/"
       preLoaderRoute: typeof LayoutRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
+    "/": {
+      id: "/"
+      path: "/"
+      fullPath: "/"
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/places/': {
-      id: '/places/'
-      path: '/'
-      fullPath: '/places/'
+    "/places/": {
+      id: "/places/"
+      path: "/"
+      fullPath: "/places/"
       preLoaderRoute: typeof PlacesIndexRouteImport
       parentRoute: typeof PlacesRouteRoute
     }
-    '/admin/': {
-      id: '/admin/'
-      path: '/'
-      fullPath: '/admin/'
+    "/admin/": {
+      id: "/admin/"
+      path: "/"
+      fullPath: "/admin/"
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/places/$placeId': {
-      id: '/places/$placeId'
-      path: '/$placeId'
-      fullPath: '/places/$placeId'
+    "/places/$placeId": {
+      id: "/places/$placeId"
+      path: "/$placeId"
+      fullPath: "/places/$placeId"
       preLoaderRoute: typeof PlacesPlaceIdRouteImport
       parentRoute: typeof PlacesRouteRoute
     }
-    '/comments/$commentId': {
-      id: '/comments/$commentId'
-      path: '/comments/$commentId'
-      fullPath: '/comments/$commentId'
+    "/comments/$commentId": {
+      id: "/comments/$commentId"
+      path: "/comments/$commentId"
+      fullPath: "/comments/$commentId"
       preLoaderRoute: typeof CommentsCommentIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/upload': {
-      id: '/api/upload'
-      path: '/api/upload'
-      fullPath: '/api/upload'
+    "/api/upload": {
+      id: "/api/upload"
+      path: "/api/upload"
+      fullPath: "/api/upload"
       preLoaderRoute: typeof ApiUploadRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/gallery': {
-      id: '/admin/gallery'
-      path: '/gallery'
-      fullPath: '/admin/gallery'
+    "/admin/gallery": {
+      id: "/admin/gallery"
+      path: "/gallery"
+      fullPath: "/admin/gallery"
       preLoaderRoute: typeof AdminGalleryRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/admin/categories': {
-      id: '/admin/categories'
-      path: '/categories'
-      fullPath: '/admin/categories'
+    "/admin/categories": {
+      id: "/admin/categories"
+      path: "/categories"
+      fullPath: "/admin/categories"
       preLoaderRoute: typeof AdminCategoriesRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/_layout/dashboard': {
-      id: '/_layout/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
+    "/_layout/dashboard": {
+      id: "/_layout/dashboard"
+      path: "/dashboard"
+      fullPath: "/dashboard"
       preLoaderRoute: typeof LayoutDashboardRouteImport
       parentRoute: typeof LayoutRouteRoute
     }
-    '/admin/users/': {
-      id: '/admin/users/'
-      path: '/users'
-      fullPath: '/admin/users/'
+    "/admin/users/": {
+      id: "/admin/users/"
+      path: "/users"
+      fullPath: "/admin/users/"
       preLoaderRoute: typeof AdminUsersIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/admin/places/': {
-      id: '/admin/places/'
-      path: '/places'
-      fullPath: '/admin/places/'
+    "/admin/places/": {
+      id: "/admin/places/"
+      path: "/places"
+      fullPath: "/admin/places/"
       preLoaderRoute: typeof AdminPlacesIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
+    "/api/auth/$": {
+      id: "/api/auth/$"
+      path: "/api/auth/$"
+      fullPath: "/api/auth/$"
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/users/$userId': {
-      id: '/admin/users/$userId'
-      path: '/users/$userId'
-      fullPath: '/admin/users/$userId'
+    "/admin/users/$userId": {
+      id: "/admin/users/$userId"
+      path: "/users/$userId"
+      fullPath: "/admin/users/$userId"
       preLoaderRoute: typeof AdminUsersUserIdRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/admin/places/add': {
-      id: '/admin/places/add'
-      path: '/places/add'
-      fullPath: '/admin/places/add'
+    "/admin/places/add": {
+      id: "/admin/places/add"
+      path: "/places/add"
+      fullPath: "/admin/places/add"
       preLoaderRoute: typeof AdminPlacesAddRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/places/_/$placeId/comments': {
-      id: '/places/_/$placeId/comments'
-      path: '/$placeId/comments'
-      fullPath: '/places/$placeId/comments'
+    "/places/_/$placeId/comments": {
+      id: "/places/_/$placeId/comments"
+      path: "/$placeId/comments"
+      fullPath: "/places/$placeId/comments"
       preLoaderRoute: typeof PlacesPlaceIdCommentsRouteImport
       parentRoute: typeof PlacesRouteRoute
     }
-    '/admin/users_/$userId/update': {
-      id: '/admin/users_/$userId/update'
-      path: '/users/$userId/update'
-      fullPath: '/admin/users/$userId/update'
+    "/admin/users_/$userId/update": {
+      id: "/admin/users_/$userId/update"
+      path: "/users/$userId/update"
+      fullPath: "/admin/users/$userId/update"
       preLoaderRoute: typeof AdminUsersUserIdUpdateRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/admin/places/$placeId/update': {
-      id: '/admin/places/$placeId/update'
-      path: '/places/$placeId/update'
-      fullPath: '/admin/places/$placeId/update'
+    "/admin/places/$placeId/update": {
+      id: "/admin/places/$placeId/update"
+      path: "/places/$placeId/update"
+      fullPath: "/admin/places/$placeId/update"
       preLoaderRoute: typeof AdminPlacesPlaceIdUpdateRouteImport
       parentRoute: typeof AdminRouteRoute
     }
@@ -546,9 +546,9 @@ export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
 
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
+import type { getRouter } from "./router.tsx"
+import type { createStart } from "@tanstack/react-start"
+declare module "@tanstack/react-start" {
   interface Register {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>

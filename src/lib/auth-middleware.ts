@@ -1,17 +1,26 @@
 import { redirect } from "@tanstack/react-router"
 import { createMiddleware } from "@tanstack/react-start"
-import { getRequestHeaders } from "@tanstack/react-start/server"
+import { getRequestHeaders, getRequestIP } from "@tanstack/react-start/server"
 import { createAuth } from "@/lib/auth"
 import { commentRateLimit, searchRateLimit } from "@/lib/rate-limit"
 
+function getClientIP(): string {
+  const headers = getRequestHeaders()
+  const ip =
+    getRequestIP() ??
+    headers["x-forwarded-for"]?.split(",")[0]?.trim() ??
+    headers["X-Forwarded-For"]?.split(",")[0]?.trim() ??
+    headers["x-real-ip"] ??
+    headers["X-Real-IP"] ??
+    headers["cf-connecting-ip"] ??
+    headers["CF-Connecting-IP"] ??
+    "unknown"
+  return ip
+}
+
 export const rateLimitMiddleware = createMiddleware().server(
   async ({ next }) => {
-    const headers = getRequestHeaders()
-    const ip =
-      headers["x-forwarded-for"]?.split(",")[0] ??
-      headers["x-real-ip"] ??
-      headers["cf-connecting-ip"] ??
-      "unknown"
+    const ip = getClientIP()
 
     const { success } = await searchRateLimit.limit(ip)
 
@@ -25,12 +34,7 @@ export const rateLimitMiddleware = createMiddleware().server(
 
 export const commentRateLimitMiddleware = createMiddleware().server(
   async ({ next }) => {
-    const headers = getRequestHeaders()
-    const ip =
-      headers["x-forwarded-for"]?.split(",")[0] ??
-      headers["x-real-ip"] ??
-      headers["cf-connecting-ip"] ??
-      "unknown"
+    const ip = getClientIP()
     const { success } = await commentRateLimit.limit(ip)
 
     if (!success) {
