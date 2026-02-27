@@ -7,6 +7,7 @@ import {
 import { Edit, MapPin, MoreHorizontal, Star } from "lucide-react"
 import { useState } from "react"
 import { queryOptions } from "@tanstack/react-query"
+import { PlacesLoadingSkeleton } from "./-components/places-loading-skeleton"
 import type { PlaceFilter } from "@/modules/places"
 import { Button, buttonVariants } from "@/components/ui/button"
 import {
@@ -27,7 +28,6 @@ import {
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 import { getPlaces } from "@/modules/places"
-import { PlacesLoadingSkeleton } from "@/components/places-loading-skeleton"
 import { Badge } from "@/components/reui/badge"
 
 const placesQueryOptions = (data: PlaceFilter) =>

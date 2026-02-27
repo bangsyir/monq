@@ -25,13 +25,13 @@ import { Route as AdminGalleryRouteImport } from './routes/admin/gallery'
 import { Route as AdminCategoriesRouteImport } from './routes/admin/categories'
 import { Route as LayoutDashboardRouteImport } from './routes/_layout/dashboard'
 import { Route as AdminUsersIndexRouteImport } from './routes/admin/users.index'
-import { Route as AdminPlacesIndexRouteImport } from './routes/admin/places.index'
+import { Route as AdminPlacesIndexRouteImport } from './routes/admin/places/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
 import { Route as AdminUsersUserIdRouteImport } from './routes/admin/users.$userId'
-import { Route as AdminPlacesAddRouteImport } from './routes/admin/places.add'
+import { Route as AdminPlacesAddRouteImport } from './routes/admin/places/add'
 import { Route as PlacesPlaceIdCommentsRouteImport } from './routes/places/_.$placeId.comments'
 import { Route as AdminUsersUserIdUpdateRouteImport } from './routes/admin/users_.$userId.update'
-import { Route as AdminPlacesPlaceIdUpdateRouteImport } from './routes/admin/places.$placeId.update'
+import { Route as AdminPlacesPlaceIdUpdateRouteImport } from './routes/admin/places/$placeId.update'
 
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
