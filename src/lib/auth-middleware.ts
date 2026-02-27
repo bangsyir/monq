@@ -1,3 +1,4 @@
+import * as process from "node:process"
 import { redirect } from "@tanstack/react-router"
 import { createMiddleware } from "@tanstack/react-start"
 import { getRequestHeaders, getRequestIP } from "@tanstack/react-start/server"
@@ -20,6 +21,10 @@ function getClientIP(): string {
 
 export const rateLimitMiddleware = createMiddleware().server(
   async ({ next }) => {
+    if (process.env.NODE_ENV === "development") {
+      return await next()
+    }
+
     const ip = getClientIP()
 
     const { success } = await searchRateLimit.limit(ip)
@@ -34,6 +39,10 @@ export const rateLimitMiddleware = createMiddleware().server(
 
 export const commentRateLimitMiddleware = createMiddleware().server(
   async ({ next }) => {
+    if (process.env.NODE_ENV === "development") {
+      return await next()
+    }
+
     const ip = getClientIP()
     const { success } = await commentRateLimit.limit(ip)
 
