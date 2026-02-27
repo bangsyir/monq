@@ -32,6 +32,7 @@ export function insertPlaceRepo(
       rating: 0,
       amenities: data.amenities || [],
       isFeatured: data.isFeatured,
+      bestSeason: data.bestSeason || [],
     })
     .returning({ id: places.id, title: places.name })
 }
@@ -87,6 +88,7 @@ export function updatePlaceRepo(
       distance: data.distance,
       amenities: data.amenities,
       isFeatured: data.isFeatured,
+      bestSeason: data.bestSeason,
     })
     .where(and(eq(places.id, placeId), eq(places.userId, userId)))
     .returning({ id: places.id, title: places.name })

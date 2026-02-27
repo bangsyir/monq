@@ -31,6 +31,7 @@ import { getDefaultImages } from "@/modules/galleries"
 import { Separator } from "@/components/ui/separator"
 import { amenitiesData } from "@/data/amenities"
 import { Switch } from "@/components/ui/switch"
+import { Badge } from "@/components/ui/badge"
 
 const difficulties = [
   { value: "easy", label: "Easy" },
@@ -68,7 +69,6 @@ function RouteComponent() {
   const [imageUrls, setImageUrls] = useState<Array<string>>([])
   const [urlInput, setUrlInput] = useState("")
   const [isUploading, setIsUploading] = useState(false)
-
   // Load persisted image URLs from localStorage on mount
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY)
@@ -104,8 +104,8 @@ function RouteComponent() {
             body: formData,
           })
           if (!response.ok) throw new Error("Failed to upload image")
-          const result = await response.json()
-          return result.url as string
+          const result = await response.json<{ url: string }>()
+          return result.url
         }),
       )
 
@@ -167,6 +167,8 @@ function RouteComponent() {
       isFeatured: false,
       images: [] as Array<File> | null,
       amenities: [] as Array<string>,
+      season: "",
+      bestSeason: [] as Array<string>,
     },
     validators: {
       onSubmit: addPlaceClientSchema,
@@ -673,103 +675,165 @@ function RouteComponent() {
                 />
               </div>
             </div>
-
-            {/* Amenities */}
-            <div className="space-y-4">
-              <form.Field
-                name="amenities"
-                children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid
-                  return (
-                    <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor={field.name}>
-                        Amenities (Optional)
-                      </FieldLabel>
-                      <div className="space-y-3">
-                        {/* Selected amenities */}
-                        {field.state.value.length > 0 && (
-                          <div className="flex flex-wrap gap-2">
-                            {field.state.value.map((amenity, index) => (
-                              <div
-                                key={index}
-                                className="bg-secondary text-secondary-foreground inline-flex items-center gap-1 rounded-full px-3 py-1"
-                              >
-                                <span>
-                                  {
-                                    amenitiesData.find(
-                                      (icon) => icon.value === amenity,
-                                    )?.icon
-                                  }
-                                </span>
-                                {amenity}
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    field.handleChange(
-                                      field.state.value.filter(
-                                        (_, i) => i !== index,
-                                      ),
-                                    )
-                                  }}
-                                  className="hover:bg-muted ml-1 rounded-full p-0.5"
-                                >
-                                  <X className="h-3 w-3" />
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-
-                        {/* Add new amenity */}
-                        <div className="space-y-2">
-                          <div className="flex gap-2">
-                            <Select
-                              name={field.name}
-                              items={amenitiesData}
-                              onValueChange={(value) => {
-                                const selectedIcon = value
-                                if (selectedIcon) {
-                                  const icon = amenitiesData.find(
-                                    (i) => i.value === selectedIcon,
-                                  )
-                                  if (icon) {
-                                    field.handleChange([
-                                      ...field.state.value,
-                                      icon.value,
-                                    ])
-                                    value = ""
-                                  }
-                                }
+            {/* best season */}
+            <form.Field
+              name="bestSeason"
+              children={(field) => {
+                return (
+                  <Field>
+                    <FieldLabel htmlFor={field.name}>
+                      Best season (Optional)
+                    </FieldLabel>
+                    {/* Selected best season */}
+                    {field.state.value.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {field.state.value.map((season, index) => (
+                          <Badge
+                            key={index}
+                            className="bg-secondary text-secondary-foreground inline-flex items-center gap-1 rounded-full px-3 py-1"
+                            variant="secondary"
+                          >
+                            {season}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                field.handleChange(
+                                  field.state.value.filter(
+                                    (_, i) => i !== index,
+                                  ),
+                                )
                               }}
+                              className="hover:bg-muted ml-1 rounded-full p-0.5"
                             >
-                              <SelectTrigger
-                                id={field.name}
-                                aria-invalid={isInvalid}
-                                className="border-input bg-background flex-1 rounded-md border px-3 py-2 text-sm"
+                              <X className="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                    <form.Field
+                      name="season"
+                      children={(seasonField) => {
+                        return (
+                          <Input
+                            id={seasonField.name}
+                            name={seasonField.name}
+                            onChange={(e) => {
+                              seasonField.setValue(e.currentTarget.value)
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault()
+                                const val = seasonField.state.value
+                                if (val && !field.state.value.includes(val)) {
+                                  field.setValue([...field.state.value, val])
+                                  seasonField.setValue("")
+                                  e.currentTarget.value = ""
+                                }
+                              }
+                            }}
+                          />
+                        )
+                      }}
+                    />
+                  </Field>
+                )
+              }}
+            />
+            {/* Amenities */}
+            <form.Field
+              name="amenities"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>
+                      Amenities (Optional)
+                    </FieldLabel>
+                    <div className="space-y-3">
+                      {/* Selected amenities */}
+                      {field.state.value.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {field.state.value.map((amenity, index) => (
+                            <div
+                              key={index}
+                              className="bg-secondary text-secondary-foreground inline-flex items-center gap-1 rounded-full px-3 py-1"
+                            >
+                              <span>
+                                {
+                                  amenitiesData.find(
+                                    (icon) => icon.value === amenity,
+                                  )?.icon
+                                }
+                              </span>
+                              {amenity}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  field.handleChange(
+                                    field.state.value.filter(
+                                      (_, i) => i !== index,
+                                    ),
+                                  )
+                                }}
+                                className="hover:bg-muted ml-1 rounded-full p-0.5"
                               >
-                                <SelectValue placeholder="Select one" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="">None</SelectItem>
-                                {amenitiesData.map((a) => (
-                                  <SelectItem key={a.value} value={a.value}>
-                                    {a.icon} {a.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
+                                <X className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Add new amenity */}
+                      <div className="space-y-2">
+                        <div className="flex gap-2">
+                          <Select
+                            name={field.name}
+                            items={amenitiesData}
+                            onValueChange={(value) => {
+                              const selectedIcon = value
+                              if (selectedIcon) {
+                                const icon = amenitiesData.find(
+                                  (i) => i.value === selectedIcon,
+                                )
+                                if (icon) {
+                                  field.handleChange([
+                                    ...field.state.value,
+                                    icon.value,
+                                  ])
+                                  value = ""
+                                }
+                              }
+                            }}
+                          >
+                            <SelectTrigger
+                              id={field.name}
+                              aria-invalid={isInvalid}
+                              className="border-input bg-background flex-1 rounded-md border px-3 py-2 text-sm"
+                            >
+                              <SelectValue placeholder="Select one" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="">None</SelectItem>
+                              {amenitiesData.map((a) => (
+                                <SelectItem key={a.value} value={a.value}>
+                                  {a.icon} {a.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
-                    </Field>
-                  )
-                }}
-              />
-            </div>
+                    </div>
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                )
+              }}
+            />
 
             {/* Images */}
             <div className="space-y-4">

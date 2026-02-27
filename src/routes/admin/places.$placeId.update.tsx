@@ -30,6 +30,7 @@ import { StandaloneImageUploader } from "@/components/standalone-image-uploader"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
+import { Badge } from "@/components/ui/badge"
 
 const difficulties = [
   { value: "easy", label: "Easy" },
@@ -74,6 +75,8 @@ function RouteComponent() {
       distance: "",
       isFeatured: false,
       amenities: [] as Array<string>,
+      season: "",
+      bestSeason: [] as Array<string>,
     },
 
     onSubmit: async ({ value }) => {
@@ -666,7 +669,78 @@ function RouteComponent() {
                     />
                   </div>
                 </div>
-
+                {/* best season */}
+                <form.Field
+                  name="bestSeason"
+                  defaultValue={place?.bestSeason || []}
+                  children={(field) => {
+                    return (
+                      <Field>
+                        <FieldLabel htmlFor={field.name}>
+                          Best season (Optional)
+                        </FieldLabel>
+                        {/* Selected best season */}
+                        {field.state.value.length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {field.state.value.map((season, index) => (
+                              <Badge
+                                key={index}
+                                className="bg-secondary text-secondary-foreground inline-flex items-center gap-1 rounded-full px-3 py-1"
+                                variant="secondary"
+                              >
+                                {season}
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    field.handleChange(
+                                      field.state.value.filter(
+                                        (_, i) => i !== index,
+                                      ),
+                                    )
+                                  }}
+                                  className="hover:bg-muted ml-1 rounded-full p-0.5"
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                        <form.Field
+                          name="season"
+                          children={(seasonField) => {
+                            return (
+                              <Input
+                                id={seasonField.name}
+                                name={seasonField.name}
+                                onChange={(e) => {
+                                  seasonField.setValue(e.currentTarget.value)
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    e.preventDefault()
+                                    const val = seasonField.state.value
+                                    if (
+                                      val &&
+                                      !field.state.value.includes(val)
+                                    ) {
+                                      field.setValue([
+                                        ...field.state.value,
+                                        val,
+                                      ])
+                                      seasonField.setValue("")
+                                      e.currentTarget.value = ""
+                                    }
+                                  }
+                                }}
+                              />
+                            )
+                          }}
+                        />
+                      </Field>
+                    )
+                  }}
+                />
                 {/* Amenities */}
                 <div className="space-y-4">
                   <form.Field

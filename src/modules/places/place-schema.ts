@@ -40,6 +40,8 @@ export const addPlaceClientSchema = z.object({
   isFeatured: z.boolean(),
   images: z.array(z.file()).nullable(),
   amenities: z.array(z.string()),
+  season: z.string(),
+  bestSeason: z.array(z.string()),
 })
 
 export type AddPlaceClient = z.infer<typeof addPlaceClientSchema>
@@ -84,6 +86,7 @@ export const addPlaceServerSchema = z.object({
   isFeatured: z.boolean(),
   images: z.array(z.string()).nullable(),
   amenities: z.array(z.string()).default([]),
+  bestSeason: z.array(z.string()).default([]),
 })
 
 export type AddPlaceServer = z.infer<typeof addPlaceServerSchema>
@@ -108,6 +111,7 @@ export const updatePlaceClientSchema = addPlaceClientSchema
     distance: true,
     amenities: true,
     isFeatured: true,
+    bestSeason: true,
   })
 
 export const updatePlaceServerSchema = addPlaceServerSchema.extend({

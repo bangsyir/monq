@@ -53,6 +53,7 @@ export async function createPlaceService(data: AddPlaceServer, userId: string) {
     rating: 0,
     amenities: data.amenities,
     isFeatured: data.isFeatured,
+    bestSeason: data.bestSeason,
   }
   const [addPlace, addPlaceError] = await safeDbQuery(
     insertPlaceRepo(dataMap, userId),
