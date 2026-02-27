@@ -9,6 +9,7 @@ import {
   X,
 } from "lucide-react"
 import React from "react"
+import { queryOptions } from "@tanstack/react-query"
 import CategoryFilter from "@/components/category-filter"
 import PlaceCard from "@/components/place-card"
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -21,6 +22,15 @@ type PlacesSearchFilter = {
   page?: number
 }
 
+const placesQueryOptions = (data: PlacesSearchFilter) =>
+  queryOptions({
+    queryKey: ["places", data],
+    queryFn: () =>
+      getPlacesForIndex({
+        data: { category: data.cat, search: data.search, page: data.page },
+      }),
+  })
+
 export const Route = createFileRoute("/places/")({
   component: RouteComponent,
 
@@ -29,9 +39,9 @@ export const Route = createFileRoute("/places/")({
   loader: async ({ context, deps: { cat, search, page } }) => {
     const category = cat === undefined || cat === "all" ? undefined : cat
     const searchQuery = search?.trim() || undefined
-    const placesData = await getPlacesForIndex({
-      data: { category, search: searchQuery, page: page || 1 },
-    })
+    const placesData = await context.queryClient.ensureQueryData(
+      placesQueryOptions({ cat: category, search: searchQuery, page: page }),
+    )
     const isLoggedIn = context.user !== null
     return {
       selectedCategory: cat || "all",
