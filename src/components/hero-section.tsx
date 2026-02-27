@@ -1,10 +1,13 @@
 import { Link } from "@tanstack/react-router"
 import { motion } from "framer-motion"
 import { Compass, MapPin, Search } from "lucide-react"
+import { useState } from "react"
+import { Input } from "./ui/input"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 const HeroSection = () => {
+  const [search, setSearch] = useState("")
   return (
     <section className="from-primary/10 via-background to-accent/10 relative flex min-h-[30vh] items-center justify-center bg-gradient-to-br">
       {/* Content */}
@@ -48,13 +51,14 @@ const HeroSection = () => {
               <div className="flex items-center gap-2">
                 <div className="bg-secondary flex flex-1 items-center gap-3 rounded-xl px-4 py-3">
                   <MapPin className="text-muted-foreground h-5 w-5 shrink-0" />
-                  <input
+                  <Input
                     type="text"
+                    onChange={(e) => setSearch(e.currentTarget.value)}
                     placeholder="Where do you want to explore?"
                     className="text-foreground placeholder:text-muted-foreground w-full bg-transparent focus:outline-none"
                   />
                 </div>
-                <Link to="/places" search={{ cat: "all" }}>
+                <Link to="/places" search={{ search: search, cat: "all" }}>
                   <Button
                     className={cn(
                       "bg-success w-full gap-2 rounded-xl px-4 py-5 text-white sm:w-auto",

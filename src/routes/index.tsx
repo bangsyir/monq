@@ -33,7 +33,7 @@ function CategoriesSection() {
             {[...Array(6)].map((_, i) => (
               <div
                 key={i}
-                className="bg-muted aspect-[4/3] animate-pulse rounded-xl"
+                className="bg-muted aspect-4/3 animate-pulse rounded-xl"
               />
             ))}
           </div>
@@ -97,7 +97,7 @@ function CategoryCard({
         search={{ cat: category.name.toLowerCase() }}
         className="group relative block overflow-hidden rounded-xl"
       >
-        <div className="aspect-[4/3] w-40 lg:w-64">
+        <div className="aspect-4/3 w-40 lg:w-64">
           {category.image ? (
             <img
               src={category.image}
