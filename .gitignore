@@ -20,3 +20,4 @@ wrangler.jsonc
 
 src/data/kuala-lumpur.json
 src/data/selangor.json
+.neon_local/
