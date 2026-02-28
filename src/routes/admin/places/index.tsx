@@ -89,6 +89,7 @@ function RouteComponent() {
     navigate({
       to: "/admin/places",
       search: {
+        ...search,
         page: currentPage + 1,
       },
       resetScroll: true,
@@ -98,6 +99,7 @@ function RouteComponent() {
   const handlePrev = (currentPage: number) => {
     navigate({
       search: {
+        ...search,
         page: currentPage - 1,
       },
       resetScroll: true,
