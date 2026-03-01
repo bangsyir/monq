@@ -1,6 +1,6 @@
 import { Link, getRouteApi } from "@tanstack/react-router"
 import { motion } from "framer-motion"
-import { Loader2, Lock, Star } from "lucide-react"
+import { Loader2, Lock } from "lucide-react"
 import { useState } from "react"
 import { useServerFn } from "@tanstack/react-start"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
@@ -163,14 +163,10 @@ export function CommentsComponent() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
     >
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6">
         <h2 className="text-foreground text-xl font-semibold">
           Comments ({data?.comments.length})
         </h2>
-        <div className="flex items-center gap-2">
-          <Star className="fill-accent text-accent h-5 w-5" />
-          <span className="text-foreground font-semibold">{place.rating}</span>
-        </div>
       </div>
 
       {/* Add Comment */}
