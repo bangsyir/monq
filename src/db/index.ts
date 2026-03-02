@@ -10,15 +10,18 @@ import * as schema from "./schema.ts"
 export const createDb = createServerOnlyFn(() => {
   const isLocal = process.env.LOCAL_DEV || false
   if (isLocal) {
-    // HTTP Mode (recommended for most applications)
-    neonConfig.fetchEndpoint = "http://localhost:5432/sql" // Routes HTTP requests to local proxy
-    neonConfig.poolQueryViaFetch = true // Enables HTTP connection pooling
-
-    // WebSocket Mode (for real-time applications)
-    neonConfig.webSocketConstructor = ws // Enables WebSocket support
-    neonConfig.useSecureWebSocket = false // Local proxy doesn't use SSL
-    neonConfig.wsProxy = () => "localhost:5432" // Routes WebSocket connections to local proxy
-    neonConfig.pipelineConnect = false
+    const connectionString = process.env.DATABASE_URL
+    neonConfig.fetchEndpoint = (host) => {
+      const [protocol, port] =
+        host === "db.localtest.me" ? ["http", 4444] : ["https", 443]
+      return `${protocol}://${host}:${port}/sql`
+    }
+    const connectionStringUrl = new URL(connectionString)
+    neonConfig.useSecureWebSocket =
+      connectionStringUrl.hostname !== "db.localtest.me"
+    neonConfig.wsProxy = (host) =>
+      host === "db.localtest.me" ? `${host}:4444/v2` : `${host}/v2`
+    neonConfig.webSocketConstructor = ws
   }
   const sql = neon(process.env.DATABASE_URL)
   return drizzle({ client: sql, schema })
