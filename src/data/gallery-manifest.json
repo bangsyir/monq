@@ -128,5 +128,21 @@
     "name": "waterfall",
     "path": "/default/waterfall.webp",
     "folder": "default"
+  },
+  {
+    "name": "hill",
+    "path": "/default/hill.webp",
+    "folder": "default"
+  },
+  {
+    "name": "recreation",
+    "path": "/default/recreation.webp",
+    "folder": "default"
+  },
+  {
+    "name": "river",
+    "path": "/default/river.webp",
+    "folder": "default"
   }
 ]
+
