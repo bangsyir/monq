@@ -8,7 +8,10 @@ const categoryData = [
   { name: "Hiking", icon: "🥾" },
   { name: "Trail", icon: "🛤️" },
   { name: "Lake", icon: "🏞️" },
-  { name: "Mountain", icon: "⛰️" },
+  { name: "Mountain", icon: "🏔️" },
+  { name: "Hill", icon: "⛰️" },
+  { name: "River", icon: "🛶" },
+  { name: "Recreation", icon: "🎡" },
 ]
 
 const main = async () => {
