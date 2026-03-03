@@ -29,7 +29,6 @@ export function insertPlaceRepo(
       difficulty: data.difficulty,
       duration: data.duration,
       distance: data.distance,
-      rating: 0,
       amenities: data.amenities || [],
       isFeatured: data.isFeatured,
       bestSeason: data.bestSeason || [],
@@ -119,19 +118,18 @@ export function getFeaturedPlacesRepo(limit: number = 8) {
       ${places.description},
       ${places.latitude},
       ${places.longitude},
-      ${places.streetAddress},
+      ${places.streetAddress} as "streetAddress",
       ${places.city},
-      ${places.stateProvince},
+      ${places.stateProvince} as "stateProvince",
       ${places.country},
-      ${places.rating},
-      ${places.reviewCount},
+      ${places.avgRating} as "avgRating",
+      ${places.ratingCount} as "ratingCount",
       ${places.difficulty},
       ${places.duration},
       ${places.distance},
       ${places.elevation},
-      ${places.bestSeason},
       ${places.amenities},
-      ${places.isFeatured},
+      ${places.isFeatured} as "isFeatured",
       ${places.createdAt},
       ${places.updatedAt},
       COALESCE(
@@ -153,7 +151,7 @@ export function getFeaturedPlacesRepo(limit: number = 8) {
     LEFT JOIN ${categories} ON ${placeCategories.categoryId} = ${categories.id}
     WHERE ${places.isFeatured} = true
     GROUP BY ${places.id}
-    ORDER BY ${places.rating} DESC
+    ORDER BY ${places.avgRating} DESC
     LIMIT ${limit}
   `)
   return result
@@ -202,12 +200,12 @@ export function getPlacesWithDetailsRepo(
       ${places.description},
       ${places.latitude},
       ${places.longitude},
-      ${places.streetAddress},
+      ${places.streetAddress} as "streetAddress",
       ${places.city},
-      ${places.stateProvince},
+      ${places.stateProvince} as "stateProvince",
       ${places.country},
-      ${places.rating},
-      ${places.reviewCount},
+      ${places.avgRating} as "avgRating",
+      ${places.ratingCount} as "ratingCount",
       ${places.difficulty},
       ${places.duration},
       ${places.distance},
@@ -272,7 +270,7 @@ export function getPlacesRepo({
     sortBy === "name"
       ? places.name
       : sortBy === "rating"
-        ? places.rating
+        ? places.avgRating
         : sortBy === "city"
           ? places.city
           : places.createdAt
@@ -285,12 +283,12 @@ export function getPlacesRepo({
       description: places.description,
       latitude: places.latitude,
       longitude: places.longitude,
-      address: places.streetAddress,
+      streetAddress: places.streetAddress,
       city: places.city,
-      state: places.stateProvince,
+      stateProvince: places.stateProvince,
       country: places.country,
-      rating: places.rating,
-      reviewCount: places.reviewCount,
+      rating: places.avgRating,
+      reviewCount: places.ratingCount,
       difficulty: places.difficulty,
       duration: places.duration,
       distance: places.distance,
@@ -376,8 +374,8 @@ export function getPlacesByBoundsRepo(bounds: {
       ${places.stateProvince} as "stateProvince",
       ${places.postcode},
       ${places.country},
-      ${places.rating},
-      ${places.reviewCount} as "reviewCount",
+      ${places.avgRating},
+      ${places.ratingCount} as "reviewCount",
       ${places.difficulty},
       ${places.distance},
       ${places.isFeatured},

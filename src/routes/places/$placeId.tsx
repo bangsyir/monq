@@ -139,9 +139,8 @@ function RouteComponent() {
                       <div className="flex items-center gap-1">
                         <Star className="fill-accent text-accent h-5 w-5" />
                         <span className="text-foreground font-semibold">
-                          {place.rating}
+                          {place.avgRating}
                         </span>
-                        <span>({place.reviewCount} reviews)</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <MapPin className="h-4 w-4" />

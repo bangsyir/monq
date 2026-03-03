@@ -89,14 +89,14 @@ const PlaceCard = ({ place, index = 0 }: PlaceCardProps) => {
             </h3>
             <div className="flex shrink-0 items-center gap-1">
               <Star className="fill-foreground text-foreground h-4 w-4" />
-              <span className="text-sm font-medium">{place.rating}</span>
+              <span className="text-sm font-medium">{place.avgRating}</span>
             </div>
           </div>
 
           <div className="text-muted-foreground flex items-center gap-1">
             <MapPin className="h-3.5 w-3.5" />
             <span className="line-clamp-1 text-sm">
-              {place.location.city}, {place.location.state}
+              {place.location.city}, {place.location.stateProvince}
             </span>
           </div>
           {/* Categories */}

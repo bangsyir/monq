@@ -14,7 +14,11 @@ import {
   updatePlaceRepo,
 } from "./place-repo.server"
 import type { SQL } from "drizzle-orm"
-import type { AddPlaceServer, UpdatePlaceServer } from "@/modules/places"
+import type {
+  AddPlaceServer,
+  PlaceWithDetailsRaw,
+  UpdatePlaceServer,
+} from "@/modules/places"
 import { safeDbQuery } from "@/utils/safe-db-query"
 import { createDb } from "@/db"
 import { categories } from "@/db/schema"
@@ -259,23 +263,25 @@ export async function getPlacesForIndexService(
   }
 
   // Transform the result to match the expected format
-  const placesWithDetails = result.rows.map((row: any) => ({
+  const placesWithDetails = (
+    result.rows as unknown as Array<PlaceWithDetailsRaw>
+  ).map((row) => ({
     id: row.id,
     name: row.name,
     description: row.description,
     location: {
       latitude: row.latitude || 0,
       longitude: row.longitude || 0,
-      address: row.streetAddress || "",
+      streetAddress: row.streetAddress || "",
       city: row.city || "",
-      state: row.stateProvince || "",
+      stateProvince: row.stateProvince || "",
       country: row.country || "",
     },
     categories: row.categories || [],
-    images: row.first_image && row.first_image.id ? [row.first_image] : [],
-    rating: row.rating,
-    reviewCount: row.reviewCount,
-    amenities: (row.amenities || []).map((amenity: string, index: number) => ({
+    images: row.first_image ? [row.first_image] : [],
+    rating: row.avgRating,
+    reviewCount: row.ratingCount,
+    amenities: (row.amenities || [])?.map((amenity: string, index: number) => ({
       id: index.toString(),
       name: amenity,
       icon: amenity.toLowerCase().replace(/\s+/g, "-"),
@@ -311,22 +317,24 @@ export async function getFeaturedPlacesService(limit: number = 8) {
     return { data: null, error }
   }
   // Transform the result to match the expected format
-  const placesWithDetails = result.rows.map((row: any) => ({
+  const placesWithDetails = (
+    result.rows as unknown as Array<PlaceWithDetailsRaw>
+  ).map((row) => ({
     id: row.id,
     name: row.name,
     description: row.description,
     location: {
       latitude: row.latitude || 0,
       longitude: row.longitude || 0,
-      address: row.streetAddress || "",
+      streetAddress: row.streetAddress || "",
       city: row.city || "",
-      state: row.stateProvince || "",
+      stateProvince: row.stateProvince || "",
       country: row.country || "",
     },
     categories: row.categories || [],
     images: row.first_image && row.first_image.id ? [row.first_image] : [],
-    rating: row.rating,
-    reviewCount: row.reviewCount,
+    rating: row.avgRating,
+    reviewCount: row.ratingCount,
     amenities: (row.amenities || []).map((amenity: string, index: number) => ({
       id: index.toString(),
       name: amenity,

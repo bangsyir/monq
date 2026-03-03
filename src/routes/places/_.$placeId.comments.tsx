@@ -215,9 +215,8 @@ function RouteComponent() {
               <div className="text-muted-foreground flex items-center gap-1 text-sm">
                 <Star className="fill-accent text-accent h-4 w-4" />
                 <span className="text-foreground font-medium">
-                  {place.rating}
+                  {place.avgRating}
                 </span>
-                <span>({place.reviewCount} reviews)</span>
               </div>
               <div className="text-muted-foreground mt-1 flex items-center gap-1 text-sm">
                 <MapPin className="h-3.5 w-3.5" />

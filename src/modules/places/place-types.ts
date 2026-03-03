@@ -7,9 +7,9 @@ export interface PlaceImage {
 export interface PlaceLocation {
   latitude: number
   longitude: number
-  address: string
+  streetAddress: string
   city: string
-  state: string
+  stateProvince: string
   country: string
 }
 
@@ -26,8 +26,8 @@ export interface FeaturedPlace {
   location: PlaceLocation
   categories: Array<string>
   images: Array<PlaceImage>
-  rating: number | null
-  reviewCount: number | null
+  avgRating: number | null
+  ratingCount: number | null
   amenities: Array<PlaceAmenity>
   difficulty: string | null
   duration: number | null
@@ -49,8 +49,8 @@ export interface PlaceWithDetailsRaw {
   city: string | null
   stateProvince: string | null
   country: string | null
-  rating: number | null
-  reviewCount: number | null
+  avgRating: number | null
+  ratingCount: number | null
   difficulty: string | null
   duration: number | null
   distance: number | null
@@ -66,3 +66,22 @@ export interface PlaceWithDetailsRaw {
 
 // Transformed return type for getPlacesWithDetailsRepo (same structure as FeaturedPlace)
 export type PlaceWithDetails = FeaturedPlace
+
+export interface PlaceWithDetailsTransformed {
+  id: string
+  name: string
+  description: string | null
+  location: PlaceLocation
+  categories: Array<string>
+  images: Array<PlaceImage>
+  rating: number | null
+  reviewCount: number | null
+  amenities: Array<PlaceAmenity>
+  difficulty: string | null
+  duration: number | null
+  distance: number | null
+  elevation: number | null
+  bestSeason: string | null
+  isFeatured: boolean
+  createdAt: string
+}
