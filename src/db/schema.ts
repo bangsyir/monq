@@ -3,6 +3,7 @@ import {
   boolean,
   index,
   integer,
+  numeric,
   pgTable,
   real,
   text,
@@ -138,10 +139,13 @@ export const places = pgTable(
     postcode: integer("postcode"),
     stateProvince: text("state_province"),
     country: text("country"),
-
-    rating: real("rating").notNull(),
-    reviewCount: integer("review_count").notNull().default(0),
-
+    ratingSum: integer("rating_sum").default(0),
+    ratingCount: integer("rating_count").default(0),
+    avgRating: numeric("avg_rating", {
+      mode: "number",
+      precision: 10,
+      scale: 2,
+    }).default(0),
     difficulty: text("difficulty"), // e.g., "moderate", "hard"
     duration: text("duration"), // e.g., "3-4 hours"
     distance: text("distance"), // e.g., "5.2 miles"
@@ -225,7 +229,6 @@ export const reviews = pgTable("reviews", {
     .references(() => users.id)
     .notNull(),
   rating: integer("rating").notNull(), // Assuming integer rating (1-5) based on typical reviews, or use real() if decimals needed
-  comment: text("comment").notNull(),
   createdAt: timestamp("created_at", {
     withTimezone: true,
     mode: "date",

@@ -92,6 +92,13 @@
       "when": 1770089501813,
       "tag": "0012_furry_luminals",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1772540751102,
+      "tag": "0013_bent_lily_hollister",
+      "breakpoints": true
     }
   ]
 }
