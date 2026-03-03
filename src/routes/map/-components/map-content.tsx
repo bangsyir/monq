@@ -1,14 +1,15 @@
 import { Link } from "@tanstack/react-router"
 import { ExternalLink, ImageIcon } from "lucide-react"
 import type { MapRef, MapViewport } from "@/components/ui/map"
-import { buttonVariants } from "@/components/ui/button"
 import {
   Map,
   MapControls,
   MapMarker,
   MarkerContent,
   MarkerPopup,
+  MarkerTooltip,
 } from "@/components/ui/map"
+import { buttonVariants } from "@/components/ui/button"
 
 export function MapContent({
   mapRef,
@@ -40,10 +41,9 @@ export function MapContent({
                 latitude={Number(place.latitude)}
               >
                 <MarkerContent>
-                  <div className="text-primary-foreground flex size-5 h-6 w-6 items-center justify-center rounded-full bg-rose-500 text-xs font-medium shadow-lg">
-                    {place.name?.charAt(0).toUpperCase()}
-                  </div>
+                  <div className="size-4 rounded-full border-2 border-white bg-emerald-500 shadow-lg hover:animate-ping" />
                 </MarkerContent>
+                <MarkerTooltip>{place.name}</MarkerTooltip>
                 <MarkerPopup className="w-62 p-0">
                   {place.first_image?.url ? (
                     <div className="relative h-32 overflow-hidden rounded-t-md">
