@@ -9,9 +9,9 @@ export type PlaceCategory =
 export interface PlaceLocation {
   latitude: number
   longitude: number
-  address: string
+  streetAddres: string
   city: string
-  state: string
+  stateProvince: string
   country: string
 }
 
@@ -32,7 +32,7 @@ export interface PlaceReview {
   userId: string
   userName: string
   userAvatar?: string
-  rating: number
+  avgRating: number
   comment: string
   createdAt: string
 }
@@ -57,8 +57,8 @@ export interface Place {
   categories: Array<PlaceCategory>
   location: PlaceLocation
   images: Array<PlaceImage>
-  rating: number
-  reviewCount: number
+  avgRating: number
+  ratingCount: number
   amenities: Array<PlaceAmenity>
   difficulty?: "easy" | "moderate" | "hard" | "expert"
   duration?: string
