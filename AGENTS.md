@@ -509,3 +509,4 @@ bun run test      # Run tests
 6. **Types**: Use strict TypeScript, prefer interfaces over types
 7. **Styling**: Tailwind v4 with design system utilities
 8. **Auth**: Use `authMiddleware` for protected routes
+9. Comment Sparingly: Comments are essential for explaining complex logic, but strive to write self-explanatory code.
