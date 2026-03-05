@@ -1,0 +1,1 @@
+ALTER TABLE "reviews" ADD CONSTRAINT "reviews_place_user_unique" UNIQUE("place_id","user_id");

@@ -1,0 +1,1 @@
+ALTER TABLE "reviews" DROP CONSTRAINT "reviews_place_user_unique";
