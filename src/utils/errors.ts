@@ -17,8 +17,9 @@ export function getFriendlyDbMessage(
   error: DrizzleQueryError & { cause: PostgresError },
 ): string {
   // if (!isDatabaseError(error)) return "An unexpected error occurred."
-  const uniqueField = error.cause.constraint_name?.split("_")[1]
-  switch (error.cause.code) {
+  const constraintName = error.cause?.constraint_name
+  const uniqueField = constraintName ? constraintName.split("_")[1] : "record"
+  switch (error.cause?.code) {
     case DB_ERROR_CODES.UNIQUE_VIOLATION:
       return `This ${uniqueField} already exists.`
     case DB_ERROR_CODES.FOREIGN_KEY_VIOLATION:
@@ -26,6 +27,6 @@ export function getFriendlyDbMessage(
     case DB_ERROR_CODES.NOT_NULL_VIOLATION:
       return "A required field is missing."
     default:
-      return "A database error occurred."
+      return error.message || "A database error occurred."
   }
 }

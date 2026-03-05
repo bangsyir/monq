@@ -7,7 +7,6 @@ export type TAppError = {
   error: Error
 }
 
-// The generic result type for your DB queries
 export type TResult<TData> = [TData, null] | [null, TAppError]
 
 export const safeDbQuery = <TData>(
@@ -15,7 +14,8 @@ export const safeDbQuery = <TData>(
 ): Promise<TResult<TData>> =>
   tryTo<TData, TDatabaseError>(promise).then(([data, error]) => {
     if (error) {
-      return [null, { message: getFriendlyDbMessage(error), error: error }]
+      const message = getFriendlyDbMessage(error as never)
+      return [null, { message, error: error }]
     }
     return [data, null]
   })
