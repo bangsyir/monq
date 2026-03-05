@@ -38,6 +38,7 @@ export function RatingComponent({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user-rating", placeId] })
+      queryClient.invalidateQueries({ queryKey: ["get-places", placeId] })
       toast.success("Rating submitted successfully!")
     },
     onError: (error) => {
