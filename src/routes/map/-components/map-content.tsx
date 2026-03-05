@@ -41,7 +41,7 @@ export function MapContent({
                 latitude={Number(place.latitude)}
               >
                 <MarkerContent>
-                  <div className="size-4 rounded-full border-2 border-white bg-emerald-500 shadow-lg hover:animate-ping" />
+                  <div className="size-6 rounded-full border-2 border-white bg-emerald-500 shadow-lg" />
                 </MarkerContent>
                 <MarkerTooltip>{place.name}</MarkerTooltip>
                 <MarkerPopup className="w-62 p-0">
