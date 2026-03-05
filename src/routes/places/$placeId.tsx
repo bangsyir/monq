@@ -21,6 +21,7 @@ import {
 } from "lucide-react"
 import { queryOptions } from "@tanstack/react-query"
 import { CommentsComponent } from "./-components/comments"
+import { RatingComponent } from "./-components/rating"
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -80,7 +81,7 @@ export const Route = createFileRoute("/places/$placeId")({
 })
 
 function RouteComponent() {
-  const { place } = Route.useLoaderData()
+  const { place, isLoggedIn, currentUserId } = Route.useLoaderData()
   if (!place) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -365,6 +366,13 @@ function RouteComponent() {
                     experience.
                   </p>
                 </div>
+
+                {/* Rating Card */}
+                <RatingComponent
+                  placeId={place.id}
+                  isLoggedIn={isLoggedIn}
+                  currentUserId={currentUserId}
+                />
               </motion.div>
             </div>
           </div>
