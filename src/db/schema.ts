@@ -228,7 +228,7 @@ export const reviews = pgTable("reviews", {
   userId: uuid("user_id")
     .references(() => users.id)
     .notNull(),
-  rating: integer("rating").notNull(), // Assuming integer rating (1-5) based on typical reviews, or use real() if decimals needed
+  rating: integer("rating").notNull(),
   createdAt: timestamp("created_at", {
     withTimezone: true,
     mode: "date",
