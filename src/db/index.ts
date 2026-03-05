@@ -1,8 +1,7 @@
 import * as process from "node:process"
 import { createServerOnlyFn } from "@tanstack/react-start"
-import { drizzle } from "drizzle-orm/neon-serverless"
-import { Pool, neonConfig } from "@neondatabase/serverless"
-import ws from "ws"
+import { drizzle } from "drizzle-orm/neon-http"
+import { neon, neonConfig } from "@neondatabase/serverless"
 import * as schema from "./schema.ts"
 
 // Factory function to create a new database connection for each request
@@ -21,12 +20,9 @@ export const createDb = createServerOnlyFn(() => {
       connectionStringUrl.hostname !== "db.localtest.me"
     neonConfig.wsProxy = (host) =>
       host === "db.localtest.me" ? `${host}:4444/v2` : `${host}/v2`
-    neonConfig.webSocketConstructor = ws
   }
-  const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-  })
-  return drizzle({ client: pool, schema })
+  const sql = neon(process.env.DATABASE_URL)
+  return drizzle({ client: sql, schema })
 })
 
 // For backward compatibility - creates a new connection per call
