@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm"
+import { and, eq, sql } from "drizzle-orm"
 import type { AddRatingData } from "./rating-types"
 import { createDb } from "@/db"
 import { places, reviews } from "@/db/schema"
@@ -19,26 +19,23 @@ export function getUserRatingRepo(placeId: string, userId: string) {
 
 export async function insertRatingRepo(data: AddRatingData) {
   const db = createDb()
-  const result = await db
-    .insert(reviews)
-    .values({
+
+  const insertReview = db.$with("insert_review").as(
+    db.insert(reviews).values({
       placeId: data.placeId,
       userId: data.userId,
       rating: data.rating,
-    })
-    .returning({
-      id: reviews.id,
-      placeId: reviews.placeId,
-      userId: reviews.userId,
-      rating: reviews.rating,
-      createdAt: reviews.createdAt,
-    })
-
-  await db.execute(
-    `UPDATE places SET rating_count = rating_count + 1, rating_sum = rating_sum + ${data.rating}, avg_rating = (rating_sum + ${data.rating})::numeric / (rating_count + 1) WHERE id = '${data.placeId}'`,
+    }),
   )
-
-  return result
+  return db
+    .with(insertReview)
+    .update(places)
+    .set({
+      ratingCount: sql`${places.ratingCount} + 1`,
+      ratingSum: sql`${places.ratingSum} + ${data.rating}`,
+      avgRating: sql`(${places.ratingSum} + ${data.rating})::numeric / (${places.ratingCount} + 1)`,
+    })
+    .where(eq(places.id, data.placeId))
 }
 
 export async function getExistingRatingRepo(placeId: string, userId: string) {
