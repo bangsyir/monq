@@ -37,8 +37,11 @@ export function RatingComponent({
       await addRatingFn({ data: { placeId, rating } })
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["get-place", placeId],
+        exact: true,
+      })
       queryClient.invalidateQueries({ queryKey: ["user-rating", placeId] })
-      queryClient.invalidateQueries({ queryKey: ["get-places", placeId] })
       toast.success("Rating submitted successfully!")
     },
     onError: (error) => {

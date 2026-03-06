@@ -20,22 +20,32 @@ export function getUserRatingRepo(placeId: string, userId: string) {
 export async function insertRatingRepo(data: AddRatingData) {
   const db = createDb()
 
-  const insertReview = db.$with("insert_review").as(
-    db.insert(reviews).values({
+  const updateRating = db.$with("update_rating").as(
+    db
+      .update(places)
+      .set({
+        ratingCount: sql`${places.ratingCount} + 1`,
+        ratingSum: sql`${places.ratingSum} + ${data.rating}`,
+        avgRating: sql`(${places.ratingSum} + ${data.rating})::numeric / (${places.ratingCount} + 1)`,
+      })
+      .where(eq(places.id, data.placeId)),
+  )
+
+  return db
+    .with(updateRating)
+    .insert(reviews)
+    .values({
       placeId: data.placeId,
       userId: data.userId,
       rating: data.rating,
-    }),
-  )
-  return db
-    .with(insertReview)
-    .update(places)
-    .set({
-      ratingCount: sql`${places.ratingCount} + 1`,
-      ratingSum: sql`${places.ratingSum} + ${data.rating}`,
-      avgRating: sql`(${places.ratingSum} + ${data.rating})::numeric / (${places.ratingCount} + 1)`,
     })
-    .where(eq(places.id, data.placeId))
+    .returning({
+      id: reviews.id,
+      placeId: reviews.placeId,
+      userId: reviews.userId,
+      rating: reviews.rating,
+      createdAt: reviews.createdAt,
+    })
 }
 
 export async function getExistingRatingRepo(placeId: string, userId: string) {
@@ -51,17 +61,27 @@ export async function updateRatingRepo(
   newRating: number,
 ) {
   const db = createDb()
-  const existing = await db.query.reviews.findFirst({
-    where: and(eq(reviews.placeId, placeId), eq(reviews.userId, userId)),
-  })
 
-  if (!existing) {
-    throw new Error("Rating not found")
-  }
+  const getOldRating = db.$with("get_old_rating").as(
+    db
+      .select({ rating: reviews.rating })
+      .from(reviews)
+      .where(and(eq(reviews.placeId, placeId), eq(reviews.userId, userId))),
+  )
 
-  const oldRating = existing.rating
+  const updatePlacesWithDiff = db.$with("update_places_with_diff").as(
+    db
+      .with(getOldRating)
+      .update(places)
+      .set({
+        ratingSum: sql`${places.ratingSum} - (SELECT rating FROM get_old_rating) + ${newRating}`,
+        avgRating: sql`CASE WHEN ${places.ratingCount} > 0 THEN (${places.ratingSum} - (SELECT rating FROM get_old_rating) + ${newRating})::numeric / ${places.ratingCount} ELSE 0 END`,
+      })
+      .where(eq(places.id, placeId)),
+  )
 
-  const result = await db
+  return db
+    .with(getOldRating, updatePlacesWithDiff)
     .update(reviews)
     .set({ rating: newRating })
     .where(and(eq(reviews.placeId, placeId), eq(reviews.userId, userId)))
@@ -72,34 +92,35 @@ export async function updateRatingRepo(
       rating: reviews.rating,
       createdAt: reviews.createdAt,
     })
-
-  await db.execute(
-    `UPDATE places SET rating_sum = rating_sum - ${oldRating} + ${newRating}, avg_rating = (rating_sum - ${oldRating} + ${newRating})::numeric / NULLIF(rating_count, 0) WHERE id = '${placeId}'`,
-  )
-
-  return result
 }
 
 export async function deleteRatingRepo(placeId: string, userId: string) {
   const db = createDb()
-  const existing = await db.query.reviews.findFirst({
-    where: and(eq(reviews.placeId, placeId), eq(reviews.userId, userId)),
-  })
 
-  if (!existing) {
-    throw new Error("Rating not found")
-  }
+  const getDeletedRating = db.$with("get_deleted_rating").as(
+    db
+      .select({ rating: reviews.rating })
+      .from(reviews)
+      .where(and(eq(reviews.placeId, placeId), eq(reviews.userId, userId))),
+  )
 
-  const deletedRating = existing.rating
+  const updatePlacesAfterDelete = db.$with("update_places_after_delete").as(
+    db
+      .with(getDeletedRating)
+      .update(places)
+      .set({
+        ratingCount: sql`${places.ratingCount} - 1`,
+        ratingSum: sql`${places.ratingSum} - (SELECT rating FROM get_deleted_rating)`,
+        avgRating: sql`CASE WHEN (${places.ratingCount} - 1) = 0 THEN 0 ELSE (${places.ratingSum} - (SELECT rating FROM get_deleted_rating))::numeric / (${places.ratingCount} - 1) END`,
+      })
+      .where(eq(places.id, placeId)),
+  )
 
   const result = await db
+    .with(getDeletedRating, updatePlacesAfterDelete)
     .delete(reviews)
     .where(and(eq(reviews.placeId, placeId), eq(reviews.userId, userId)))
     .returning({ id: reviews.id })
-
-  await db.execute(
-    `UPDATE places SET rating_count = rating_count - 1, rating_sum = rating_sum - ${deletedRating}, avg_rating = CASE WHEN (rating_count - 1) = 0 THEN 0 ELSE (rating_sum - ${deletedRating})::numeric / (rating_count - 1) END WHERE id = '${placeId}'`,
-  )
 
   return result
 }
