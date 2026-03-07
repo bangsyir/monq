@@ -9,7 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsOfServiceRouteImport } from './routes/terms-of-service'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as PlacesRouteRouteImport } from './routes/places/route'
 import { Route as MapRouteRouteImport } from './routes/map/route'
@@ -31,9 +33,19 @@ import { Route as PlacesPlaceIdCommentsRouteImport } from './routes/places/_.$pl
 import { Route as AdminUsersUserIdUpdateRouteImport } from './routes/admin/users_.$userId.update'
 import { Route as AdminPlacesPlaceIdUpdateRouteImport } from './routes/admin/places/$placeId.update'
 
+const TermsOfServiceRoute = TermsOfServiceRouteImport.update({
+  id: '/terms-of-service',
+  path: '/terms-of-service',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -144,7 +156,9 @@ export interface FileRoutesByFullPath {
   '/map': typeof MapRouteRoute
   '/places': typeof PlacesRouteRouteWithChildren
   '/login': typeof LoginRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/settings': typeof SettingsRoute
+  '/terms-of-service': typeof TermsOfServiceRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/gallery': typeof AdminGalleryRoute
   '/api/upload': typeof ApiUploadRoute
@@ -165,7 +179,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/map': typeof MapRouteRoute
   '/login': typeof LoginRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/settings': typeof SettingsRoute
+  '/terms-of-service': typeof TermsOfServiceRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/gallery': typeof AdminGalleryRoute
   '/api/upload': typeof ApiUploadRoute
@@ -189,7 +205,9 @@ export interface FileRoutesById {
   '/map': typeof MapRouteRoute
   '/places': typeof PlacesRouteRouteWithChildren
   '/login': typeof LoginRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/settings': typeof SettingsRoute
+  '/terms-of-service': typeof TermsOfServiceRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/gallery': typeof AdminGalleryRoute
   '/api/upload': typeof ApiUploadRoute
@@ -214,7 +232,9 @@ export interface FileRouteTypes {
     | '/map'
     | '/places'
     | '/login'
+    | '/privacy-policy'
     | '/settings'
+    | '/terms-of-service'
     | '/admin/categories'
     | '/admin/gallery'
     | '/api/upload'
@@ -235,7 +255,9 @@ export interface FileRouteTypes {
     | '/'
     | '/map'
     | '/login'
+    | '/privacy-policy'
     | '/settings'
+    | '/terms-of-service'
     | '/admin/categories'
     | '/admin/gallery'
     | '/api/upload'
@@ -258,7 +280,9 @@ export interface FileRouteTypes {
     | '/map'
     | '/places'
     | '/login'
+    | '/privacy-policy'
     | '/settings'
+    | '/terms-of-service'
     | '/admin/categories'
     | '/admin/gallery'
     | '/api/upload'
@@ -282,7 +306,9 @@ export interface RootRouteChildren {
   MapRouteRoute: typeof MapRouteRoute
   PlacesRouteRoute: typeof PlacesRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
+  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   SettingsRoute: typeof SettingsRoute
+  TermsOfServiceRoute: typeof TermsOfServiceRoute
   ApiUploadRoute: typeof ApiUploadRoute
   CommentsCommentIdRoute: typeof CommentsCommentIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -290,11 +316,25 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms-of-service': {
+      id: '/terms-of-service'
+      path: '/terms-of-service'
+      fullPath: '/terms-of-service'
+      preLoaderRoute: typeof TermsOfServiceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -490,7 +530,9 @@ const rootRouteChildren: RootRouteChildren = {
   MapRouteRoute: MapRouteRoute,
   PlacesRouteRoute: PlacesRouteRouteWithChildren,
   LoginRoute: LoginRoute,
+  PrivacyPolicyRoute: PrivacyPolicyRoute,
   SettingsRoute: SettingsRoute,
+  TermsOfServiceRoute: TermsOfServiceRoute,
   ApiUploadRoute: ApiUploadRoute,
   CommentsCommentIdRoute: CommentsCommentIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
