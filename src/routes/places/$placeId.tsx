@@ -25,6 +25,7 @@ import { RatingComponent } from "./-components/rating"
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { Footer } from "@/components/footer"
 import ImageGallery from "@/components/image-gallery"
 import { getPlaceByIdNoAuth } from "@/modules/places"
 
@@ -379,7 +380,7 @@ function RouteComponent() {
         </div>
       </main>
 
-      {/* <Footer /> */}
+      <Footer />
     </div>
   )
 }

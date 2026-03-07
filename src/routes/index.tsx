@@ -5,6 +5,7 @@ import { motion } from "framer-motion"
 import { ArrowRight, Sparkles } from "lucide-react"
 import type { Category } from "@/modules/categories"
 import FeaturedPlaces from "@/components/featured-places"
+import { Footer } from "@/components/footer"
 import HeroSection from "@/components/hero-section"
 import { Navbar } from "@/components/navbar"
 import { getCategories } from "@/modules/categories"
@@ -132,11 +133,12 @@ function CategoryCard({
 function App() {
   const { user } = Route.useLoaderData()
   return (
-    <div className="min-h-screen">
+    <div className="flex min-h-screen flex-col">
       <Navbar username={user?.username} role={user.role!} />
       <HeroSection />
       <CategoriesSection />
       <FeaturedPlaces />
+      <Footer />
     </div>
   )
 }

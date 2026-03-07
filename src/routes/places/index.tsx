@@ -11,6 +11,7 @@ import {
 import React from "react"
 import { queryOptions } from "@tanstack/react-query"
 import CategoryFilter from "@/components/category-filter"
+import { Footer } from "@/components/footer"
 import PlaceCard from "@/components/place-card"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -216,6 +217,7 @@ function RouteComponent() {
           )}
         </div>
       </main>
+      <Footer />
     </>
   )
 }
