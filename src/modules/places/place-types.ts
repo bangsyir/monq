@@ -61,7 +61,7 @@ export interface PlaceWithDetailsRaw {
   createdAt: Date
   updatedAt: Date
   categories: Array<string>
-  first_image: PlaceImage | null
+  firstImage: PlaceImage | null
 }
 
 // Transformed return type for getPlacesWithDetailsRepo (same structure as FeaturedPlace)

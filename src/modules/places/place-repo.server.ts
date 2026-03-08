@@ -1,5 +1,4 @@
-import { and, asc, count, desc, eq, ilike, or, sql } from "drizzle-orm"
-import type { FeaturedPlace, PlaceWithDetailsRaw } from "./place-types"
+import { and, asc, between, count, desc, eq, ilike, or, sql } from "drizzle-orm"
 import type { InferInsertModel, SQL } from "drizzle-orm"
 import { createDb } from "@/db"
 import { categories, placeCategories, placeImages, places } from "@/db/schema"
@@ -111,32 +110,32 @@ export function deletePlaceImageRepo(imageId: string) {
 export function getFeaturedPlacesRepo(limit: number = 8) {
   const db = createDb()
   // PostgreSQL JSON aggregation query for featured places
-  const result = db.execute(sql<FeaturedPlace>`
-    SELECT 
-      ${places.id},
-      ${places.name},
-      ${places.description},
-      ${places.latitude},
-      ${places.longitude},
-      ${places.streetAddress} as "streetAddress",
-      ${places.city},
-      ${places.stateProvince} as "stateProvince",
-      ${places.country},
-      ${places.avgRating} as "avgRating",
-      ${places.ratingCount} as "ratingCount",
-      ${places.difficulty},
-      ${places.duration},
-      ${places.distance},
-      ${places.elevation},
-      ${places.amenities},
-      ${places.isFeatured} as "isFeatured",
-      ${places.createdAt},
-      ${places.updatedAt},
-      COALESCE(
+  return db
+    .select({
+      id: places.id,
+      name: places.name,
+      description: places.description,
+      latitude: places.latitude,
+      longitude: places.longitude,
+      streetAddress: places.streetAddress,
+      city: places.city,
+      stateProvince: places.stateProvince,
+      country: places.country,
+      avgRating: places.avgRating,
+      ratingCount: places.ratingCount,
+      difficulty: places.difficulty,
+      duration: places.duration,
+      distance: places.distance,
+      elevation: places.elevation,
+      amenities: places.amenities,
+      isFeatured: places.isFeatured,
+      createdAt: places.createdAt,
+      updatedAt: places.updatedAt,
+      categories: sql<Array<string>>`COALESCE(
         JSON_AGG(DISTINCT ${categories.name}) FILTER (WHERE ${categories.name} IS NOT NULL),
         '[]'::json
-      ) as categories,
-      (
+      )`,
+      firstImage: sql<{ id: string; url: string; alt: string }>`(
         SELECT JSON_BUILD_OBJECT(
           'id', ${placeImages.id},
           'url', ${placeImages.url},
@@ -145,18 +144,18 @@ export function getFeaturedPlacesRepo(limit: number = 8) {
         FROM ${placeImages}
         WHERE ${placeImages.placeId} = ${places.id}
         LIMIT 1
-      ) as first_image
-    FROM ${places}
-    LEFT JOIN ${placeCategories} ON ${places.id} = ${placeCategories.placeId}
-    LEFT JOIN ${categories} ON ${placeCategories.categoryId} = ${categories.id}
-    WHERE ${places.isFeatured} = true
-    GROUP BY ${places.id}
-    ORDER BY ${places.avgRating} DESC
-    LIMIT ${limit}
-  `)
-  return result
+      )`,
+    })
+    .from(places)
+    .leftJoin(placeCategories, eq(places.id, placeCategories.placeId))
+    .leftJoin(categories, eq(placeCategories.categoryId, categories.id))
+    .where(eq(places.isFeatured, true))
+    .groupBy(places.id)
+    .orderBy(desc(places.avgRating))
+    .limit(limit)
 }
 
+// used at /places
 export function getPlacesWithDetailsRepo(
   categoryFilter?: string,
   searchQuery?: string,
@@ -193,32 +192,33 @@ export function getPlacesWithDetailsRepo(
   const whereCondition = sql`${categoryCondition} AND ${searchCondition}`
 
   // PostgreSQL JSON aggregation query - single query, no duplicates
-  return db.execute(sql<PlaceWithDetailsRaw>`
-    SELECT 
-      ${places.id},
-      ${places.name},
-      ${places.description},
-      ${places.latitude},
-      ${places.longitude},
-      ${places.streetAddress} as "streetAddress",
-      ${places.city},
-      ${places.stateProvince} as "stateProvince",
-      ${places.country},
-      ${places.avgRating} as "avgRating",
-      ${places.ratingCount} as "ratingCount",
-      ${places.difficulty},
-      ${places.duration},
-      ${places.distance},
-      ${places.elevation},
-      ${places.bestSeason},
-      ${places.amenities},
-      ${places.isFeatured},
-      ${places.createdAt},
-      ${places.updatedAt},
-      COALESCE(
+  return db
+    .select({
+      id: places.id,
+      name: places.name,
+      description: places.description,
+      latitude: places.latitude,
+      longtitude: places.longitude,
+      streetAdress: places.streetAddress,
+      city: places.city,
+      stateProvince: places.stateProvince,
+      country: places.country,
+      avgRating: places.avgRating,
+      ratingCount: places.ratingCount,
+      difficulty: places.difficulty,
+      duration: places.duration,
+      distance: places.distance,
+      elevation: places.elevation,
+      bestSession: places.bestSeason,
+      amenities: places.amenities,
+      isFeatured: places.isFeatured,
+      createdAt: places.createdAt,
+      updatedAt: places.updatedAt,
+      categories: sql<Array<string>>`COALESCE(
         JSON_AGG(DISTINCT ${categories.name}) FILTER (WHERE ${categories.name} IS NOT NULL),
         '[]'::json
-      ) as categories,
+      )`,
+      firstImage: sql<{ id: string; url: string; alt: string }>`
       (
         SELECT JSON_BUILD_OBJECT(
           'id', ${placeImages.id},
@@ -228,15 +228,15 @@ export function getPlacesWithDetailsRepo(
         FROM ${placeImages}
         WHERE ${placeImages.placeId} = ${places.id}
         LIMIT 1
-      ) as first_image
-    FROM ${places}
-    LEFT JOIN ${placeCategories} ON ${places.id} = ${placeCategories.placeId}
-    LEFT JOIN ${categories} ON ${placeCategories.categoryId} = ${categories.id}
-    WHERE ${whereCondition}
-    GROUP BY ${places.id}
-    LIMIT ${limit}
-    offset ${offset}
-  `)
+      ) as "firstImage"`,
+    })
+    .from(places)
+    .leftJoin(placeCategories, eq(places.id, placeCategories.placeId))
+    .leftJoin(categories, eq(placeCategories.categoryId, categories.id))
+    .where(whereCondition)
+    .groupBy(places.id)
+    .limit(limit!)
+    .offset(offset!)
 }
 
 export function placeConditionFilterRepo(search: string | undefined) {
@@ -362,35 +362,42 @@ export function getPlacesByBoundsRepo(bounds: {
   west: number
 }) {
   const db = createDb()
-  return db.execute(sql<any>`
-    SELECT 
-      ${places.id},
-      ${places.name},
-      ${places.description},
-      ${places.latitude},
-      ${places.longitude},
-      ${places.streetAddress} as "streetAddress",
-      ${places.city},
-      ${places.stateProvince} as "stateProvince",
-      ${places.postcode},
-      ${places.country},
-      ${places.avgRating},
-      ${places.ratingCount} as "reviewCount",
-      ${places.difficulty},
-      ${places.distance},
-      ${places.isFeatured},
-      (
-        SELECT JSON_BUILD_OBJECT(
-          'id', ${placeImages.id},
-          'url', ${placeImages.url},
-          'alt', ${placeImages.alt}
-        )
-        FROM ${placeImages}
-        WHERE ${placeImages.placeId} = ${places.id}
-        LIMIT 1
-      ) as first_image
-    FROM ${places}
-    WHERE ${places.latitude} BETWEEN ${bounds.south} AND ${bounds.north} 
-      AND ${places.longitude} BETWEEN ${bounds.west} AND ${bounds.east}
-  `)
+
+  return db
+    .select({
+      id: places.id,
+      name: places.name,
+      description: places.description,
+      latitude: places.latitude,
+      longitude: places.longitude,
+      streetAddress: places.streetAddress,
+      city: places.city,
+      postcode: places.postcode,
+      stateProvince: places.stateProvince,
+      country: places.country,
+      avgRating: places.avgRating,
+      ratingCount: places.ratingCount,
+      difficulty: places.difficulty,
+      distance: places.distance,
+      isFeatured: places.isFeatured,
+      firstImage: sql<{ id: string; url: string; alt: string }>`
+        (
+          SELECT JSON_BUILD_OBJECT(
+            'id', ${placeImages.id},
+            'url', ${placeImages.url},
+            'alt', ${placeImages.alt}
+          )
+          FROM ${placeImages}
+          WHERE ${placeImages.placeId} = ${places.id}
+          LIMIT 1
+        ) as "firstImage"
+      `,
+    })
+    .from(places)
+    .where(
+      and(
+        between(places.latitude, bounds.south, bounds.north),
+        between(places.longitude, bounds.west, bounds.east),
+      ),
+    )
 }

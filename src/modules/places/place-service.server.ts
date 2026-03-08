@@ -261,10 +261,9 @@ export async function getPlacesForIndexService(
       error,
     }
   }
-
   // Transform the result to match the expected format
   const placesWithDetails = (
-    result.rows as unknown as Array<PlaceWithDetailsRaw>
+    result as unknown as Array<PlaceWithDetailsRaw>
   ).map((row) => ({
     id: row.id,
     name: row.name,
@@ -278,9 +277,8 @@ export async function getPlacesForIndexService(
       country: row.country || "",
     },
     categories: row.categories || [],
-    images: row.first_image ? [row.first_image] : [],
+    images: row?.firstImage && row.firstImage.id ? [row.firstImage] : [],
     rating: row.avgRating,
-    reviewCount: row.ratingCount,
     amenities: (row.amenities || [])?.map((amenity: string, index: number) => ({
       id: index.toString(),
       name: amenity,
@@ -317,9 +315,7 @@ export async function getFeaturedPlacesService(limit: number = 8) {
     return { data: null, error }
   }
   // Transform the result to match the expected format
-  const placesWithDetails = (
-    result.rows as unknown as Array<PlaceWithDetailsRaw>
-  ).map((row) => ({
+  const placesWithDetails = result.map((row) => ({
     id: row.id,
     name: row.name,
     description: row.description,
@@ -332,9 +328,8 @@ export async function getFeaturedPlacesService(limit: number = 8) {
       country: row.country || "",
     },
     categories: row.categories || [],
-    images: row.first_image && row.first_image.id ? [row.first_image] : [],
+    images: row?.firstImage && row.firstImage.id ? [row.firstImage] : [],
     rating: row.avgRating,
-    reviewCount: row.ratingCount,
     amenities: (row.amenities || []).map((amenity: string, index: number) => ({
       id: index.toString(),
       name: amenity,
@@ -344,7 +339,6 @@ export async function getFeaturedPlacesService(limit: number = 8) {
     duration: row.duration,
     distance: row.distance,
     elevation: row.elevation,
-    bestSeason: row.bestSeason,
     isFeatured: row.isFeatured,
     createdAt: row.createdAt
       ? new Date(row.createdAt).toISOString()
@@ -389,7 +383,7 @@ export async function getPlacesByBoundsService(bounds: {
     return { data: null, error }
   }
   return {
-    data: result.rows as unknown as Array<PlaceByBoundsData>,
+    data: result,
     error: null,
   }
 }
