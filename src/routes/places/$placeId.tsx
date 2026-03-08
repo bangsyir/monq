@@ -83,6 +83,7 @@ export const Route = createFileRoute("/places/$placeId")({
 
 function RouteComponent() {
   const { place, isLoggedIn, currentUserId } = Route.useLoaderData()
+
   if (!place) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -92,8 +93,9 @@ function RouteComponent() {
           </h1>
           <Link
             to="/places"
-            search={{ cat: "all" }}
+            search={(prev) => prev}
             className={buttonVariants({ variant: "ghost" })}
+            resetScroll={false}
           >
             <ChevronsLeft className="h-5 w-5" />
             Back to places
@@ -109,8 +111,9 @@ function RouteComponent() {
         <div className="container mx-auto px-4 py-4">
           <Link
             to="/places"
-            search={{ cat: "all" }}
+            search={(prev) => prev}
             className={buttonVariants({ variant: "ghost" })}
+            resetScroll={false}
           >
             <ChevronsLeft className="h-5 w-5" />
             Back to places

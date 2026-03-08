@@ -53,12 +53,11 @@ export interface PlaceComment {
 export interface Place {
   id: string
   name: string
-  description: string
-  categories: Array<PlaceCategory>
+  description: string | null
+  categories: Array<string>
   location: PlaceLocation
   images: Array<PlaceImage>
-  avgRating: number
-  ratingCount: number
+  rating: number
   amenities: Array<PlaceAmenity>
   difficulty?: "easy" | "moderate" | "hard" | "expert"
   duration?: string

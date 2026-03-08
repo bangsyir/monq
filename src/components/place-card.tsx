@@ -26,6 +26,7 @@ const PlaceCard = ({ place, index = 0 }: PlaceCardProps) => {
       <Link
         to={`/places/$placeId`}
         params={{ placeId: place.id }}
+        search={true}
         className="group block"
       >
         <div className="relative overflow-hidden rounded-xl">
@@ -89,7 +90,9 @@ const PlaceCard = ({ place, index = 0 }: PlaceCardProps) => {
             </h3>
             <div className="flex shrink-0 items-center gap-1">
               <Star className="fill-foreground text-foreground h-4 w-4" />
-              <span className="text-sm font-medium">{place.avgRating}</span>
+              <span className="text-sm font-medium">
+                {Number(place.rating).toFixed(1)}
+              </span>
             </div>
           </div>
 
