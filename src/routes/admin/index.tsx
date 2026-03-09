@@ -1,37 +1,35 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { motion } from "framer-motion"
 import { Flag, MapPin, TrendingUp, Users } from "lucide-react"
-import { useQuery } from "@tanstack/react-query"
-import { useServerFn } from "@tanstack/react-start"
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { getDashboardStats, getRecentData } from "@/modules/dashboard"
 
+const dashboardStatsOptions = () =>
+  queryOptions({
+    queryKey: ["dashboard-stats"],
+    queryFn: () => getDashboardStats(),
+  })
+
+const recentDataOptions = () =>
+  queryOptions({
+    queryKey: ["dashboard-recent"],
+    queryFn: () => getRecentData(),
+  })
+
 export const Route = createFileRoute("/admin/")({
-  loader: async () => {
-    const stats = await getDashboardStats()
-    const recent = await getRecentData()
-    return { stats, recent }
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(dashboardStatsOptions())
+    await context.queryClient.ensureQueryData(recentDataOptions())
   },
   component: AdminDashboard,
 })
 
 function AdminDashboard() {
-  const { stats, recent } = Route.useLoaderData()
-  const getStatsFn = useServerFn(getDashboardStats)
-  const getRecentFn = useServerFn(getRecentData)
+  const { data: dashboardStats } = useSuspenseQuery(dashboardStatsOptions())
 
-  const { data: dashboardStats } = useQuery({
-    queryKey: ["dashboard-stats"],
-    queryFn: () => getStatsFn(),
-    initialData: stats,
-  })
-
-  const { data: recentData } = useQuery({
-    queryKey: ["dashboard-recent"],
-    queryFn: () => getRecentFn(),
-    initialData: recent,
-  })
+  const { data: recentData } = useSuspenseQuery(recentDataOptions())
 
   const formatNumber = (num: number) => {
     if (num >= 1000) {
@@ -65,12 +63,7 @@ function AdminDashboard() {
 
   return (
     <main className="pt-5">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="mb-8"
-      >
+      <div className="mb-8">
         <div className="mb-2 flex items-center gap-3">
           <h1 className="text-foreground text-2xl font-bold md:text-3xl">
             Admin Dashboard
@@ -79,13 +72,8 @@ function AdminDashboard() {
         <p className="text-muted-foreground">
           Manage users, places, and reports
         </p>
-      </motion.div>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4"
-      >
+      </div>
+      <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
         {dashboardStatsList.map((stat) => (
           <Card key={stat.label}>
             <CardContent>
@@ -103,7 +91,7 @@ function AdminDashboard() {
             </CardContent>
           </Card>
         ))}
-      </motion.div>
+      </div>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
