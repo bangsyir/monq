@@ -79,6 +79,20 @@ export const Route = createFileRoute("/places/$placeId")({
     )
     return { place, isLoggedIn, currentUserId }
   },
+  head: ({ loaderData }) => ({
+    meta: [
+      {
+        charSet: "utf-8",
+      },
+      {
+        name: "viewport",
+        content: "width=device-width, initial-scale=1",
+      },
+      {
+        title: `${loaderData?.place?.name}`,
+      },
+    ],
+  }),
 })
 
 function RouteComponent() {
