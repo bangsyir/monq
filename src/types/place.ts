@@ -9,7 +9,7 @@ export type PlaceCategory =
 export interface PlaceLocation {
   latitude: number
   longitude: number
-  streetAddres: string
+  streetAddress: string
   city: string
   stateProvince: string
   country: string
