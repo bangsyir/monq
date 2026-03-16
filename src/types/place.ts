@@ -57,13 +57,13 @@ export interface Place {
   categories: Array<string>
   location: PlaceLocation
   images: Array<PlaceImage>
-  rating: number
+  rating: number | null
   amenities: Array<PlaceAmenity>
-  difficulty?: "easy" | "moderate" | "hard" | "expert"
-  duration?: string
-  distance?: string
-  elevation?: string
-  bestSeason?: Array<string>
+  difficulty?: string | null
+  duration?: number | null
+  distance?: number | null
+  elevation?: number | null
+  bestSeason?: Array<string> | null
   isFeatured?: boolean
   createdAt: string
 }

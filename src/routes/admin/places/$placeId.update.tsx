@@ -1,9 +1,9 @@
 import { useForm } from "@tanstack/react-form"
-import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router"
 import { ChevronsLeft, MapPin, X } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import {
   Field,
   FieldDescription,
@@ -109,16 +109,18 @@ function RouteComponent() {
     })
   }
 
-  const handleBack = () => {
-    navigate({ to: "/admin/places" })
-  }
-
   return (
     <div className="pb-10">
-      <Button variant="ghost" onClick={handleBack} className="mt-5 mb-4">
+      <Link
+        to="/admin/places"
+        // @ts-expect-error
+        search={(prev) => prev}
+        className={buttonVariants({ variant: "ghost", className: "my-4" })}
+      >
         <ChevronsLeft className="h-5 w-5" />
         Back to Places
-      </Button>
+      </Link>
+
       <div className="mb-6">
         <h1 className="mb-2 text-2xl font-bold">Update Place</h1>
         <div className="flex gap-4 text-sm text-gray-600">

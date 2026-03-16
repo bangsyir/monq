@@ -283,6 +283,7 @@ function RouteComponent() {
                               <Link
                                 to={"/admin/places/$placeId/update"}
                                 params={{ placeId: place.id }}
+                                search={true}
                               />
                             }
                           >
