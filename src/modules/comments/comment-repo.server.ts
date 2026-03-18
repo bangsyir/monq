@@ -132,8 +132,8 @@ export function getCommentByIdRepo(commentId: string) {
         columns: {
           id: true,
           name: true,
-          rating: true,
-          reviewCount: true,
+          avgRating: true,
+          ratingCount: true,
           streetAddress: true,
           city: true,
           stateProvince: true,
