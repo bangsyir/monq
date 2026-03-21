@@ -565,12 +565,7 @@ function RouteComponent() {
         </motion.div>
         <Separator className="my-2" />
         {/* Replies Section - Background Color Style */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="pt-4 pl-12"
-        >
+        <div className="pt-4 pl-12">
           <div className="space-y-3">
             {isLoadingReplies && replies.length === 0 ? (
               <div className="flex items-center justify-center py-8">
@@ -690,7 +685,7 @@ function RouteComponent() {
               </>
             )}
           </div>
-        </motion.div>
+        </div>
       </main>
     </div>
   )

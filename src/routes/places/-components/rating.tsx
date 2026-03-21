@@ -101,7 +101,7 @@ export function RatingComponent({
                 key={star}
                 className={`h-6 w-6 ${
                   star <= userRating.rating
-                    ? "fill-accent text-accent"
+                    ? "text-accent fill-yellow-500 text-yellow-500"
                     : "text-muted-foreground"
                 }`}
               />

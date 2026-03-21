@@ -156,7 +156,9 @@ function RouteComponent() {
                     </h1>
                     <div className="text-muted-foreground flex flex-wrap items-center gap-4">
                       <div className="flex items-center gap-1">
-                        <Star className="fill-accent text-accent h-5 w-5" />
+                        <Star
+                          className={`fill-accent ${place.avgRating !== 0 && "fill-yellow-500 text-yellow-500"} h-5 w-5`}
+                        />
                         <span className="text-foreground font-semibold">
                           {place.avgRating}
                         </span>
